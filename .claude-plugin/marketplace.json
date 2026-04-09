@@ -1,0 +1,22 @@
+{
+  "name": "phejno-plugins",
+  "owner": {
+    "name": "Przemyslaw Hejno"
+  },
+  "metadata": {
+    "description": "Personal Claude Code plugins",
+    "version": "1.0.0"
+  },
+  "plugins": [
+    {
+      "name": "claude-project-index",
+      "source": {
+        "source": "url",
+        "url": "https://github.com/przemyslawhejno/claude-project-index.git",
+        "sha": "7e2904a2204347a3874a879f5bae47c5f2792ff1"
+      },
+      "description": "Generates and maintains a compact project index in .claude/index/ for fast file lookup, reducing token usage and speeding up navigation",
+      "version": "0.1.0"
+    }
+  ]
+}
