@@ -13,10 +13,10 @@
       "source": {
         "source": "url",
         "url": "https://github.com/przemyslawhejno/claude-project-index.git",
-        "sha": "d773cf222887abbcc41f46cc532a7794c285c605"
+        "sha": "6ad407255c2c8dbbf2f86b77ead8e123450723c5"
       },
       "description": "Generates and maintains a compact project index in .claude/index/ for fast file lookup, reducing token usage and speeding up navigation",
-      "version": "0.2.0"
+      "version": "0.3.0"
     }
   ]
 }
