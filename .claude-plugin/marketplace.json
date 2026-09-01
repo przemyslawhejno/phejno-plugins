@@ -13,10 +13,10 @@
       "source": {
         "source": "url",
         "url": "https://github.com/przemyslawhejno/claude-codemap.git",
-        "sha": "4371385210160c838605a437519aec920dd6a0cc"
+        "sha": "3e366626bebfd5d0d699f74657220a40f4e96293"
       },
       "description": "Generates and maintains a codemap in .claude/codemap/ for fast file lookup and symbol navigation, reducing token usage and speeding up navigation",
-      "version": "0.4.0"
+      "version": "0.5.0"
     }
   ]
 }
