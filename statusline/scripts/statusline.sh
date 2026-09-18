@@ -1,5 +1,14 @@
 #!/usr/bin/env bash
 export LC_NUMERIC=C
+
+# Hard dependency: jq is used throughout to parse the JSON piped in via stdin.
+# Fail loud (in the status line itself, since stderr isn't shown) rather than
+# silently producing an empty/garbled line.
+if ! command -v jq >/dev/null 2>&1; then
+  printf "\033[31mstatusline plugin: 'jq' not found on PATH - install it (e.g. apt/brew/snap install jq)\033[0m"
+  exit 0
+fi
+
 input=$(cat)
 
 cwd=$(echo "$input" | jq -r '.workspace.current_dir // .cwd // "?"')

@@ -22,7 +22,7 @@
       "name": "statusline",
       "source": "./statusline",
       "description": "Custom status line: model/effort, context usage, cache hit rate, rate limits, session/daily/monthly cost, git branch, and cwd",
-      "version": "1.0.0"
+      "version": "1.1.0"
     }
   ]
 }
