@@ -34,3 +34,7 @@ Writes cost 60% more, so compare `/model-manager:mm-report` before and after.
 | `modu-ai/moai-adk` | role table of model plus effort, effort by task class | the whole harness |
 | `NeoLabHQ/context-engineering-kit` | decision-table shape only (GPL-3.0, no text copied) | Opus as the default, mandatory self-critique |
 | `gargpratyush/jev-router` | | sends routing through an external API key |
+
+## Ongoing measurement
+
+`scripts/report.py --since YYYY-MM-DD --json` adds dispatches by model and effort, named agents and hook denials. `scripts/review.sh` asks a short Sonnet run for conclusions from JSON snapshots in `~/.claude/model-manager/snapshots/` and writes them to `reviews/`. To schedule both, run `bash scripts/install-timers.sh` yourself; the file header shows how to remove them.

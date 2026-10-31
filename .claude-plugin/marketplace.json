@@ -28,7 +28,7 @@
       "name": "model-manager",
       "source": "./model-manager",
       "description": "Per-task model and effort policy for subagents, dispatch enforcement and cost report by model",
-      "version": "0.1.0"
+      "version": "0.2.0"
     }
   ]
 }
