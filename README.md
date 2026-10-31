@@ -27,3 +27,11 @@ claude plugins install statusline@phejno-plugins
 ```
 
 After installing, run `/statusline:setup-statusline` to wire it into `~/.claude/settings.json`, then restart Claude Code. Requires `jq` and `git` on PATH.
+
+### model-manager
+
+Per-task model and effort policy for subagents: Opus coordinates, Sonnet implements, Haiku does mechanical work. Enforces explicit dispatch choices and reports cost by model.
+
+```bash
+claude plugins install model-manager@phejno-plugins
+```
