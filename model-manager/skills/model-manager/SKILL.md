@@ -35,6 +35,20 @@ Tasks run at the same time when their `Files:` lists are disjoint and neither de
 
 The coordinator starts anything over 4 minutes in the background and hands the finished log to haiku low. Long waits inside a subagent expire its cache, and the next turn rewrites the whole context.
 
+## Cleanup
+
+A finished agent makes no requests and costs nothing. An agent still running costs tokens on every turn, and a leftover server, browser or test run holds CPU and can distort other sessions' tests.
+
+Check the running list before ending a turn and after any change of direction:
+
+| State | Action |
+|---|---|
+| Finished | none |
+| Doing needed work, recent progress | keep |
+| Work superseded or no longer needed | TaskStop |
+| Repeating the same step, or no new output since the last check | read its output, then TaskStop and re-dispatch with a sharper brief |
+| Shell, server or browser you started, its check is done | stop it; kill only your own PIDs |
+
 ## Brief
 
 A brief holds the goal, the files, what is already ruled out, and the check that proves the task done. Point at files instead of pasting them.
