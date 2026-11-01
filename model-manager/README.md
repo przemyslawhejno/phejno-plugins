@@ -20,7 +20,7 @@ Requires Claude Code 2.1.292+ (the `effort` parameter on `Agent`) and `python3`.
 
 The table replaces patching agent frontmatter in `~/.claude/plugins/cache`, which every plugin update overwrites. A model on the `Agent` call beats frontmatter, so the routing survives updates. Without it, an agent with `model: inherit` runs on the main session's model, and `CLAUDE_CODE_SUBAGENT_MODEL` does not apply to it.
 
-A routed call returns `permissionDecision: "allow"`, so a permission rule that would ask about that `Agent` call no longer does.
+A routed call returns only `updatedInput`, without a permission decision, so your permission rules for `Agent` still apply.
 
 ## Main session stays yours
 

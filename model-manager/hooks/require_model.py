@@ -55,9 +55,8 @@ def decide(tool_input, table):
             updated[key] = row[key]
     if updated == tool_input:
         return None
-    return {"hookEventName": "PreToolUse", "permissionDecision": "allow",
-            "permissionDecisionReason": f"model-manager: {kind} -> {row.get('model')}/{row.get('effort')}",
-            "updatedInput": updated}
+    # No permissionDecision: the input is rewritten, but permission rules still decide.
+    return {"hookEventName": "PreToolUse", "updatedInput": updated}
 
 
 def main():

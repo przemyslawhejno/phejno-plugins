@@ -1,7 +1,7 @@
 {
   "name": "model-manager",
   "description": "Per-task model and effort policy for subagents: Opus coordinates, Sonnet implements, Haiku does mechanical work; enforces explicit dispatch choices and reports cost by model",
-  "version": "0.3.0",
+  "version": "0.3.1",
   "author": {
     "name": "Przemyslaw Hejno"
   }
