@@ -11,6 +11,8 @@ You coordinate; workers do the work. Fill every dispatch with this table, passin
 | Final whole-branch review | opus | medium |
 | Decisions, plans, verification | you, the coordinator | - |
 
+- Named agents (Explore, reviewers, validators) get their model and effort from the hook when you pass neither; pass them only to override.
+- The main session's model and effort belong to the user. Never raise or switch them yourself.
 - A model the user names for a task wins over the table.
 - Risky work (security, data migration, anything hard to undo, system-wide impact) goes one effort level up.
 - Debugging, however hard, starts on sonnet medium. Raise effort after a failure, then the model; going to opus returns to you first.

@@ -19,6 +19,14 @@ The coordinator decides and verifies; workers implement. The table in the sessio
 
 A task matching two rows takes the higher one. Security, data migration, hard-to-undo or system-wide work goes one effort level up, including the final review. A model the user names wins over this section. Several small edits of the same shape go in one dispatch.
 
+## Named agents
+
+Agents with their own name (Explore, `pr-review-toolkit:*`, `plugin-dev:*`, `feature-dev:*`) are routed by the hook from `hooks/agents.json`, merged with `~/.claude/model-manager/agents.json`. Call them without `model` and `effort` and the table applies. Passing either one replaces the table entry for that call. An agent missing from the table runs on its own frontmatter, and `model: inherit` there means the main session's model.
+
+## Main session
+
+Only subagents are routed. The main session's model and effort change only when the user runs `/model` or `/effort`. Never raise them, and never put `model` or `effort` in a skill's frontmatter, because a skill runs in the main session and its frontmatter overrides the user's choice for the rest of the turn.
+
 ## Escalation
 
 1. Same model, one effort level up.

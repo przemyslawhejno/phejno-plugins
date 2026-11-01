@@ -3,11 +3,32 @@
 Keeps delegated work on the cheapest capable model. It complements `superpowers`.
 
 - A SessionStart hook injects the dispatch table into each new session.
-- A PreToolUse hook denies a generic `Agent` call that lacks `model` and `effort`; the denial explains the table, so the agent retries. Forks and named agents pass. `MODEL_MANAGER_ENFORCE=0` turns it off.
+- A PreToolUse hook denies a generic `Agent` call that lacks `model` and `effort`; the denial explains the table, so the agent retries.
+- The same hook routes named agents (Explore, reviewers, validators) through `updatedInput`, using `hooks/agents.json`, when the call passes neither `model` nor `effort`. Forks and unlisted agents pass. `MODEL_MANAGER_ENFORCE=0` turns the whole hook off.
 - The `model-manager` skill covers classification, escalation, lanes and long jobs.
 - `/model-manager:mm-report` shows estimated cost by model.
 
 Requires Claude Code 2.1.292+ (the `effort` parameter on `Agent`) and `python3`.
+
+## Named agents
+
+`hooks/agents.json` maps agent names to a model and an effort. To change an entry or add one, put a file at `~/.claude/model-manager/agents.json` with the same shape. Its entries replace the defaults, and `null` removes one:
+
+```json
+{ "pr-review-toolkit:code-reviewer": { "model": "opus", "effort": "high" }, "Explore": null }
+```
+
+The table replaces patching agent frontmatter in `~/.claude/plugins/cache`, which every plugin update overwrites. A model on the `Agent` call beats frontmatter, so the routing survives updates. Without it, an agent with `model: inherit` runs on the main session's model, and `CLAUDE_CODE_SUBAGENT_MODEL` does not apply to it.
+
+A routed call returns `permissionDecision: "allow"`, so a permission rule that would ask about that `Agent` call no longer does.
+
+## Main session stays yours
+
+The plugin routes only subagents. It never sets a model or effort on skills, because skills run in the main session and skill frontmatter overrides `/effort` for the rest of the turn. To set a default effort per model, use `modelSettings` in `~/.claude/settings.json`. A plugin cannot set it. Opus 5.5 and later read effort only from there, not from the top-level `effortLevel`:
+
+```json
+{ "modelSettings": { "claude-opus-5-5": { "effortLevel": "medium" } } }
+```
 
 ## Optional: one-hour cache for subagents
 

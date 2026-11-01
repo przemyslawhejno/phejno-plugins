@@ -30,7 +30,7 @@ After installing, run `/statusline:setup-statusline` to wire it into `~/.claude/
 
 ### model-manager
 
-Per-task model and effort policy for subagents: Opus coordinates, Sonnet implements, Haiku does mechanical work. Enforces explicit dispatch choices and reports cost by model.
+Per-task model and effort policy for subagents: Opus coordinates, Sonnet implements, Haiku does mechanical work. Enforces explicit dispatch choices, routes named agents such as reviewers and Explore, and reports cost by model.
 
 ```bash
 claude plugins install model-manager@phejno-plugins

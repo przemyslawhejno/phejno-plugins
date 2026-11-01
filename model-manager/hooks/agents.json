@@ -1,0 +1,19 @@
+{
+  "Explore": { "model": "haiku", "effort": "low" },
+  "episodic-memory:search-conversations": { "model": "haiku", "effort": "low" },
+
+  "plugin-dev:plugin-validator": { "model": "sonnet", "effort": "low" },
+  "plugin-dev:skill-reviewer": { "model": "sonnet", "effort": "medium" },
+  "plugin-dev:agent-creator": { "model": "sonnet", "effort": "medium" },
+  "feature-dev:code-explorer": { "model": "sonnet", "effort": "medium" },
+  "feature-dev:code-reviewer": { "model": "sonnet", "effort": "medium" },
+  "pr-review-toolkit:comment-analyzer": { "model": "sonnet", "effort": "medium" },
+  "pr-review-toolkit:pr-test-analyzer": { "model": "sonnet", "effort": "high" },
+
+  "pr-review-toolkit:type-design-analyzer": { "model": "opus", "effort": "high" },
+  "pr-review-toolkit:code-simplifier": { "model": "opus", "effort": "high" },
+  "code-simplifier:code-simplifier": { "model": "opus", "effort": "high" },
+  "pr-review-toolkit:code-reviewer": { "model": "opus", "effort": "xhigh" },
+  "pr-review-toolkit:silent-failure-hunter": { "model": "opus", "effort": "xhigh" },
+  "feature-dev:code-architect": { "model": "opus", "effort": "xhigh" }
+}
