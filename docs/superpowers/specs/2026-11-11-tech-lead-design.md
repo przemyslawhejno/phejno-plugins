@@ -58,7 +58,7 @@ Rules:
 - A fable subagent is the exception. Architecture, ambiguous requirements and system-wide decisions belong to the lead itself. Delegate to fable only when the work would flood the lead's context or must run beside other work.
 - Escalation follows model-manager: effort up, then model up, then back to the lead. The lead decides whether to take the task itself or dispatch fable.
 - Never plan a task on fable or opus that sonnet or haiku can handle reliably. A first-attempt fable task needs a risk or ambiguity reason in the ledger.
-- The main session's model belongs to the user. The skill never switches it. The command suggests `/model fable` once and carries on with whatever model is active.
+- The lead runs on whatever model the session uses. The user chooses it; the skill and the command never switch it and never suggest another model for the lead.
 
 ## Ledger
 
@@ -121,7 +121,7 @@ The skill is checked by reading it against this spec and by running `/tech-lead:
 
 ## Out of scope
 
-- No hook, and no change to the main session's model or effort.
+- No hook, and no change or suggested change to the main session's model or effort.
 - No automatic resume after a session restart. Running the command again with the ledger path resumes from `ledger.py next`.
 - No changes to model-manager code or tables.
 - `Workflow` orchestration: its agents bypass the model-manager hook.
