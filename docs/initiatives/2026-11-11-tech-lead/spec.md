@@ -17,6 +17,7 @@ Success means: the spec is completed at full quality and nothing in it is lost; 
 - `model-manager` stays the source of truth for the dispatch table, the Agent hook, named-agent routing, lanes and the cost report. Its code does not change.
 - An independent fable review of the first draft was accepted in full; this version incorporates it.
 - Prior-art search is a standard step.
+- Every plan is reviewed by an independent agent and corrected before the user sees it; the lead then recommends implementing it. In autopilot, agreed beforehand, the lead goes from plan to goal without the gate.
 - Quality foundation: project standards, shared checks, ADRs.
 - An HTML mockup is part of the spec whenever the work has a UI, a user flow or behaviour easier shown than described. The lead makes it without asking; the user can decline it.
 - Every artifact lives inside the project directory, in the hierarchy below, unless the user says otherwise.
@@ -82,16 +83,18 @@ A SessionStart hook (`startup`, `clear`, `compact`) runs `status.py --brief`. Wh
 5. **Prior art.** Unless the spec is small or entirely project-specific glue, name 1 to 4 areas where building from scratch is costly. Dispatch one scout per area in parallel (sonnet low, read-only, brief in `scout-prompt.md`). Search order: this repository and the user's other repositories, package registries, GitHub, the web. Each scout writes its report to `research/` and returns at most 3 candidates with name, URL, pinned version or SHA, license, last release, maintenance state, fit, and a mode: `dependency`, `copy` (with attribution), `pattern` or `reject`. The lead decides per area. When the network blocks the search, the lead records `skipped: no network` and continues.
 6. **Spikes.** A task whose approach is unknown gets a spike before planning: sonnet medium, working in `.tech-lead/scratch/`, returning an answer recorded in `research/`, not code to keep.
 7. **Plan and ledger.** Run `superpowers:writing-plans`, saving `plan.md` in the initiative folder. Write `ledger.json` with one entry per plan task, copying each task's run commands into `verify`. Requirements may point at mockup sections. Assign models by assessing complexity, reasoning need, risk and scope, taking the lowest row of the tier table that fits, with one sentence of reason. Run `ledger.py check` until it passes.
-8. **Gate.** One message holds the plan path, the `ledger.py show` output unchanged, and the execution question writing-plans would ask. This replaces writing-plans' separate plan review. Nothing that edits project code is dispatched before approval; standards discovery, mockups, scouts, Explore and spikes may run before it. The approval goes into `journal.md`.
-9. **Execute by waves.** `ledger.py next` names the current wave. For each wave:
+8. **Plan review.** As soon as the plan and ledger pass `ledger.py check`, the lead dispatches an independent reviewer without asking (`plan-review-prompt.md`, read-only): spec coverage, task size and boundaries, interfaces between tasks, dependencies and waves, model and effort per task (too high wastes cost, too low risks failure), `verify` commands that really prove acceptance, Review Focus, and risks the plan ignores. Model: sonnet medium; opus medium when the spec is large, system-wide or risky; never the lead reviewing its own plan. The reviewer writes its report to `research/plan-review.md`. The lead applies the findings it accepts, records rejected ones with a reason, runs `ledger.py check` again, and repeats the review once more only when blocking findings changed the plan, at most 2 rounds. The outcome goes into `journal.md`.
+9. **Gate.** One message holds the plan path, a short plan-review summary (rounds, what changed, what was rejected and why), the `ledger.py show` output unchanged, and a recommendation to implement with the execution question writing-plans would ask. This replaces writing-plans' separate plan review. Nothing that edits project code is dispatched before approval; standards discovery, mockups, scouts, Explore, spikes and the plan review may run before it. The approval goes into `journal.md`.
+   - **Autopilot.** When the user said beforehand that the work should go from plan to goal without stopping (in words, or `/tech-lead:run --auto`), the ledger's `mode` is `autopilot` and the gate is skipped once the plan review is clean: the lead posts the same gate message as a status note and goes straight to execution. Autopilot still stops for SDD's four stop reasons (an irreversible or destructive operation, a security-sensitive action, a side effect outside the worktree such as a merge, push to a shared branch or publish, and a plan so broken that every path is a guess) and for a change that adds requirements beyond the spec. Other re-gate thresholds become rulings, recorded in the journal and listed in the finish report.
+10. **Execute by waves.** `ledger.py next` names the current wave. For each wave:
    1. Reset the lane worktrees to the integration branch head (see Lanes).
    2. Dispatch each task's implementer with the ledger's model and effort, using SDD's implementer prompt plus the paths of `standards.md` and, for UI tasks, `mockup.html`.
    3. Review: one reviewer dispatch per lane batch of up to 4 tasks, with a verdict per task (`batch-review-prompt.md`), checking spec compliance, `standards.md`, and the mockup for UI tasks. The reviewer's model follows SDD's rule, scaled to the diff, with sonnet medium as the floor; a risky task raises it one effort level.
    4. Fix loop per task, following Escalation.
    5. Merge the lane branches into the integration branch.
    6. Run `ledger.py checkpoint --mark`. A failure goes back to the fix loop of the failing task. On success it records the wave's tasks as done in the ledger and appends to the journal; the lead runs `status.py --write` and commits ledger, journal and status together.
-10. **Rulings.** Decisions during execution follow SDD's "Rulings, not stalls". The user is asked again only when a requirement or the scope changes, or when new opus or fable work is added; the question shows the ledger change as `git diff`. A decision that shapes the system beyond this initiative becomes an ADR. Found work outside the scope goes to `backlog.md`.
-11. **Finish.** Final whole-branch review on opus medium, one effort level up for risky work, plus `security-review` when the work is security-sensitive and the skill is available. Walk the requirement list against the result, run `superpowers:verification-before-completion` and `superpowers:finishing-a-development-branch`. The report lists what was done, rulings, escalations with their cause, what was reused and from where, new backlog items, and points to `/model-manager:mm-report` for cost by model. Then propose next steps from `STATUS.md`.
+11. **Rulings.** Decisions during execution follow SDD's "Rulings, not stalls". The user is asked again only when a requirement or the scope changes, or when new opus or fable work is added; the question shows the ledger change as `git diff`. A decision that shapes the system beyond this initiative becomes an ADR. Found work outside the scope goes to `backlog.md`.
+12. **Finish.** Final whole-branch review on opus medium, one effort level up for risky work, plus `security-review` when the work is security-sensitive and the skill is available. Walk the requirement list against the result, run `superpowers:verification-before-completion` and `superpowers:finishing-a-development-branch`. The report lists what was done, rulings, escalations with their cause, what was reused and from where, new backlog items, and points to `/model-manager:mm-report` for cost by model. Then propose next steps from `STATUS.md`.
 
 Resume: `/tech-lead:run <initiative folder>` reads its journal, plan and ledger and continues at `ledger.py next`; inside a wave it also reads SDD's `progress.md` when present.
 
@@ -121,7 +124,7 @@ One ladder, replacing the separate ones in model-manager and SDD. Each failed at
 |---|---|
 | `brief` (unclear or wrong instructions) | Sharpen the brief; same model |
 | `context` (missing files or facts) | Add the context; same model |
-| `plan` (the task itself is wrong) | Ruling on the plan; re-gate only under the thresholds in step 10 |
+| `plan` (the task itself is wrong) | Ruling on the plan; re-gate only under the thresholds in step 11 |
 | `capability` (the model could not do it) | Climb the ladder |
 
 Ladder for `capability`:
@@ -184,6 +187,7 @@ Fields:
 - `checks`: project-wide commands from `standards.md`, run at every checkpoint. May be empty.
 - `requirements`: one entry per requirement of the spec. `covers` on a task is optional.
 - `done`: ids of completed tasks.
+- `mode` (optional): `gated` (default) or `autopilot`; set at planning from what the user agreed, read again on resume.
 - `files`: repository-relative paths, normalised (no leading `./`, no `..`, not absolute). An entry ending in `/` covers every path below it. Empty exactly when `model` is `lead`.
 - `verify`: shell commands run from the repository root. An empty list needs `no_verify` with a reason. Not used for `lead` tasks.
 - `model`: `haiku`, `sonnet`, `opus`, `fable` or `lead`. `effort`: `low`, `medium`, `high`, `xhigh`, `max`; required unless `model` is `lead`.
@@ -214,6 +218,7 @@ Validation errors in `check`:
 - A non-normalised path.
 - Two tasks in the same wave sharing a file, directory prefixes included. The message says to add a dependency between them.
 - `prior_art` missing.
+- `mode` other than `gated` or `autopilot`.
 
 Waves: a task without dependencies is in wave 1; any other task is one wave after its latest dependency. Because `next` releases a wave only after all earlier ones are done, the same-wave file check is sufficient.
 
@@ -238,7 +243,8 @@ tech-lead/
   skills/tech-lead/scout-prompt.md       brief for a prior-art scout
   skills/tech-lead/mockup-prompt.md      brief for a mockup builder
   skills/tech-lead/batch-review-prompt.md  brief for a batched task review
-  commands/run.md                        /tech-lead:run <spec text, spec path or initiative folder>
+  skills/tech-lead/plan-review-prompt.md   brief for the plan review
+  commands/run.md                        /tech-lead:run [--auto] <spec text, spec path or initiative folder>
   scripts/ledger.py                      check, show, next, checkpoint
   scripts/status.py                      project status
   tests/test_ledger.py
