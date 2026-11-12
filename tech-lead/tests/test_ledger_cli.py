@@ -24,19 +24,13 @@ def run_script(args, cwd=None, env=None):
                           text=True, encoding="utf-8", cwd=cwd, env=env or clean_env())
 
 
-def run(args, cwd=None):
+def run(args, cwd=None, env=None):
     out, err = io.StringIO(), io.StringIO()
-    old = os.getcwd()
-    try:
-        if cwd:
-            os.chdir(cwd)
-        with redirect_stdout(out), redirect_stderr(err):
-            try:
-                code = ledger.main(list(args))
-            except SystemExit as e:
-                code = e.code
-    finally:
-        os.chdir(old)
+    with redirect_stdout(out), redirect_stderr(err), mock.patch.dict(os.environ, env or {}):
+        try:
+            code = ledger.main(list(args), cwd=cwd)
+        except SystemExit as e:
+            code = e.code
     return SimpleNamespace(returncode=code, stdout=out.getvalue(), stderr=err.getvalue())
 
 

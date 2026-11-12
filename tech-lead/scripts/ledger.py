@@ -35,11 +35,11 @@ def _build() -> argparse.ArgumentParser:
     return p
 
 
-def _repo_root() -> str:
+def _repo_root(cwd: str | None = None) -> str:
     env = {k: v for k, v in os.environ.items() if k not in ("GIT_DIR", "GIT_WORK_TREE")}
     try:
         p = subprocess.run(["git", "rev-parse", "--show-toplevel"], capture_output=True,
-                           env=env)
+                           env=env, cwd=cwd)
     except OSError:
         raise CheckpointError("git is not installed")
     if p.returncode != 0:
@@ -47,7 +47,7 @@ def _repo_root() -> str:
     return p.stdout.decode("utf-8", "replace").strip()
 
 
-def _run(args) -> int:
+def _run(args, cwd: str | None = None) -> int:
     ledger = load(args.ledger)
     errors = validate(ledger)
     if errors:
@@ -71,8 +71,11 @@ def _run(args) -> int:
             else:
                 print(f"Task {t['id']}: {t['title']} ({t['model']}/{t.get('effort', '')})")
         return 0
-    repo = _repo_root()
-    log = args.log or os.path.join(repo, ".tech-lead", "scratch", f"checkpoint-{args.wave}.log")
+    repo = _repo_root(cwd)
+    if args.log:
+        log = os.path.join(cwd or "", args.log)
+    else:
+        log = os.path.join(repo, ".tech-lead", "scratch", f"checkpoint-{args.wave}.log")
     result = run_checkpoint(ledger, args.wave, args.base, repo, log)
     print(format_result(result))
     print(f"Wrote {result.log_path}")
@@ -93,7 +96,7 @@ def _run(args) -> int:
     return 0
 
 
-def main(argv: list) -> int:
+def main(argv: list, cwd: str | None = None) -> int:
     for s in (sys.stdout, sys.stderr):
         try:
             s.reconfigure(encoding="utf-8")
@@ -101,7 +104,7 @@ def main(argv: list) -> int:
             pass
     args = _build().parse_args(argv)
     try:
-        return _run(args)
+        return _run(args, cwd)
     except (LedgerError, CheckpointError) as e:
         print(f"error: {e}", file=sys.stderr)
         return 1
