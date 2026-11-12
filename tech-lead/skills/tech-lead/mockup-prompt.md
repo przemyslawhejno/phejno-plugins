@@ -25,7 +25,7 @@ Kind `superdesign-export`: {{MOCKUP_PATH}} already holds a draft exported from s
 
 - Standalone check, which fails on: any `<sd-component` tag; relative or `file://` paths; any remote resource other than public `https://` images from superdesign, the Tailwind CDN script and the Lucide icon CDN.
 - Check passed: add one element with an `id="<name>"` attribute to each screen or state (screen id), and the mapping list from each screen id to the spec requirements it shows (see Deliverable).
-- Check failed: rebuild the file from the export, keeping the design: replace each `<sd-component` with plain HTML and CSS, using the `list-components` output the lead gives you for unresolved templates, inline local assets, then add the screen ids and the mapping.
+- Check failed: rebuild the file from the export, keeping the design: replace each `<sd-component` with plain HTML and CSS, using the `list-components` output the lead gives you for unresolved templates; replace relative or `file://` assets with inline data URIs or plain CSS, and drop what cannot be resolved and say so in your reply; then add the screen ids and the mapping.
 - The UI standards below apply to what you add or rebuild.
 
 ## UI standards

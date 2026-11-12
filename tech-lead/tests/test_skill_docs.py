@@ -214,6 +214,20 @@ class SkillDocsTest(unittest.TestCase):
             for line in hits:
                 self.assertIn(NEVER_SUPERDESIGN, line)
 
+    def test_superdesign_consent_identity_and_withdrawal(self):
+        skill, layout = read(SKILL), read(LAYOUT)
+        for item in ("user.email", "check-ignore", "consent: no"):
+            self.assertIn(item, skill)
+            self.assertIn(item, layout)
+        self.assertIn("At every start of work", skill)
+
+    def test_superdesign_context_file_guard(self):
+        skill, layout = read(SKILL), read(LAYOUT)
+        for item in (".env", "--context-file", "*.pem", "git"):
+            self.assertIn(item, skill)
+        self.assertIn(".env", layout)
+        self.assertIn("verbatim", layout)
+
     def test_layout_superdesign(self):
         text = read(LAYOUT)
         missing = [item for item in REQUIRED_SUPERDESIGN_IN_LAYOUT if item not in text]
