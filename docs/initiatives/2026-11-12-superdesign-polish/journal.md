@@ -23,3 +23,9 @@ Timing: Task 1 1.0s, checks 0.0s
 ## 2026-11-12 wave 2
 Tasks done: 3
 Timing: Task 3 1.1s, checks 0.0s
+
+## 2026-11-12 final review (opus/medium)
+
+- Ready with fixes: 1 Important (security-lens minors not recorded → backlog B20), fix-now minor (case-insensitive http-equiv in the export bullet), optional wording items folded into the fix wave.
+- From the user's dom-z-widokiem CLAUDE.md (commit 33da20b, a bullet in Work Tracking, not a ## Project docs heading): B18 must detect the rule by content (any mention routing specs and plans to docs/initiatives/), not by heading, or it adds a duplicate. Folded into the fix wave.
+- Proposed to the user: B19, status.py finds docs/initiatives/ at the git top level when the session starts in a subdirectory (dom-z-widokiem sessions start in topology/).
