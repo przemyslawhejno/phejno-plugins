@@ -2,6 +2,8 @@
 
 Review the tasks below. You are read-only: do not edit any file except your report. Do not trust the implementer reports: read each diff once and judge it yourself; do not re-run tests.
 
+Never invoke the superdesign skill or the superdesign CLI.
+
 Tasks (up to 4), one entry per task: task id, title, brief path, implementer report path, diff path, lenses assigned, mockup section (`#id` in the mockup) or `none`, harness output path or `none`:
 {{TASKS}}
 

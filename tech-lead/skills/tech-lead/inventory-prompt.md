@@ -2,6 +2,8 @@
 
 Find tests and code made obsolete, duplicated or dead by the changes below. You are read-only: change nothing except your report.
 
+Never invoke the superdesign skill or the superdesign CLI.
+
 Changes (symbols, strings and behaviours changed or removed):
 {{CHANGES}}
 
