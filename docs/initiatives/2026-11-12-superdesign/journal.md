@@ -55,3 +55,15 @@ Ruling: no separate inventory before Task 3 — wave 1 changed no scripts and ad
 - Ready to merge with fixes: 3 Important wording gaps in SKILL.md, deferred minors to fix now.
 - Ruling: in autopilot with no user present, step 4 always uses the built-in builder — superdesign needs the user to pick and approve the design, and the lead must not spend credits or choose a design alone — cost if wrong: autopilot runs never use superdesign; the user can run step 4 interactively. Spec updated.
 - One fix wave dispatched.
+
+## 2026-11-12 wave 3
+Tasks done: 4
+Timing: checks 0.0s
+
+## 2026-11-12 session
+
+- Done: tech-lead 0.3.0 — superdesign as optional mockup provider (consent per user and clone, bound to git user.email and git-ignored; full disclosure of credits, tokens and what is sent; the lead runs it only at step 4 with the user present; autopilot without the user uses the built-in builder; file list approved after the repository analysis; export to mockup.html with a standalone check and local rebuild; screen ids and mapping on both paths; `.superdesign/*` allowlist; never-invoke rule in every subagent brief) and the B16 hygiene leftovers.
+- 4 tasks in 3 waves on autopilot: sonnet 3 (Task 1 on high), lead 1. The security lens ran for the first time (Task 1): 3 Important findings, all fixed and re-reviewed by the lens. Final review (opus/medium): ready with fixes; one fix wave, security-focused re-review clean.
+- Suite: 166 tests at 1.12 s ratchet before the final fixes; 167 tests at the end.
+- Open: B1 (live run, now including superdesign), B17 (wording minors).
+- Next: user decides on merging the PR.
