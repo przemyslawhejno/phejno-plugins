@@ -46,6 +46,17 @@ Each task can carry `experts`: review lenses chosen from its risk and files. The
 
 Projects with a graphical interface set `ui: true`. The lead makes a mockup, a UI/UX expert reviews it with the spec, and `kind: ui` tasks are checked against WCAG 2.2 AA, responsive layout and theme standards, with screenshots, axe and Lighthouse output as evidence.
 
+## Optional: superdesign mockups
+
+With the `superdesign` plugin installed, the lead can make the step 4 mockup on superdesign's canvas instead of the built-in builder. The chosen draft is exported to `mockup.html`, which stays the canonical artifact.
+
+- Requirements: shell access, Node.js (`npx`) and a browser for login. Headless and cloud sessions use the built-in builder.
+- Install: `/plugin marketplace add superdesigndev/superdesign-skill`, then `/plugin install superdesign@superdesign`. Log in once with `npx --yes @superdesign/cli@latest login`.
+- Consent is per user, stored in git-ignored `.tech-lead/superdesign-consent`. The lead asks once and says what it costs and sends: generation credits on your superdesign account, lead tokens for the superdesign skill, and, to superdesign's servers, the written spec, your request, selected project files and uploaded images (which become public URLs). The CLI runs unpinned from npm.
+- Only the lead runs superdesign, never subagents. Autopilot uses it only if consent was recorded before the start.
+- Without the plugin, login or consent, the built-in mockup builder runs as before.
+- The integration has not yet been run live (backlog B1).
+
 ## Ledger schema
 
 New ledgers carry `"schema": 2`, which enables the hygiene, lens and UI rules. Ledgers without `schema` keep the 0.1.0 validation unchanged.
