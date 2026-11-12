@@ -1,12 +1,14 @@
 from __future__ import annotations
 
+import io
 import json
 import os
 import re
 import shutil
+import subprocess
 import tempfile
-import time
 import unittest
+from unittest import mock
 
 from helpers import git, init_repo, make_ledger, make_task
 
@@ -93,10 +95,39 @@ class CheckpointTests(unittest.TestCase):
         self.assertIn("$ echo hello", text)
         self.assertNotIn("hello", cp.format_result(r))
 
-    def test_stdin_is_closed(self):
-        t = time.time()
-        self.run_cp(verify=["read x; echo got"], checks=["read y; echo got"])
-        self.assertLess(time.time() - t, 10)
+    def test_commands_run_with_stdin_closed(self):
+        with mock.patch("ledger_checkpoint.subprocess.run") as run:
+            run.return_value = mock.Mock(stdout=b"", returncode=0)
+            cp._run("true", self.repo, io.StringIO())
+        self.assertIs(run.call_args.kwargs["stdin"], subprocess.DEVNULL)
+
+    def test_log_truncated_on_rerun(self):
+        self.run_cp(verify=["echo first-run"])
+        self.run_cp(verify=["echo second-run"])
+        with open(self.log, encoding="utf-8") as f:
+            text = f.read()
+        self.assertIn("second-run", text)
+        self.assertNotIn("first-run", text)
+
+    def test_lead_task_verify_is_skipped(self):
+        marker = os.path.join(self.tmp, "lead-ran")
+        ledger = make_ledger([make_task(1), make_task(2, model="lead", files=[],
+                                                      verify=[f"touch {marker}"])])
+        r = cp.run_checkpoint(ledger, 1, self.base, self.repo, self.log)
+        self.assertEqual([i for i, _, _ in r.tasks], [1])
+        self.assertFalse(os.path.exists(marker))
+
+    def test_first_failing_exit_code_wins(self):
+        r = self.run_cp(verify=["true", "exit 3", "exit 5"])
+        self.assertEqual(r.tasks[0][1], 3)
+
+    def test_only_requested_wave_runs(self):
+        ledger = make_ledger([make_task(1), make_task(2, depends_on=[1], verify=["exit 7"])])
+        r = cp.run_checkpoint(ledger, 1, self.base, self.repo, self.log)
+        self.assertEqual([i for i, _, _ in r.tasks], [1])
+        self.assertTrue(r.passed)
+        r = cp.run_checkpoint(ledger, 2, self.base, self.repo, self.log)
+        self.assertEqual([(i, c) for i, c, _ in r.tasks], [(2, 7)])
 
     def test_bad_base_raises(self):
         with self.assertRaises(cp.CheckpointError) as cm:

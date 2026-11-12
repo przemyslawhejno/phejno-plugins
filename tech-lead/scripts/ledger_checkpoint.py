@@ -142,6 +142,7 @@ def _read(path: str) -> str:
 
 def mark_done(ledger_path: str, ledger: dict, wave: int, progress_path, today: str,
               result=None) -> list:
+    """Mark the wave's tasks done in the ledger dict passed in, then write ledger and journal."""
     tasks = ledger.get("tasks", [])
     wave_of = waves(tasks)
     ids = sorted(t["id"] for t in tasks if wave_of[t["id"]] == wave)

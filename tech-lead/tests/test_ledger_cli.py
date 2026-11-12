@@ -1,21 +1,25 @@
 from __future__ import annotations
 
+import io
 import json
 import os
 import subprocess
 import sys
 import tempfile
 import unittest
+from contextlib import redirect_stderr
+from unittest import mock
 
+import ledger
 from helpers import clean_env, make_ledger, make_repo, make_task
 
 LEDGER_PY = os.path.abspath(os.path.join(os.path.dirname(os.path.abspath(__file__)),
                                          "..", "scripts", "ledger.py"))
 
 
-def run(args, cwd=None):
+def run(args, cwd=None, env=None):
     return subprocess.run([sys.executable, LEDGER_PY] + args, capture_output=True,
-                          text=True, encoding="utf-8", cwd=cwd, env=clean_env())
+                          text=True, encoding="utf-8", cwd=cwd, env=env or clean_env())
 
 
 class CliTest(unittest.TestCase):
@@ -124,6 +128,64 @@ class CliTest(unittest.TestCase):
         self.assertEqual(r.returncode, 1)
         self.assertEqual(len(r.stderr.strip().splitlines()), 1)
         self.assertTrue(r.stderr.startswith("error:"))
+
+    def checkpoint_args(self, *extra, wave="1"):
+        path = self.write(make_ledger([make_task(1, files=["README"])]))
+        return ["checkpoint", path, "--wave", wave, "--base", "HEAD", *extra]
+
+    def assert_one_line_error(self, r):
+        self.assertEqual(r.returncode, 1)
+        self.assertEqual(len(r.stderr.strip().splitlines()), 1, r.stderr)
+        self.assertTrue(r.stderr.startswith("error:"))
+
+    def test_missing_argument_one_line(self):
+        self.assert_one_line_error(run(["show"]))
+
+    def test_non_integer_wave_one_line(self):
+        self.assert_one_line_error(run(self.checkpoint_args(wave="x")))
+
+    def test_abbreviated_option_rejected(self):
+        make_repo(self.tmp)
+        args = self.checkpoint_args()
+        args[args.index("--base")] = "--bas"
+        self.assert_one_line_error(run(args, cwd=self.tmp))
+
+    def test_relative_log_resolved_to_absolute(self):
+        make_repo(self.tmp)
+        r = run(self.checkpoint_args("--log", "out/cp.log"), cwd=self.tmp)
+        self.assertEqual(r.returncode, 0, r.stdout + r.stderr)
+        expected = os.path.join(self.tmp, "out", "cp.log")
+        self.assertIn(f"Wrote {expected}\n", r.stdout)
+        self.assertTrue(os.path.exists(expected))
+
+    def test_unknown_wave_one_line(self):
+        make_repo(self.tmp)
+        r = run(self.checkpoint_args(wave="9"), cwd=self.tmp)
+        self.assert_one_line_error(r)
+        self.assertIn("wave 9 has no tasks", r.stderr)
+
+    def test_show_in_non_utf8_locale(self):
+        env = {k: v for k, v in clean_env().items() if k != "PYTHONIOENCODING"}
+        env.update(LC_ALL="C", PYTHONUTF8="0", PYTHONCOERCECLOCALE="0")
+        path = self.write(make_ledger([make_task(1, title="Za\u017c\u00f3\u0142\u0107")]))
+        r = subprocess.run([sys.executable, LEDGER_PY, "show", path], capture_output=True,
+                           env=env)
+        self.assertEqual(r.returncode, 0, r.stderr)
+        self.assertIn("Za\u017c\u00f3\u0142\u0107".encode("utf-8"), r.stdout)
+
+    def test_missing_git_reports_not_installed(self):
+        path = self.write(make_ledger([make_task(1)]))
+        err = io.StringIO()
+        with mock.patch.object(ledger.subprocess, "run", side_effect=FileNotFoundError), \
+                redirect_stderr(err):
+            code = ledger.main(["checkpoint", path, "--wave", "1", "--base", "HEAD"])
+        self.assertEqual(code, 1)
+        self.assertEqual(err.getvalue(), "error: git is not installed\n")
+
+    def test_help_exits_zero(self):
+        r = run(["-h"])
+        self.assertEqual(r.returncode, 0)
+        self.assertIn("usage:", r.stdout)
 
 
 if __name__ == "__main__":
