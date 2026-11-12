@@ -50,3 +50,8 @@ Tasks done: 1, 2, 3, 4
 Task 3: Ruling: gaps found while following batch-review-prompt.md (none placeholders, lenses per task, implementer report path, severity scale) are Important though reported as observations — every future reviewer hits them — cost if wrong: one fix round
 Task 4: Ruling: the cross-lane reference failure is expected within wave 1 and is verified by the wave checkpoint after both lanes merge — tasks in one wave may reference each other's new files by plan contract — cost if wrong: one fix round after merge
 Task 3: Ruling: lens-review-prompt "up to 4 tasks" conflicts with one dispatch per lens per wave; fixed at integration after the wave 1 merge (file is in lane-1) — cost if wrong: one small fix dispatch
+
+## 2026-11-12 wave 2
+Tasks done: 5, 6
+Timing: Task 5 1.9s, Task 6 1.7s, checks 0.0s
+- Out-of-scope lines in wave 2 are the lead's integration fix (bda4c29), expected.

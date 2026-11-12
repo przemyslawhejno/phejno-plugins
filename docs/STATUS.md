@@ -2,7 +2,7 @@
 # Project status
 
 ## In progress
-- 2026-11-12-quality (in progress, waves 1/5, next wave 2): /home/user/phejno-plugins/docs/initiatives/2026-11-12-quality
+- 2026-11-12-quality (in progress, waves 2/5, next wave 3): /home/user/phejno-plugins/docs/initiatives/2026-11-12-quality
 
 ## Recently done
 - 2026-11-11-tech-lead (done, waves 5/5): /home/user/phejno-plugins/docs/initiatives/2026-11-11-tech-lead
