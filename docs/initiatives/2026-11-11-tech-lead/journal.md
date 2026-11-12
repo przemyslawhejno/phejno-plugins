@@ -38,3 +38,14 @@ Task 4: Ruling: unknown wave raises CheckpointError and an OSError on the log be
 
 ## 2026-11-12 wave 3
 Tasks done: 5
+
+## 2026-11-12 wave 4
+Tasks done: 8
+
+## 2026-11-12 lead verification (task 9)
+
+- 90 tests pass; `ledger.py check` on this ledger passes; `status.py --write` wrote docs/STATUS.md; `--brief` from another directory with CLAUDE_PROJECT_DIR reports this initiative; `TECH_LEAD_STATUS=0` silences it.
+- SKILL.md read against the spec: consistent, including plan review, autopilot, lead tasks and absolute paths.
+- Headless smoke tests (`claude -p --plugin-dir tech-lead`): the skill and `/tech-lead:run` load; the SessionStart hook is silent without docs/initiatives and, in a sample project, injects the status and the agent proposes next steps and waits.
+- Not run here: the full dry run up to the gate (brainstorming is interactive and stops a headless run at its first question). To do in a new interactive session: `/tech-lead:run <sample spec with a UI>`.
+- Final whole-branch review dispatched (opus/medium).
