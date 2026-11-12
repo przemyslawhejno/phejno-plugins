@@ -7,19 +7,37 @@ import subprocess
 import sys
 import tempfile
 import unittest
-from contextlib import redirect_stderr
+from contextlib import redirect_stderr, redirect_stdout
+from types import SimpleNamespace
 from unittest import mock
 
-import ledger
 from helpers import clean_env, make_ledger, make_repo, make_task
+
+import ledger
 
 LEDGER_PY = os.path.abspath(os.path.join(os.path.dirname(os.path.abspath(__file__)),
                                          "..", "scripts", "ledger.py"))
 
 
-def run(args, cwd=None, env=None):
+def run_script(args, cwd=None, env=None):
     return subprocess.run([sys.executable, LEDGER_PY] + args, capture_output=True,
                           text=True, encoding="utf-8", cwd=cwd, env=env or clean_env())
+
+
+def run(args, cwd=None):
+    out, err = io.StringIO(), io.StringIO()
+    old = os.getcwd()
+    try:
+        if cwd:
+            os.chdir(cwd)
+        with redirect_stdout(out), redirect_stderr(err):
+            try:
+                code = ledger.main(list(args))
+            except SystemExit as e:
+                code = e.code
+    finally:
+        os.chdir(old)
+    return SimpleNamespace(returncode=code, stdout=out.getvalue(), stderr=err.getvalue())
 
 
 class CliTest(unittest.TestCase):
@@ -60,7 +78,7 @@ class CliTest(unittest.TestCase):
     def test_checkpoint_mark_end_to_end(self):
         make_repo(self.tmp)
         path = self.write(make_ledger([make_task(1, files=["README"])]))
-        r = run(["checkpoint", path, "--wave", "1", "--base", "HEAD", "--mark"], cwd=self.tmp)
+        r = run_script(["checkpoint", path, "--wave", "1", "--base", "HEAD", "--mark"], cwd=self.tmp)
         self.assertEqual(r.returncode, 0, r.stdout + r.stderr)
         self.assertIn("Task 1: pass", r.stdout)
         self.assertGreaterEqual(sum(1 for l in r.stdout.splitlines() if l.startswith("Wrote /")), 2)
@@ -183,7 +201,7 @@ class CliTest(unittest.TestCase):
         self.assertEqual(err.getvalue(), "error: git is not installed\n")
 
     def test_help_exits_zero(self):
-        r = run(["-h"])
+        r = run_script(["-h"])
         self.assertEqual(r.returncode, 0)
         self.assertIn("usage:", r.stdout)
 
