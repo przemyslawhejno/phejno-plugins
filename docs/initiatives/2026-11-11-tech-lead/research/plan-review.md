@@ -47,3 +47,30 @@ M12. **Ledger requirements.** R10 does not mention the `.gitignore` entries or t
 Waves and file disjointness (1/6/7, 2/3/4, 5, 8, 9). `helpers.py` is imported via the discover start dir, does not match `test*.py`, and `tech-lead/tests` needs no `__init__.py` (say so). Script imports work via `sys.path[0]` when run as a script. `shell=True` with `exit N` is fine on POSIX. Review Focus items 1, 2, 4 and 5 have concrete tests. The `mode` field is validated. Autopilot and plan review are in Tasks 6 and 7.
 
 PLAN NEEDS CHANGES
+
+## Round 2
+
+Scope: fix commit a9c5057 against round-1 findings.
+
+- B1 resolved: "contains `Ruling:`" in plan Task 4 and spec; fixture now has `Task 2:` and parked forms.
+- B2 resolved: `--progress` in spec table, Task 5 and Task 6 synopsis; `--progress`, `--wave`, `--base`, `sdd-workspace` in the skill test.
+- B3 resolved: synopsis in Task 6; spec path in Global Constraints.
+- B4 resolved: test limited to `layout.md` and `*-prompt.md`.
+- B5 resolved: `test_checkpoint_errors` (non-git dir, bad base, ledger byte-identical).
+- B6 resolved: dry-run step in Task 9.
+- M1 partially: most mentions added; `backlog.md` and `research/plan-review.md` not in the test, and the migration offer in Orient is not asserted. Minor.
+- M2 resolved. M3 resolved (patched `render_brief`, guarded import). M4 resolved (plan and ledger say sonnet/medium).
+- M5 resolved (`Wrote` only, log truncated). M6 resolved (constraint plus `test_usage_error_one_line`). M7 resolved. M8 resolved. M9 resolved.
+- M10 rejected by lead; the reason is valid (plain stdout is injected as context). Not reopened.
+- M11 resolved by the alternative: the path is shown only when the file exists, with a test.
+- M12 resolved (R10 extended, matching `test_layout_paths`).
+
+New problems:
+
+1. minor: Task 9 dry run says `claude -p --plugin-dir tech-lead` in a scratch git repository but writes the sample spec under `.tech-lead/scratch/sample/` of an unspecified repo. Fix: say the sample lives in the scratch repository, not in phejno-plugins, so the real tree stays clean.
+2. minor: Task 6 `test_mentions_required_items` has `` `plan` `` and `` `brief` `` in backticks. Fix: make sure SKILL.md's `Attempt: Task N <model>/<effort> failed, cause <brief|context|capability|plan>, <note>` format uses exactly these backticked words.
+3. minor: Task 2 `test_brief_swallows_errors` patches `status.render_brief`, so `main` must call it through the module attribute. Fix: add one clause to the Task 2 text.
+
+No contradictions found between spec, plan and ledger; no test that cannot pass; Task 5 and Task 4 interfaces match (`Wrote` paths, `progress_path`).
+
+PLAN APPROVED
