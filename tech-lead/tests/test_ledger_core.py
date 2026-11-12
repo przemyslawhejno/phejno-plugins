@@ -156,7 +156,7 @@ class Schema2Tests(unittest.TestCase):
         ]
         self.assertEqual(errors2(*tasks), [])
 
-    def test_schema_absent_keeps_v1_rules(self):
+    def test_no_schema_field_skips_schema2_rules(self):
         tasks = [make_task(i, experts=["bogus"], kind="nope") for i in (1, 2, 3, 4)]
         self.assertEqual(errors_of(*tasks), [])
 
@@ -167,7 +167,7 @@ class Schema2Tests(unittest.TestCase):
     def test_schema2_ui_must_be_boolean(self):
         self.assertHas(errors2(make_task(1), ui="yes"), "ui must be a boolean")
 
-    def test_schema2_invalid_kind(self):
+    def test_schema2_hygiene_depends_on_every_other_task(self):
         self.assertHas(errors2(make_task(1, kind="docs")), "task 1: invalid kind 'docs'")
         self.assertEqual(errors2(make_task(1, model="lead", files=[], kind="docs")), [])
 
@@ -248,7 +248,7 @@ class Schema2Tests(unittest.TestCase):
         self.assertHas(errs, "task 4: hygiene task must depend on task 3")
         self.assertFalse(any("depend on task 1" in e for e in errs), errs)
 
-    def test_finished_v1_initiative_ledger_valid(self):
+    def test_0_1_0_initiative_ledger_without_schema_validates(self):
         path = os.path.join(REPO_ROOT, "docs", "initiatives", "2026-11-11-tech-lead", "ledger.json")
         self.assertEqual(validate(ledger_core.load(path)), [])
 
