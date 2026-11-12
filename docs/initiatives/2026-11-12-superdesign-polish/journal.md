@@ -9,3 +9,7 @@
 ## 2026-11-12 plan review, round 1 (sonnet/medium)
 
 - PLAN NEEDS CHANGES: 2 Important, 4 Minor; all accepted. Decision 8 now baselines `git status --porcelain --ignored` before dispatch and never reverts automatically (the old rule could have destroyed the user's uncommitted work and missed ignored paths); decision 5 defines pinned as a full `x.y.z` version and rebuilds locally on failure; tests tightened.
+
+## 2026-11-12 plan review, round 2 (sonnet/low, scoped)
+
+- PLAN APPROVED; two minors applied to the spec (package names as the match key; stated limits of the baseline comparison). Execution starts (autopilot).
