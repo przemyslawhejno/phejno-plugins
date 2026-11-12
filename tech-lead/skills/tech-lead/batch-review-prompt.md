@@ -7,7 +7,7 @@ Tasks (up to 4), one entry per task: task id, title, brief path, implementer rep
 
 Spec: {{SPEC_PATH}}
 Standards: {{STANDARDS_PATH}}
-Mockup (UI tasks only): {{MOCKUP_PATH}}
+Mockup (UI tasks only; `none` for batches without UI tasks): {{MOCKUP_PATH}}
 Hygiene candidates: {{CANDIDATES_PATH}}
 
 A value of `none` in a placeholder or entry field means that input does not exist: skip the checks that need it.

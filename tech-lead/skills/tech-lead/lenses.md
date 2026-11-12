@@ -1,6 +1,6 @@
 # Lenses
 
-A lens is a focused review of a task's diff. Each section gives the checklist and what the lens uses when installed. Use an installed skill as an extra input to the checklist. An installed named agent replaces the generic dispatch, never adds to it (Dispatch).
+A lens is a focused review of a task's diff. Each section gives the checklist (at most 8 bullet lines) and what the lens uses when installed. Use an installed skill as an extra input to the checklist. An installed named agent replaces the generic dispatch, never adds to it (Dispatch).
 
 ## security
 
@@ -72,7 +72,7 @@ A lens is a focused review of a task's diff. Each section gives the checklist an
 - One dispatch per lens per wave, covering every task of the wave that lists it, in the same message as the batch reviews.
 - Pass `model` and `effort` explicitly on every call, overriding model-manager's routing: sonnet medium. Opus medium for `security` and `architecture` on tasks with a risk, and for `ui-ux` on tasks with risk `system-wide`.
 - When a lens has a named agent in its `Uses when installed` line and a task carries a risk, that agent replaces the generic lens dispatch for the lens: same `lens-review-prompt.md` brief and report path, called with the same explicit `model` and `effort` the generic lens would get. Its findings count in the lens yield. Never dispatch both.
-- A lens finding enters the task's fix loop like a review finding; the lens that raised it re-reviews only the fix diff. Any Critical or Important finding blocks the task.
+- A lens finding enters the task's fix loop like a review finding; the lens that raised it re-reviews only the fix diff and writes `research/lens-<lens>-<wave>-fix<n>.md`. Any Critical or Important finding blocks the task.
 
 ## Yield
 

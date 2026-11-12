@@ -30,7 +30,7 @@ docs/
 - `docs/standards.md`: conventions in force (layout, naming, formatter, linter, type checker, test runner, CI), then the sections under Standards below. It ends with a `Checks` list of commands, copied into each ledger's `checks`.
 - `docs/adr/NNNN-<title>.md`: one decision that shapes the system beyond a single initiative. Number sequentially from `0001`.
 - `docs/initiatives/YYYY-MM-DD-<topic>/`: one initiative is one folder. Everything about it is found there, never under `docs/superpowers/`. The date is the day the folder was created.
-- `research/`: scout reports (`research/<area>.md`), spike answers and architectural proposals, `research/plan-review.md`, inventory candidates (`research/hygiene-candidates-<wave>.md`) and lens reports (`research/lens-<lens>-<wave>.md`).
+- `research/`: scout reports (`research/<area>.md`), spike answers and architectural proposals, `research/plan-review.md`, inventory candidates (`research/hygiene-candidates-<wave>.md`) and lens reports (`research/lens-<lens>-<wave>.md`, re-reviews `research/lens-<lens>-<wave>-fix<n>.md`).
 - `.tech-lead/scratch/<initiative>/task-<N>/`: render harness output of a `kind: ui` task (screenshots at mobile and desktop widths, axe JSON, Lighthouse summary). Reviewers read it and run nothing.
 
 ## Standards
@@ -52,7 +52,7 @@ docs/
 - Suite time: <seconds>s (<date>, <test count> tests)
 ```
 
-`Suite time` is the ratchet. It is written when missing and updated at a finish without regression.
+The `Suite time:` line is the ratchet. It is written when missing and updated at a finish without regression.
 
 `Lens yield`, updated at each finish, one line per lens that has run; Critical and Important findings count together:
 
@@ -112,10 +112,10 @@ When lenses ran in the wave, the lead appends one line below that entry, each le
 Lens yield: security 1 Critical/Important, 2 Minor; data 0
 ```
 
-Suite timing, written by the lead at the first wave and at the finish (median of 3 runs, or one run over 4 minutes):
+Suite timing, written by the lead at the first wave and at the finish (median of 3 runs, or one run over 4 minutes); each measurement is an event, the ratchet stays in `standards.md`:
 
 ```
-Suite time: 41.2s (2026-11-12, 812 tests)
+Suite time: 41.2s, 812 tests (measured; ratchet 40.0s in standards.md)
 ```
 
 Plan review, gate and re-gate:
@@ -186,7 +186,5 @@ Paths shown to the user are absolute, one per line, never shortened or relative.
 
 not `docs/initiatives/2026-11-11-orders/mockup.html` or `./mockup.html`.
 
-- Give the absolute path whenever an artifact is created or updated.
-- Every subagent brief asks for the absolute paths of the files it created or changed in its report.
-- Gate messages, wave summaries, the finish report and the session-start status list the absolute paths of the artifacts they mention: spec, mockup, plan, ledger, journal, status, ADRs, research reports, logs.
+- Give the absolute path whenever an artifact is created or updated; the lists of where it applies are in `SKILL.md` (Paths).
 - Paths inside `ledger.json` (`files`) stay repository-relative; only paths shown to people are absolute.

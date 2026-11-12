@@ -41,10 +41,24 @@ class PromptTests(unittest.TestCase):
                                             "copy", "pattern", "reject", "license"])
 
     def test_mockup_rules(self):
-        self.assert_has("mockup-prompt.md", ["self-contained", "static", "prototype", "simulation", "id"])
+        self.assert_has("mockup-prompt.md", ["self-contained", "static", "prototype", "simulation", 'id="'])
 
     def test_review_rules(self):
         self.assert_has("batch-review-prompt.md", ["APPROVED", "CHANGES_REQUIRED", "none"])
+
+    def test_lens_checklists_at_most_8_bullets(self):
+        lens = None
+        counts = {}
+        for line in read("lenses.md").splitlines():
+            if line.startswith("## "):
+                lens = line[3:].strip()
+                counts[lens] = 0
+            elif line.startswith("- Uses when installed"):
+                lens = None
+            elif lens and line.startswith("- "):
+                counts[lens] += 1
+        for name in LENS_NAMES:
+            self.assertTrue(0 < counts[name] <= 8, "%s has %d bullets" % (name, counts[name]))
 
     def test_plan_review_rules(self):
         self.assert_has("plan-review-prompt.md", ["PLAN APPROVED", "PLAN NEEDS CHANGES", "model", "verify",

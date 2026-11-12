@@ -34,7 +34,7 @@ class PackagingTests(unittest.TestCase):
     def test_plugin_json(self):
         d = load(PLUGIN / ".claude-plugin" / "plugin.json")
         self.assertEqual(d["name"], "tech-lead")
-        self.assertEqual(d["version"], "0.2.0")
+        self.assertEqual(d["version"], "0.2.1")
         self.assertEqual(d["description"], DESC)
         self.assertEqual(d["author"]["name"], "Przemyslaw Hejno")
 
@@ -72,6 +72,8 @@ class PackagingTests(unittest.TestCase):
         names = set(re.findall(r"[\w-]+-prompt\.md", text)) | {"layout.md", "lenses.md"}
         for n in names:
             self.assertTrue((d / n).is_file(), n)
+        for n in set(re.findall(r"\.\./\.\./scripts/([\w-]+\.py)", text)):
+            self.assertTrue((PLUGIN / "scripts" / n).is_file(), n)
 
     def test_lenses_match_ledger_core(self):
         d = PLUGIN / "skills" / "tech-lead"
