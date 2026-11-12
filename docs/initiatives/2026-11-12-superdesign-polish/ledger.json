@@ -21,7 +21,9 @@
       "text": "B18: the lead adds a ## Project docs section to CLAUDE.md so sessions without tech-lead find the hierarchy"
     }
   ],
-  "done": [],
+  "done": [
+    1
+  ],
   "tasks": [
     {
       "id": 1,
@@ -70,7 +72,9 @@
       "files": [
         "tech-lead/skills/tech-lead/SKILL.md",
         "tech-lead/skills/tech-lead/layout.md",
-        "tech-lead/tests/test_skill_docs.py"
+        "tech-lead/tests/test_skill_docs.py",
+        "tech-lead/skills/tech-lead/mockup-prompt.md",
+        "tech-lead/tests/test_prompts.py"
       ],
       "covers": [
         "R4"

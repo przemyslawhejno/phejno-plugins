@@ -14,3 +14,8 @@
 
 - PLAN APPROVED; two minors applied to the spec (package names as the match key; stated limits of the baseline comparison). Execution starts (autopilot).
 - The user asked whether superpowers find the documents without tech-lead (only through the tech-lead SessionStart hook; superpowers default to docs/superpowers/). B18 added on request and folded into this initiative as Task 3 (sonnet low) plus a CLAUDE.md for this repository in lead verification. Ruling: no separate plan review for this one-section addition; it goes through batch review and the final review — cost if wrong: a wording gap caught later.
+
+## 2026-11-12 wave 1
+Tasks done: 1
+Timing: Task 1 1.0s, checks 0.0s
+- Wave 1 (B17) done. Lens yield: security 4 Critical/Important (3 + 1 after the first fix), 7 Minor; all Important fixed over two fix rounds and re-reviewed by the lens. Two lens minors moved into Task 3.

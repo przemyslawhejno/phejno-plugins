@@ -36,7 +36,7 @@ Waves: 1 = Task 1; 2 = Task 3; 3 = Task 2.
 
 ### Task 3: Project docs pointer (B18)
 
-**Files:** `tech-lead/skills/tech-lead/SKILL.md`, `tech-lead/skills/tech-lead/layout.md`, `tech-lead/tests/test_skill_docs.py`
+**Files:** `tech-lead/skills/tech-lead/SKILL.md`, `tech-lead/skills/tech-lead/layout.md`, `tech-lead/tests/test_skill_docs.py`, `tech-lead/skills/tech-lead/mockup-prompt.md`, `tech-lead/tests/test_prompts.py` (two security-lens minors: the `@tailwindcss/browser@<x.y.z>` shape requires a `/` after the version; existing CSP metas are matched case-insensitively on `http-equiv`)
 
 - [ ] Tests first: SKILL.md "Start of work" mentions `CLAUDE.md` and `## Project docs`; layout.md lists `CLAUDE.md` and contains the section text from the spec verbatim.
 - [ ] Add one Start-of-work item to SKILL.md (add the section when missing, leave an existing one, commit it with the initiative) and the layout.md entry with the exact section text.
