@@ -14,3 +14,4 @@
 - [ ] B12 [hygiene] ledger_core.py: split the long `_schema2_errors`; reject `schema: 2.0`; drop the double risk-vocabulary check; test that `ui` tasks count toward the hygiene thresholds; state the lead-task interpretation — from 2026-11-12-quality — 2026-11-12
 - [ ] B13 [hygiene] tests: assert the 8-line lens checklist limit; `m.group(1)` without a None check in test_ledger_checkpoint.py; the instruction line asserted twice in test_status.py; bare `tuple` annotation on `_run` — from 2026-11-12-quality — 2026-11-12
 - [ ] B14 SKILL.md and layout.md: one place for the Suite time writes; a re-review path for lens reports — from 2026-11-12-quality — 2026-11-12
+- [ ] B15 Superdesign as optional mockup provider (tech-lead 0.3.0): see docs/initiatives/2026-11-12-superdesign/ — from user request — 2026-11-12
