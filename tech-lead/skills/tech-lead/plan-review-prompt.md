@@ -5,6 +5,7 @@ Review the plan against the spec. You are read-only: edit nothing except your re
 Spec: {{SPEC_PATH}}
 Plan: {{PLAN_PATH}}
 Ledger: {{LEDGER_PATH}}
+Standards: {{STANDARDS_PATH}}
 
 When `.claude/codemap/INDEX.md` exists, find code through `symbols.md` and `INDEX.md` there before Glob or Grep.
 
@@ -20,7 +21,7 @@ When `.claude/codemap/INDEX.md` exists, find code through `symbols.md` and `INDE
 - Risks the plan ignores.
 - Each behaviour change names what it `replaces`, and planned tests do not duplicate existing ones.
 - The hygiene task (`kind: hygiene`) is required when the plan has 3 or more `code` or `ui` tasks, or 2 or more such tasks and any has a non-empty `replaces`; it must depend directly on every `code` and `ui` task.
-- Risks and lenses, both ways: a task with a risk lacks a matching lens; a lens sits on routine work without a risk; a lens is chosen without a risk although the `Lens yield` section of `standards.md` shows 3 or more consecutive initiatives without an Important finding for it.
+- Risks and lenses, both ways: a task with a risk lacks a matching lens; a lens sits on routine work without a risk; a lens is chosen without a risk although the `Lens yield` section of `standards.md` shows 3 or more consecutive initiatives without a Critical or Important finding for it.
 
 ## Output
 

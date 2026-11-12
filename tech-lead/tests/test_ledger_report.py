@@ -22,12 +22,34 @@ class RenderShowTests(unittest.TestCase):
     def test_wave_tables(self):
         out = render_show(self._ledger())
         w1, rest = out.split("## Wave 2")
-        self.assertIn("| Task | Title | Depends on | Files | Model | Reason | Acceptance |", w1)
+        self.assertIn("| Task | Title | Depends on | Files | Model | Risk | Experts | Reason | Acceptance |", w1)
         self.assertIn("sonnet/low", w1)
         self.assertIn("Task 1", w1)
         w2 = rest.split("## Requirement coverage")[0]
         self.assertIn("Task 2", w2)
         self.assertIn("| lead |", w2)
+
+    def test_risk_and_experts_columns(self):
+        out = render_show(make_ledger([
+            make_task(1, risk=["security", "data"], experts=["security", "data"])]))
+        self.assertIn("| sonnet/low | security<br>data | security<br>data | r |", out)
+
+    def test_kind_suffix(self):
+        out = render_show(make_ledger([
+            make_task(1), make_task(2, kind="ui"), make_task(3, kind="hygiene")]))
+        self.assertIn("| sonnet/low (ui) |", out)
+        self.assertIn("| sonnet/low (hygiene) |", out)
+
+    def test_lens_dispatch_counts_distinct_per_wave(self):
+        out = render_show(make_ledger([
+            make_task(1, experts=["security"]), make_task(2, experts=["security"]),
+            make_task(3, depends_on=[1, 2])]))
+        self.assertIn("Lens dispatches: wave 1: 1, wave 2: 0 (total 1)", out)
+
+    def test_v1_ledger_renders_dashes_and_none(self):
+        out = render_show(self._ledger())
+        self.assertIn("| sonnet/low | - | - | r |", out)
+        self.assertIn("Lens dispatches: none", out)
 
     def test_coverage_lists_tasks(self):
         out = render_show(self._ledger())
