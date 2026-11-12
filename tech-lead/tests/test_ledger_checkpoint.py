@@ -92,6 +92,35 @@ class CheckpointTests(unittest.TestCase):
             self.run_cp(base="nope")
         self.assertTrue(str(cm.exception).startswith("git diff failed"))
 
+    def test_non_ascii_declared_file_is_in_scope(self):
+        name = "src/za\u017c\u00f3\u0142\u0107.py"
+        with open(os.path.join(self.repo, name), "w") as f:
+            f.write("z\n")
+        git(self.repo, "add", "-A")
+        git(self.repo, "commit", "-q", "-m", "nonascii")
+        ledger = make_ledger([make_task(1, files=[name, "other.txt", "src/t1.py"])])
+        r = cp.run_checkpoint(ledger, 1, self.base, self.repo, self.log)
+        self.assertEqual(r.out_of_scope, [])
+
+    def test_empty_wave_raises(self):
+        ledger = make_ledger([make_task(1)])
+        with self.assertRaises(cp.CheckpointError) as cm:
+            cp.run_checkpoint(ledger, 5, self.base, self.repo, self.log)
+        self.assertEqual(str(cm.exception), "wave 5 has no tasks")
+        self.assertFalse(os.path.exists(self.log))
+        with self.assertRaises(cp.CheckpointError):
+            cp.mark_done(self.ledger_path, ledger, 5, None, "2026-11-11")
+        self.assertFalse(os.path.exists(os.path.join(self.tmp, "journal.md")))
+
+    def test_unwritable_log_raises(self):
+        blocker = os.path.join(self.tmp, "file")
+        with open(blocker, "w") as f:
+            f.write("x")
+        ledger = make_ledger([make_task(1)])
+        with self.assertRaises(cp.CheckpointError) as cm:
+            cp.run_checkpoint(ledger, 1, self.base, self.repo, os.path.join(blocker, "l.txt"))
+        self.assertTrue(str(cm.exception).startswith("cannot write log "))
+
     def _marked(self, progress=PROGRESS):
         ledger = make_ledger([make_task(1)])
         with open(self.ledger_path, "w", encoding="utf-8") as f:

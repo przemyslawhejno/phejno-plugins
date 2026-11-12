@@ -35,14 +35,15 @@ def _git_env() -> dict:
 
 def _changed_files(base: str, repo: str) -> list:
     try:
-        p = subprocess.run(["git", "diff", "--name-only", f"{base}..HEAD"], cwd=repo,
+        p = subprocess.run(["git", "-c", "core.quotepath=false", "diff", "--name-only", "-z",
+                            f"{base}..HEAD"], cwd=repo,
                            capture_output=True, env=_git_env())
     except OSError as e:
         raise CheckpointError(f"git diff failed: {e}")
     if p.returncode != 0:
         err = p.stderr.decode("utf-8", "replace").strip().splitlines()
         raise CheckpointError("git diff failed: " + (err[0] if err else f"exit {p.returncode}"))
-    return [l for l in p.stdout.decode("utf-8", "replace").splitlines() if l]
+    return [l for l in p.stdout.decode("utf-8", "replace").split("\0") if l]
 
 
 def _run(command: str, repo: str, log) -> int:
@@ -62,12 +63,18 @@ def run_checkpoint(ledger: dict, wave: int, base: str, repo: str,
     wave_of = waves(tasks)
     members = sorted((t for t in tasks if wave_of[t["id"]] == wave and t.get("model") != "lead"),
                      key=lambda t: t["id"])
+    if not any(wave_of[t["id"]] == wave for t in tasks):
+        raise CheckpointError(f"wave {wave} has no tasks")
     allowed = [f for t in members for f in t.get("files", [])]
     changed = _changed_files(base, repo)
     result = CheckpointResult(out_of_scope=out_of_scope(changed, allowed),
                               log_path=os.path.abspath(log_path))
-    os.makedirs(os.path.dirname(result.log_path), exist_ok=True)
-    with open(result.log_path, "w", encoding="utf-8") as log:
+    try:
+        os.makedirs(os.path.dirname(result.log_path), exist_ok=True)
+        log = open(result.log_path, "w", encoding="utf-8")
+    except OSError as e:
+        raise CheckpointError(f"cannot write log {result.log_path}: {e.strerror or e}")
+    try:
         for t in members:
             worst = 0
             for cmd in t.get("verify", []):
@@ -77,6 +84,10 @@ def run_checkpoint(ledger: dict, wave: int, base: str, repo: str,
             result.tasks.append((t["id"], worst))
         for cmd in ledger.get("checks", []):
             result.checks.append((cmd, _run(cmd, repo, log)))
+    except OSError as e:
+        raise CheckpointError(f"cannot write log {result.log_path}: {e.strerror or e}")
+    finally:
+        log.close()
     return result
 
 
@@ -108,6 +119,8 @@ def mark_done(ledger_path: str, ledger: dict, wave: int, progress_path, today: s
     tasks = ledger.get("tasks", [])
     wave_of = waves(tasks)
     ids = sorted(t["id"] for t in tasks if wave_of[t["id"]] == wave)
+    if not ids:
+        raise CheckpointError(f"wave {wave} has no tasks")
     done = list(ledger.get("done", []))
     for i in ids:
         if i not in done:
