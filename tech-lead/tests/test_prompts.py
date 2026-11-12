@@ -17,7 +17,7 @@ PLACEHOLDERS = {
     "lens-review-prompt.md": ["LENS", "TASKS", "SPEC_PATH", "STANDARDS_PATH", "LENSES_PATH",
                               "CANDIDATES_PATH", "REPORT_PATH"],
     "inventory-prompt.md": ["CHANGES", "TEST_ROOTS", "CODE_ROOTS", "REPORT_PATH"],
-    "plan-review-prompt.md": ["SPEC_PATH", "PLAN_PATH", "LEDGER_PATH", "REPORT_PATH"],
+    "plan-review-prompt.md": ["SPEC_PATH", "PLAN_PATH", "LEDGER_PATH", "STANDARDS_PATH", "REPORT_PATH"],
 }
 
 

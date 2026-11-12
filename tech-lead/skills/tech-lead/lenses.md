@@ -76,4 +76,4 @@ A lens is a focused review of a task's diff. Each section gives the checklist an
 
 ## Yield
 
-Record each lens's result in the wave journal entry, in this format: `Lens yield: <lens> <I> Important, <M> Minor`; separate lenses with `; `, and write a lens with no findings as `<lens> 0`.
+Record each lens's result in the wave journal entry, in this format: `Lens yield: <lens> <C+I> Critical/Important, <M> Minor`; separate lenses with `; `, and write a lens with no findings as `<lens> 0`.

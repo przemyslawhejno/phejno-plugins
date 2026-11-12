@@ -2,7 +2,7 @@
 
 Review the tasks below through one lens only: {{LENS}}. Ignore everything outside it. You are read-only: run nothing and edit no file except your report.
 
-Tasks (up to 4), one entry per task: task id, title, brief path, implementer report path, diff path, lenses assigned, mockup section (`#id` in the mockup) or `none`:
+Tasks: every task of this wave that lists this lens, one entry per task: task id, title, brief path, implementer report path, diff path, lenses assigned, mockup section (`#id` in the mockup) or `none`:
 {{TASKS}}
 
 Spec: {{SPEC_PATH}}
