@@ -160,9 +160,10 @@ class Schema2Tests(unittest.TestCase):
         tasks = [make_task(i, experts=["bogus"], kind="nope") for i in (1, 2, 3, 4)]
         self.assertEqual(errors_of(*tasks), [])
 
-    def test_invalid_schema(self):
-        self.assertHas(errors_of(make_task(1), schema=3), "invalid schema '3'")
-        self.assertHas(errors_of(make_task(1), schema="2"), "invalid schema '2'")
+    def test_schema_must_be_int_two(self):
+        for bad in (3, "2", 2.0, True):
+            self.assertHas(errors_of(make_task(1), schema=bad), f"invalid schema '{bad}'")
+        self.assertEqual(errors_of(make_task(1), schema=2), [])
 
     def test_schema2_ui_must_be_boolean(self):
         self.assertHas(errors2(make_task(1), ui="yes"), "ui must be a boolean")
@@ -240,6 +241,10 @@ class Schema2Tests(unittest.TestCase):
         self.assertEqual(errors2(make_task(1), make_task(2)), [])
         self.assertHas(errors2(make_task(1), make_task(2, replaces=["old.py"])), "missing hygiene task")
         self.assertEqual(errors2(make_task(1, model="lead", files=[]), make_task(2), make_task(3)), [])
+
+    def test_ui_tasks_count_toward_hygiene_threshold(self):
+        ui = [make_task(i, kind="ui", model="haiku") for i in (1, 2, 3)]
+        self.assertHas(errors2(*ui, ui=True), "missing hygiene task")
 
     def test_schema2_hygiene_must_depend_on_code_tasks(self):
         tasks = [make_task(1), make_task(2), make_task(3), make_hygiene(4, [1])]
