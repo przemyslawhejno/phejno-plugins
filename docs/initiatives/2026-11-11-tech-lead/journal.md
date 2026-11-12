@@ -26,3 +26,8 @@
 ## 2026-11-12 gate
 
 - Approved by the user: subagent-driven execution in two lanes, autopilot to the end (ledger `mode: autopilot`).
+
+## 2026-11-12 wave 1
+Tasks done: 1, 6, 7
+Ruling: T8 hook test asserts the command contains `scripts/status.py` and `--brief` separately — the plan's literal substring cannot match the plan's own quoted command — cost if wrong: none, both parts are still pinned.
+Checkpoint run by hand (ledger.py not built yet): 40 tests pass, no out-of-scope files. Fix rounds: Task 1 x1 (requirement id type safety, cycle rotation), Task 6 x1 (migration targets, lead tasks in waves).

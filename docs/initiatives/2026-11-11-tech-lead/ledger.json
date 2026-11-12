@@ -67,7 +67,11 @@
       "text": "Automatic plan review before the gate; autopilot mode agreed in advance skips the gate"
     }
   ],
-  "done": [],
+  "done": [
+    1,
+    6,
+    7
+  ],
   "tasks": [
     {
       "id": 1,
