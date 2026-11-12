@@ -6,6 +6,8 @@ Spec: {{SPEC_PATH}}
 Plan: {{PLAN_PATH}}
 Ledger: {{LEDGER_PATH}}
 
+When `.claude/codemap/INDEX.md` exists, find code through `symbols.md` and `INDEX.md` there before Glob or Grep.
+
 ## Check
 
 - Spec coverage: every requirement maps to a task.
@@ -16,6 +18,9 @@ Ledger: {{LEDGER_PATH}}
 - `verify` commands really prove the acceptance criteria.
 - Review Focus is specific and points at the real risks.
 - Risks the plan ignores.
+- Each behaviour change names what it `replaces`, and planned tests do not duplicate existing ones.
+- A hygiene task exists as the hygiene rule requires.
+- Risks and lenses, both ways: a task with a risk lacks a matching lens; a lens sits on routine work without a risk; a lens that `standards.md` flags in its Lens yield section is chosen without a risk.
 
 ## Output
 

@@ -8,13 +8,17 @@ Tasks (up to 4: task id, brief path, diff path):
 Spec: {{SPEC_PATH}}
 Standards: {{STANDARDS_PATH}}
 Mockup (UI tasks only): {{MOCKUP_PATH}}
+Hygiene candidates: {{CANDIDATES_PATH}}
+
+When `.claude/codemap/INDEX.md` exists, find code through `symbols.md` and `INDEX.md` there before Glob or Grep.
 
 ## For each task check
 
 1. Spec compliance: the diff does what the brief and spec require, nothing missing, nothing extra.
 2. Code quality against {{STANDARDS_PATH}}.
 3. Tests prove the acceptance criteria and were not weakened, skipped or deleted.
-4. For UI tasks, the result matches the mockup.
+4. For UI tasks, the result matches the mockup. Skip this check for tasks that have the `ui-ux` lens.
+5. Hygiene: obsolete code or tests left behind, or a new test duplicating one in the diff or in {{CANDIDATES_PATH}}, is blocking (**Important**); a noise comment (restating code, change history, commented-out code) is minor (**Minor**).
 
 ## Output
 
