@@ -23,3 +23,9 @@
 - Export syntax checked in the skill source: `get-design --draft-id <id> --json` and `get-design --output`; drafts may use `<sd-component>` templates and public asset URLs, hence the standalone check and fallback.
 - Task 1 carries risk `system-wide` (behaviour of every UI run, paid external service) with the `architecture` lens.
 - Spec, plan and ledger written.
+
+## 2026-11-12 spec and plan review, round 1 (sonnet/high)
+
+- Report: research/plan-review.md. PLAN NEEDS CHANGES: 1 Critical, 11 Important, 6 Minor; CLI claims verified against the superdesign source.
+- Accepted all: explicit never-invoke rule in every subagent brief (the skill can trigger itself), with the repository-analysis exception; full disclosure in the consent question (spec, request, project files, images as public URLs, unpinned CLI) and lead token cost; consent per user in git-ignored `.tech-lead/superdesign-consent`; autopilot without consent uses the built-in builder; allowed remote resources defined; screen ids and mapping on both paths; expert fixes split between a local builder subagent and the lead's import; `.superdesign/*` allowlist; Task 1 risk changed to `security` with the `security` lens; stronger tests; README states requirements and that the integration has not run live.
+- Minor accepted: local-only rebuild, generations counted by the lead, noise margin for timing. Kept Task 2 on sonnet low (short prose; overspend small).

@@ -43,6 +43,11 @@
         "tech-lead/skills/tech-lead/SKILL.md",
         "tech-lead/skills/tech-lead/layout.md",
         "tech-lead/skills/tech-lead/mockup-prompt.md",
+        "tech-lead/skills/tech-lead/scout-prompt.md",
+        "tech-lead/skills/tech-lead/lens-review-prompt.md",
+        "tech-lead/skills/tech-lead/batch-review-prompt.md",
+        "tech-lead/skills/tech-lead/inventory-prompt.md",
+        "tech-lead/skills/tech-lead/plan-review-prompt.md",
         "tech-lead/tests/test_skill_docs.py",
         "tech-lead/tests/test_prompts.py"
       ],
@@ -63,12 +68,12 @@
       "model": "sonnet",
       "effort": "high",
       "risk": [
-        "system-wide"
+        "security"
       ],
       "experts": [
-        "architecture"
+        "security"
       ],
-      "reason": "Changes the behaviour of every UI run and adds a paid external service; wording must be unambiguous"
+      "reason": "Sends project code and the spec to a paid third-party service; consent and the subagent rule must be exact"
     },
     {
       "id": 2,
