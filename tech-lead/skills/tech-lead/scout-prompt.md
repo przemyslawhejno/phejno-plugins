@@ -12,8 +12,6 @@ Spec: read {{SPEC_PATH}} for the requirements.
 3. GitHub.
 4. The web.
 
-Stop early when a strong candidate turns up.
-
 ## Output
 
 Report at most 3 candidates. For each give:
@@ -25,7 +23,7 @@ Report at most 3 candidates. For each give:
 - last release
 - maintenance state
 - fit: how well it covers the spec
-- mode: one of `dependency` (install as is), `copy` (vendor the code), `pattern` (reuse the idea only), `reject`, with a reason
+- mode: one of `dependency` (install as is), `copy` (vendor the code, with attribution), `pattern` (reuse the idea only), `reject`, with a reason
 
 Copyleft licenses (GPL, AGPL, LGPL, MPL, EUPL and similar) may only be `pattern`, unless the user has decided otherwise.
 

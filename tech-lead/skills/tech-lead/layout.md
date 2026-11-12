@@ -91,7 +91,7 @@ Closed: superseded — <reason, with the replacing initiative>
 
 ## Backlog
 
-`docs/backlog.md` holds work discovered along the way: out-of-scope findings, follow-ups, parked review findings, user ideas. One line per item, numbered sequentially:
+`docs/backlog.md` holds work discovered along the way: out-of-scope findings, follow-ups, parked review findings, user ideas. At finish, deferred minors and parked findings from SDD's git-ignored `progress.md` are copied here. One line per item, numbered sequentially:
 
 ```
 - [ ] B<n> <title> — from <initiative or session> — <date>
