@@ -5,14 +5,21 @@ import os
 import tempfile
 import unittest
 
-from helpers import make_ledger, make_task  # noqa: F401  (sets sys.path)
+from helpers import make_hygiene, make_ledger, make_task  # noqa: F401  (sets sys.path)
 
 import ledger_core
 from ledger_core import LedgerError, next_wave, paths_overlap, validate, waves
 
 
+REPO_ROOT = os.path.abspath(os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", ".."))
+
+
 def errors_of(*tasks, **overrides):
     return validate(make_ledger(list(tasks), **overrides))
+
+
+def errors2(*tasks, **overrides):
+    return errors_of(*tasks, schema=2, **overrides)
 
 
 class ValidateTests(unittest.TestCase):
@@ -134,6 +141,116 @@ class ValidateTests(unittest.TestCase):
         self.assertTrue(errors_of(make_task(1, files=5)))
         self.assertTrue(errors_of(make_task(1, depends_on=None)))
         self.assertTrue(validate({"tasks": [1, "a", None]}))
+
+
+class Schema2Tests(unittest.TestCase):
+    def assertHas(self, errors, text):
+        self.assertTrue(any(text in e for e in errors), f"{text!r} not in {errors}")
+
+    def test_valid_schema2_ledger(self):
+        tasks = [
+            make_task(1, risk=["security"], experts=["security"]),
+            make_task(2, risk=["data"], experts=["data"]),
+            make_task(3, model="opus", risk=["irreversible"], experts=["api"]),
+            make_hygiene(4, [1, 2, 3]),
+        ]
+        self.assertEqual(errors2(*tasks), [])
+
+    def test_schema_absent_keeps_v1_rules(self):
+        tasks = [make_task(i, experts=["bogus"], kind="nope") for i in (1, 2, 3, 4)]
+        self.assertEqual(errors_of(*tasks), [])
+
+    def test_invalid_schema(self):
+        self.assertHas(errors_of(make_task(1), schema=3), "invalid schema '3'")
+        self.assertHas(errors_of(make_task(1), schema="2"), "invalid schema '2'")
+
+    def test_schema2_ui_must_be_boolean(self):
+        self.assertHas(errors2(make_task(1), ui="yes"), "ui must be a boolean")
+
+    def test_schema2_invalid_kind(self):
+        self.assertHas(errors2(make_task(1, kind="docs")), "task 1: invalid kind 'docs'")
+        self.assertEqual(errors2(make_task(1, model="lead", files=[], kind="docs")), [])
+
+    def test_schema2_list_fields_must_be_string_lists(self):
+        for f in ("risk", "experts", "replaces"):
+            for bad in ("security", [1], None):
+                self.assertHas(errors2(make_task(1, **{f: bad})), f"task 1: {f} must be a list of strings")
+
+    def test_schema2_invalid_risk(self):
+        self.assertHas(errors2(make_task(1, risk=["scary"])), "task 1: invalid risk 'scary'")
+
+    def test_schema2_unknown_lens(self):
+        self.assertHas(errors2(make_task(1, risk=["data"], experts=["data", "magic"])),
+                       "task 1: unknown lens 'magic'")
+
+    def test_case_sensitive_lens_and_risk(self):
+        self.assertHas(errors2(make_task(1, risk=["Security"])), "task 1: invalid risk 'Security'")
+        self.assertHas(errors2(make_task(1, risk=["security"], experts=["Security"])),
+                       "task 1: unknown lens 'Security'")
+
+    def test_schema2_more_than_four_experts(self):
+        t = make_task(1, risk=["irreversible"],
+                      experts=["data", "api", "architecture", "security", "tests"])
+        self.assertHas(errors2(t), "task 1: more than 4 experts")
+
+    def test_schema2_lead_takes_no_experts(self):
+        t = make_task(1, model="lead", files=[], experts=["security"])
+        self.assertHas(errors2(t), "task 1: lead tasks take no experts")
+
+    def test_schema2_risk_needs_matching_lens(self):
+        self.assertHas(errors2(make_task(1, risk=["security"], experts=["tests"])),
+                       "task 1: risk 'security' needs one of the lenses security")
+        self.assertHas(errors2(make_task(1, risk=["irreversible"], experts=["tests"])),
+                       "task 1: risk 'irreversible' needs one of the lenses data, api, architecture")
+        self.assertHas(errors2(make_task(1, risk=["data"])),
+                       "task 1: risk 'data' needs one of the lenses data")
+
+    def test_system_wide_matches_ui_ux_on_ui_task(self):
+        ui = make_task(1, kind="ui", risk=["ux", "system-wide"], experts=["ui-ux"])
+        self.assertEqual(errors2(ui, ui=True), [])
+        code = make_task(1, risk=["system-wide"], experts=["ui-ux"])
+        self.assertHas(errors2(code), "task 1: risk 'system-wide' needs one of the lenses architecture")
+
+    def test_schema2_routine_task_takes_no_experts(self):
+        self.assertHas(errors2(make_task(1, model="haiku", experts=["tests"])),
+                       "task 1: routine task takes no experts")
+        self.assertHas(errors2(make_task(1, experts=["tests"])),
+                       "task 1: routine task takes no experts")
+        self.assertEqual(errors2(make_task(1, effort="medium", experts=["tests"])), [])
+
+    def test_schema2_ui_kind_needs_top_level_ui(self):
+        t = make_task(1, kind="ui", risk=["ux"], experts=["ui-ux"])
+        self.assertHas(errors2(t), "task 1: kind 'ui' needs top-level ui: true")
+        self.assertHas(errors2(t, ui=False), "task 1: kind 'ui' needs top-level ui: true")
+        self.assertEqual(errors2(t, ui=True), [])
+
+    def test_schema2_ui_task_not_on_haiku_needs_ux(self):
+        self.assertHas(errors2(make_task(1, kind="ui"), ui=True),
+                       "task 1: ui task not on haiku needs risk 'ux'")
+        self.assertEqual(errors2(make_task(1, kind="ui", model="haiku"), ui=True), [])
+
+    def test_schema2_haiku_cannot_carry_risk(self):
+        errs = errors2(make_task(1, model="haiku", risk=["data"]))
+        self.assertHas(errs, "task 1: haiku task cannot carry risk 'data'")
+        self.assertFalse(any("needs one of the lenses" in e for e in errs), errs)
+
+    def test_schema2_missing_hygiene_task(self):
+        three = [make_task(i) for i in (1, 2, 3)]
+        self.assertHas(errors2(*three), "missing hygiene task")
+        self.assertEqual(errors2(make_task(1), make_task(2)), [])
+        self.assertHas(errors2(make_task(1), make_task(2, replaces=["old.py"])), "missing hygiene task")
+        self.assertEqual(errors2(make_task(1, model="lead", files=[]), make_task(2), make_task(3)), [])
+
+    def test_schema2_hygiene_must_depend_on_code_tasks(self):
+        tasks = [make_task(1), make_task(2), make_task(3), make_hygiene(4, [1])]
+        errs = errors2(*tasks)
+        self.assertHas(errs, "task 4: hygiene task must depend on task 2")
+        self.assertHas(errs, "task 4: hygiene task must depend on task 3")
+        self.assertFalse(any("depend on task 1" in e for e in errs), errs)
+
+    def test_finished_v1_initiative_ledger_valid(self):
+        path = os.path.join(REPO_ROOT, "docs", "initiatives", "2026-11-11-tech-lead", "ledger.json")
+        self.assertEqual(validate(ledger_core.load(path)), [])
 
 
 class WavesTests(unittest.TestCase):

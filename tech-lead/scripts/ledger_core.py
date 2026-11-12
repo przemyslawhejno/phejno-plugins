@@ -7,6 +7,17 @@ MODELS = ("haiku", "sonnet", "opus", "fable", "lead")
 EFFORTS = ("low", "medium", "high", "xhigh", "max")
 REUSE_MODES = ("dependency", "copy", "pattern")
 MODES = ("gated", "autopilot")
+KINDS = ("code", "ui", "hygiene")
+RISKS = ("security", "data", "irreversible", "system-wide", "ux")
+LENSES = ("security", "data", "api", "architecture", "performance", "errors", "tests", "ui-ux")
+RISK_LENSES = {
+    "security": ("security",),
+    "data": ("data",),
+    "irreversible": ("data", "api", "architecture"),
+    "system-wide": ("architecture",),
+    "ux": ("ui-ux",),
+}
+MAX_EXPERTS = 4
 
 REQUIRED_FIELDS = ("id", "title", "depends_on", "files", "acceptance", "model", "reason")
 
@@ -110,6 +121,10 @@ def validate(ledger: dict) -> list:
         errors.append("missing field 'prior_art'")
     if "mode" in ledger and ledger["mode"] not in MODES:
         errors.append(f"invalid mode '{ledger['mode']}'")
+
+    schema = ledger.get("schema")
+    if "schema" in ledger and schema != 2:
+        errors.append(f"invalid schema '{schema}'")
 
     tasks = ledger.get("tasks")
     if not _is_list(tasks):
@@ -239,6 +254,9 @@ def validate(ledger: dict) -> list:
                 if not (isinstance(nv, str) and nv.strip()):
                     errors.append(f"task {n}: verify is empty and no_verify gives no reason")
 
+    if schema == 2:
+        errors.extend(_schema2_errors(ledger, tasks))
+
     for x in done:
         if not (_valid_id(x) and x in ids):
             errors.append(f"done: unknown task id {x}")
@@ -258,6 +276,91 @@ def validate(ledger: dict) -> list:
             else:
                 errors.extend(_conflicts(valid_tasks))
     return errors
+
+
+def _string_list(x) -> bool:
+    return _is_list(x) and all(isinstance(v, str) for v in x)
+
+
+def _schema2_errors(ledger: dict, tasks: list) -> list:
+    errors: list = []
+    if "ui" in ledger and not isinstance(ledger["ui"], bool):
+        errors.append("ui must be a boolean")
+    ui_enabled = ledger.get("ui") is True
+    code_tasks: list = []
+    hygiene_tasks: list = []
+    for t in tasks:
+        if not isinstance(t, dict) or not _valid_id(t.get("id")):
+            continue
+        n = t["id"]
+        lead = t.get("model") == "lead"
+        kind = t.get("kind", "code")
+        if not lead:
+            if kind not in KINDS:
+                errors.append(f"task {n}: invalid kind '{kind}'")
+            elif kind == "hygiene":
+                hygiene_tasks.append(t)
+            else:
+                code_tasks.append(t)
+
+        lists: dict = {}
+        for f in ("risk", "experts", "replaces"):
+            value = t.get(f, [])
+            if _string_list(value):
+                lists[f] = value
+            else:
+                lists[f] = []
+                errors.append(f"task {n}: {f} must be a list of strings")
+        risks, lenses = lists["risk"], lists["experts"]
+
+        for r in risks:
+            if r not in RISKS:
+                errors.append(f"task {n}: invalid risk '{r}'")
+        for lens in lenses:
+            if lens not in LENSES:
+                errors.append(f"task {n}: unknown lens '{lens}'")
+        if len(lenses) > MAX_EXPERTS:
+            errors.append(f"task {n}: more than {MAX_EXPERTS} experts")
+        if lead:
+            if lenses:
+                errors.append(f"task {n}: lead tasks take no experts")
+            continue
+
+        model = t.get("model")
+        if kind == "ui":
+            if not ui_enabled:
+                errors.append(f"task {n}: kind 'ui' needs top-level ui: true")
+            if model != "haiku" and "ux" not in risks:
+                errors.append(f"task {n}: ui task not on haiku needs risk 'ux'")
+        if model == "haiku" and risks:
+            for r in risks:
+                errors.append(f"task {n}: haiku task cannot carry risk '{r}'")
+            continue
+        if lenses and (model == "haiku" or (model == "sonnet" and t.get("effort") == "low" and not risks)):
+            errors.append(f"task {n}: routine task takes no experts")
+        for r in risks:
+            if r not in RISKS:
+                continue
+            wanted = RISK_LENSES[r]
+            if r == "system-wide" and kind == "ui":
+                wanted = wanted + ("ui-ux",)
+            if not any(lens in wanted for lens in lenses):
+                errors.append(f"task {n}: risk '{r}' needs one of the lenses {', '.join(wanted)}")
+
+    if not hygiene_tasks and (
+        len(code_tasks) >= 3 or (len(code_tasks) >= 2 and _any_replaces(code_tasks))
+    ):
+        errors.append("missing hygiene task")
+    for h in hygiene_tasks:
+        deps = _deps(h)
+        for m in sorted(c["id"] for c in code_tasks):
+            if m not in deps:
+                errors.append(f"task {h['id']}: hygiene task must depend on task {m}")
+    return errors
+
+
+def _any_replaces(tasks: list) -> bool:
+    return any(_string_list(t.get("replaces")) and t["replaces"] for t in tasks)
 
 
 def _conflicts(tasks: list) -> list:

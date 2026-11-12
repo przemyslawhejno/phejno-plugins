@@ -26,6 +26,10 @@ def make_task(id, **overrides):
     return task
 
 
+def make_hygiene(id, depends_on):
+    return make_task(id, kind="hygiene", depends_on=depends_on, files=["src/", "tests/"])
+
+
 def make_ledger(tasks, **overrides):
     tasks = list(tasks)
     if tasks and isinstance(tasks[0], dict) and "covers" not in tasks[0]:
