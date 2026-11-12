@@ -76,6 +76,25 @@ class RenderShowTests(unittest.TestCase):
         self.assertIn("Opus and fable share: 50% (2 of 4 tasks)", out)
         self.assertIn("Prior art: done", out)
 
+    def test_cells_stay_on_one_row(self):
+        out = render_show(make_ledger([make_task(
+            1, title="a\nb|c", files=["f\n|g", "h"], acceptance=["x\ny|z"])]))
+        row = [l for l in out.splitlines() if l.startswith("| 1 |")]
+        self.assertEqual(row, ["| 1 | a b\\|c | - | f \\|g<br>h | sonnet/low | - | - | r | x y\\|z |"])
+
+    def test_empty_task_list_renders_sections(self):
+        out = render_show(make_ledger([]))
+        self.assertIn("## Requirement coverage", out)
+        self.assertIn("None.", out)
+        self.assertIn("share: 0% (0 of 0 tasks)", out)
+
+    def test_share_rounds_half_up(self):
+        one = render_show(make_ledger([make_task(1, model="opus"), make_task(2), make_task(3)]))
+        two = render_show(make_ledger([make_task(1, model="opus"), make_task(2, model="opus"),
+                                       make_task(3)]))
+        self.assertIn("share: 33% (1 of 3 tasks)", one)
+        self.assertIn("share: 67% (2 of 3 tasks)", two)
+
 
 if __name__ == "__main__":
     unittest.main()
