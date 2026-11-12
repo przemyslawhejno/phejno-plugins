@@ -35,3 +35,6 @@ Checkpoint run by hand (ledger.py not built yet): 40 tests pass, no out-of-scope
 ## 2026-11-12 wave 2
 Tasks done: 2, 3, 4
 Task 4: Ruling: unknown wave raises CheckpointError and an OSError on the log becomes CheckpointError — the reviewer's ⚠️ item and the no-traceback global constraint make both real gaps — cost if wrong: two extra error paths
+
+## 2026-11-12 wave 3
+Tasks done: 5
