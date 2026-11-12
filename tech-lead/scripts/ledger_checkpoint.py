@@ -7,7 +7,7 @@ import subprocess
 import time
 from dataclasses import dataclass, field
 
-from ledger_core import paths_overlap, waves
+from ledger_core import codemap_action, paths_overlap, waves
 
 
 class CheckpointError(Exception):
@@ -47,15 +47,7 @@ def _changed_files(base: str, repo: str) -> list:
     return [l for l in p.stdout.decode("utf-8", "replace").split("\0") if l]
 
 
-CODEMAP_INLINE_MAX = 15
-CODEMAP_UPDATE_MAX = 50
 CODEMAP_IGNORED = (".worktrees/", ".claude/codemap/")
-
-
-def codemap_action(count: int) -> str:
-    if count <= CODEMAP_INLINE_MAX:
-        return "inline"
-    return "update" if count <= CODEMAP_UPDATE_MAX else "rebuild"
 
 
 def sync_codemap(repo: str, base: str):
@@ -73,7 +65,7 @@ def sync_codemap(repo: str, base: str):
     return len(unique), codemap_action(len(unique))
 
 
-def _run(command: str, repo: str, log) -> tuple:
+def _run(command: str, repo: str, log) -> tuple[int, float]:
     start = time.monotonic()
     p = subprocess.run(command, shell=True, cwd=repo, stdin=subprocess.DEVNULL, stdout=subprocess.PIPE,
                        stderr=subprocess.STDOUT)

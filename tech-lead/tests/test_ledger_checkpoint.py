@@ -8,7 +8,6 @@ import subprocess
 import tempfile
 import unittest
 
-import helpers  # noqa: F401  (adds scripts to sys.path)
 from helpers import make_ledger, make_task
 
 import ledger_checkpoint as cp

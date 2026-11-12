@@ -18,6 +18,8 @@ RISK_LENSES = {
     "ux": ("ui-ux",),
 }
 MAX_EXPERTS = 4
+CODEMAP_INLINE_MAX = 15
+CODEMAP_UPDATE_MAX = 50
 
 REQUIRED_FIELDS = ("id", "title", "depends_on", "files", "acceptance", "model", "reason")
 
@@ -66,6 +68,12 @@ def paths_overlap(a: str, b: str) -> bool:
 def _deps(task: dict) -> list:
     deps = task.get("depends_on")
     return deps if _is_list(deps) else []
+
+
+def codemap_action(count: int) -> str:
+    if count <= CODEMAP_INLINE_MAX:
+        return "inline"
+    return "update" if count <= CODEMAP_UPDATE_MAX else "rebuild"
 
 
 def waves(tasks: list) -> dict:

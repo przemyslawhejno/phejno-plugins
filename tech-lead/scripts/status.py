@@ -22,8 +22,6 @@ BRIEF_BACKLOG = 5
 RECENT = 5
 OPEN_PREFIX = "- [ ] "
 CODEMAP_MIN_FILES = 30
-CODEMAP_UPDATE_MIN = 16
-CODEMAP_REBUILD_MIN = 51
 CODEMAP_STALE_DAYS = 30
 CODEMAP_STALE_COMMITS = 20
 
@@ -175,9 +173,10 @@ def _codemap_proposal(root: Path, facts: dict):
         if n >= CODEMAP_MIN_FILES:
             return f"Codemap: none for {n} code files \u2014 propose /codemap (claude-codemap plugin)"
         return None
-    if facts["pending"] >= CODEMAP_REBUILD_MIN or not facts["symbols"]:
+    action = _core().codemap_action(facts["pending"])
+    if action == "rebuild" or not facts["symbols"]:
         return "Codemap: stale \u2014 propose /codemap (full rebuild)"
-    if facts["pending"] >= CODEMAP_UPDATE_MIN:
+    if action == "update":
         return f"Codemap: {facts['pending']} pending \u2014 propose /codemap update"
     if facts["generated"]:
         since = datetime.date.fromisoformat(facts["generated"])
