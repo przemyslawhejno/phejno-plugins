@@ -10,3 +10,4 @@
 - [ ] B8 Prompts: say what `{{MOCKUP_PATH}}` holds for batches without UI tasks; stronger `id` assertion in test_prompts — from 2026-11-11-tech-lead — 2026-11-12
 - [ ] B9 tech-lead README: list the optional skills (`engineering:architecture`, `security-review`, `modern-web-guidance`); packaging test also checks the scripts the skill names — from 2026-11-11-tech-lead — 2026-11-12
 - [ ] B10 ledger_core.py: tighten type annotations; remaining test gaps from the Task 1 review — from 2026-11-11-tech-lead — 2026-11-12
+- [ ] B11 ledger_checkpoint stdin test can pass without stdin=DEVNULL under a runner without a terminal; make it fail without the fix — from 2026-11-11-tech-lead — 2026-11-12

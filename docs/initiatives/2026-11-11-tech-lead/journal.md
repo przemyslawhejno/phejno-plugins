@@ -49,3 +49,12 @@ Tasks done: 8
 - Headless smoke tests (`claude -p --plugin-dir tech-lead`): the skill and `/tech-lead:run` load; the SessionStart hook is silent without docs/initiatives and, in a sample project, injects the status and the agent proposes next steps and waits.
 - Not run here: the full dry run up to the gate (brainstorming is interactive and stops a headless run at its first question). To do in a new interactive session: `/tech-lead:run <sample spec with a UI>`.
 - Final whole-branch review dispatched (opus/medium).
+
+## 2026-11-12 wave 5
+Tasks done: 9
+
+## 2026-11-12 session
+
+- Done: all 9 tasks in 5 waves, autopilot. Final whole-branch review (opus/medium): ready with fixes; one fix wave (session-start brief no longer halts work in progress, deferred findings copied to backlog at finish, wave base recorded for resume, re-gate journal entry, checkpoint commands get no stdin, scout `copy` with attribution), scoped re-review clean. 91 tests pass, also on Python 3.9 per the final reviewer.
+- Open: backlog B1 (interactive dry run up to the gate, needs a new session) and B2-B11 (minor polish and test gaps from the reviews).
+- Next: user decides on merging PR #1; then B1.
