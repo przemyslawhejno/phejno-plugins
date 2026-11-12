@@ -4,12 +4,14 @@ from __future__ import annotations
 from ledger_core import MODELS, waves
 
 
-def _cell(items) -> str:
-    return "<br>".join(str(x) for x in items) or "-"
-
-
 def _esc(x) -> str:
     return str(x).replace("|", "\\|").replace("\n", " ")
+
+
+def _cell(x) -> str:
+    if isinstance(x, (list, tuple)):
+        return "<br>".join(_esc(i) for i in x) or "-"
+    return _esc(x)
 
 
 def _model(t: dict) -> str:
@@ -33,12 +35,9 @@ def render_show(ledger: dict) -> str:
         for t in tasks:
             if wave_of[t["id"]] != w:
                 continue
-            row = [t["id"], t["title"], _cell(t["depends_on"]), _cell(t["files"]),
-                   _model(t), _cell(t.get("risk", [])), _cell(t.get("experts", [])),
-                   t["reason"], _cell(t["acceptance"])]
-            out.append("| " + " | ".join(_esc(c) if i not in (2, 3, 5, 6, 8) else
-                                         str(c).replace("|", "\\|")
-                                         for i, c in enumerate(row)) + " |")
+            row = [t["id"], t["title"], t["depends_on"], t["files"], _model(t),
+                   t.get("risk", []), t.get("experts", []), t["reason"], t["acceptance"]]
+            out.append("| " + " | ".join(_cell(c) for c in row) + " |")
         out.append("")
 
     out.append("## Requirement coverage")
@@ -47,7 +46,7 @@ def render_show(ledger: dict) -> str:
     out.append("| --- | --- | --- |")
     for r in ledger.get("requirements", []):
         ids = [str(t["id"]) for t in tasks if r["id"] in t.get("covers", [])]
-        out.append(f"| {_esc(r['id'])} | {_esc(r.get('text', ''))} | {', '.join(ids)} |")
+        out.append(f"| {_cell(r['id'])} | {_cell(r.get('text', ''))} | {', '.join(ids)} |")
     out.append("")
 
     out.append("## New dependencies and copied code")
