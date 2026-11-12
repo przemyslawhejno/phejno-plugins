@@ -66,13 +66,13 @@ Rules:
 `journal.md` is the initiative's memory for later sessions. Entries are short and dated, newest last:
 
 - `## <date> session`: what was done, what is open, what comes next. Written before a turn ends with work stopped.
-- Wave results, rulings and escalations, copied by `ledger.py checkpoint` from SDD's `progress.md` (lines starting `Ruling:` and `Attempt:`), so they survive the git-ignored SDD workspace.
+- Wave results, rulings and escalations, copied by `ledger.py checkpoint` from SDD's `progress.md` (lines containing `Ruling:`, which covers SDD's `Task N: Ruling:` and parked-finding forms, and lines starting `Attempt:`), so they survive the git-ignored SDD workspace.
 - Gate approvals and re-gates, with what changed.
 - `Closed:` when the initiative ends without completion.
 
 ## Session start
 
-A SessionStart hook (`startup`, `clear`, `compact`) runs `status.py --brief`. When `docs/initiatives/` does not exist it prints nothing. Otherwise it injects at most about 25 lines: initiatives in progress with their next wave, planned and specified initiatives, the first backlog items, and an instruction to propose next steps to the user as a short list and wait for their choice before starting work. Any error in the hook prints nothing; a hook failure never blocks a session. `TECH_LEAD_STATUS=0` turns it off.
+A SessionStart hook (`startup`, `clear`, `compact`) runs `status.py --brief`. When `docs/initiatives/` does not exist it prints nothing. Otherwise it injects at most about 25 lines: initiatives in progress with their next wave, planned and specified initiatives, the first backlog items, and an instruction to propose next steps to the user as a short list and wait for their choice before starting work, followed by the absolute path of `docs/STATUS.md` when that file exists. Any error in the hook prints nothing; a hook failure never blocks a session. `TECH_LEAD_STATUS=0` turns it off.
 
 ## Lead process (SKILL.md)
 
@@ -204,7 +204,7 @@ Python 3, stdlib only, pure functions plus a thin CLI. A malformed or unreadable
 | `check LEDGER` | Validates. One error per line, exit 1; nothing and exit 0 when valid. |
 | `show LEDGER` | Runs `check`, then prints markdown: tasks grouped by wave (id, title, depends on, files, model/effort, reason, acceptance); requirement coverage (requirement to tasks); "New dependencies and copied code" from `reuse` entries with mode `dependency` or `copy`; summary of task count per model including `lead`, and the share on opus and fable. |
 | `next LEDGER` | Prints the earliest wave with a task not in `done`, and that wave's remaining tasks with model and effort, or `all tasks complete`. A failed or abandoned task keeps its wave open instead of silently blocking later ones. |
-| `checkpoint LEDGER --wave W --base REF [--log FILE] [--mark]` | Lists files in `git diff --name-only REF..HEAD` outside the union of the wave's `files` as out-of-scope warnings. Runs every `verify` command of the wave's tasks, then `checks`, writing full output to the log (default `.tech-lead/scratch/checkpoint-W.log`). Prints `Task N: pass` or `Task N: fail (exit X)` per task, `Checks: pass` or the failing check, then the warnings. Exit 1 when anything fails. With `--mark` and everything passing: adds the wave's ids to `done`, and appends to the folder's `journal.md` a wave entry plus the `Ruling:` and `Attempt:` lines from SDD's `progress.md` not yet copied. |
+| `checkpoint LEDGER --wave W --base REF [--log FILE] [--progress FILE] [--mark]` | Lists files in `git diff --name-only REF..HEAD` outside the union of the wave's `files` as out-of-scope warnings. Runs every `verify` command of the wave's tasks, then `checks`, writing full output to the log (default `.tech-lead/scratch/checkpoint-W.log`). Prints `Task N: pass` or `Task N: fail (exit X)` per task, `Checks: pass` or the failing check, then the warnings. Exit 1 when anything fails. With `--mark` and everything passing: adds the wave's ids to `done`, and appends to the folder's `journal.md` a wave entry plus the lines of the `--progress` file (SDD's `progress.md`, whose path the lead takes from SDD's `sdd-workspace` script) containing `Ruling:` or starting `Attempt:`, not yet copied. Without `--progress` the entry has no copied lines. |
 
 Validation errors in `check`:
 

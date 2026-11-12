@@ -14,7 +14,10 @@
 
 ## Global Constraints
 
-- Python 3.9+ compatible (`from __future__ import annotations`, no `match`), stdlib only, no third-party packages.
+- Spec: `docs/initiatives/2026-11-11-tech-lead/spec.md`. A task that names spec sections reads them there.
+- Python 3.9+ compatible: `from __future__ import annotations` in every module; no `match`, no `X | Y` unions evaluated at runtime (in `isinstance` or outside annotations), no parenthesised multi-item `with`, no `zip(strict=...)`. Stdlib only, no third-party packages.
+- CLIs reconfigure stdout and stderr to UTF-8 (`reconfigure(encoding="utf-8")`). Usage errors are one `error: <message>` line on stderr and exit 1, not argparse's multi-line exit 2.
+- Tests that create git repositories set `user.email`, `user.name` and `commit.gpgsign=false` locally, run git with `GIT_DIR` and `GIT_WORK_TREE` removed from the environment, and compare paths after `os.path.realpath`.
 - Every file read or written as UTF-8; JSON written with `indent=2`, `ensure_ascii=False` and a trailing newline.
 - A malformed or unreadable input is one error line on stderr (`error: <message>`) and exit 1, never a traceback.
 - Every file a script writes is announced as `Wrote <absolute path>` on its own stdout line; paths in reports are absolute.
@@ -86,7 +89,7 @@ Waves: 1 = Tasks 1, 6, 7; 2 = Tasks 2, 3, 4; 3 = Task 5; 4 = Task 8; 5 = Task 9.
   - `waves(tasks: list[dict]) -> dict[int, int]`: task id to wave number. Callers validate first (acyclic).
   - `paths_overlap(a: str, b: str) -> bool`.
   - `next_wave(ledger: dict) -> tuple[int, list[dict]] | None`: earliest wave with a task whose id is not in `done`, and those tasks in id order; `None` when all are done.
-- Produces, in `tests/helpers.py`: `SCRIPTS` (absolute path of `tech-lead/scripts`, inserted at the front of `sys.path` on import), `make_task(id: int, **overrides) -> dict` (a valid sonnet/low task with `files=[f"src/t{id}.py"]`, `acceptance=["works"]`, `verify=["true"]`, `depends_on=[]`, `reason="r"`, `title=f"Task {id}"`), `make_ledger(tasks: list[dict], **overrides) -> dict` (`prior_art="done"`, `checks=[]`, `done=[]`, one requirement `R1` covered by the first task).
+- Produces, in `tests/helpers.py`: `SCRIPTS` (absolute path of `tech-lead/scripts`, inserted at the front of `sys.path` on import), `make_task(id: int, **overrides) -> dict` (a valid sonnet/low task with `files=[f"src/t{id}.py"]`, `acceptance=["works"]`, `verify=["true"]`, `depends_on=[]`, `reason="r"`, `title=f"Task {id}"`), `make_ledger(tasks: list[dict], **overrides) -> dict`: top-level `prior_art="done"`, `checks=[]`, `done=[]`, `requirements=[{"id": "R1", "text": "r"}]`, `tasks`; sets the first task's `covers` to `["R1"]` unless it already has `covers`; then `overrides` replace top-level keys.
 
 Validation messages (tests assert these substrings; `N` is the task id):
 
@@ -109,13 +112,13 @@ Validation messages (tests assert these substrings; `N` is the task id):
 | prior art | `missing field 'prior_art'` |
 | mode | `invalid mode '<v>'` (allowed `gated`, `autopilot`; absent means `gated`) |
 
-Required fields: `id`, `title`, `depends_on`, `files`, `acceptance`, `model`, `reason`; `effort` and `verify` unless `model` is `lead`. Top-level `requirements`, `done`, `checks` default to `[]` when absent. A path is not normalised when it is empty, starts with `/` or `./`, contains `\`, `//` or a `..` segment. `paths_overlap`: equal, or one ends with `/` and the other starts with it. Wave and conflict checks are skipped when there is a cycle or an unknown dependency.
+Required fields: `id`, `title`, `depends_on`, `files`, `acceptance`, `model`, `reason`; `effort` and `verify` unless `model` is `lead`. Top-level `requirements`, `done`, `checks` default to `[]` when absent. A path is not normalised when it is empty, starts with `/` or `./`, contains `\`, `//` or a `..` segment. `paths_overlap`: equal, or one ends with `/` and the other starts with it. Wave and conflict checks are skipped when there is a cycle, an unknown dependency, or an invalid or duplicate task id.
 
 - [ ] **Step 1: Write `tests/helpers.py` and the failing tests**
 
 Tests in `test_ledger_core.py`, one per line:
 - `test_valid_ledger_has_no_errors`: `validate(make_ledger([make_task(1), make_task(2, depends_on=[1])])) == []`.
-- `test_missing_field`, `test_empty_acceptance`, `test_string_id_rejected` (`make_task("1")` gives `id must be a positive integer`), `test_duplicate_ids`, `test_unknown_done_id`, `test_invalid_model_effort_reuse_mode`, `test_reuse_needs_source_and_license`, `test_unknown_dependency_and_covers`, `test_cycle_reported` (tasks 1 and 2 depending on each other give `dependency cycle: 1 -> 2 -> 1`), `test_uncovered_requirement`, `test_lead_task_files_rules`, `test_lead_task_needs_no_effort_or_verify`, `test_empty_verify_needs_reason` (`no_verify="docs only"` clears it), `test_paths_not_normalised` (each of `/a`, `./a`, `a/../b`, `a//b`, `a\\b`, `""`), `test_same_wave_conflict_with_directory_prefix` (files `src/` and `src/a.py` in wave 1 give `wave 1: tasks 1 and 2 share`), `test_conflict_cleared_by_dependency`, `test_prior_art_missing`, `test_invalid_mode`, `test_wrong_types_do_not_raise` (`tasks="x"`, `files=5`, `depends_on=None` each yield errors).
+- `test_missing_field`, `test_empty_acceptance`, `test_string_id_rejected` (`make_task("1")` gives `id must be a positive integer`), `test_duplicate_ids`, `test_unknown_done_id` (including `done: ["1"]`), `test_invalid_model_effort_reuse_mode`, `test_reuse_needs_source_and_license`, `test_unknown_dependency_and_covers`, `test_cycle_reported` (tasks 1 and 2 depending on each other give `dependency cycle: 1 -> 2 -> 1`), `test_uncovered_requirement`, `test_lead_task_files_rules`, `test_lead_task_needs_no_effort_or_verify`, `test_empty_verify_needs_reason` (`no_verify="docs only"` clears it), `test_paths_not_normalised` (each of `/a`, `./a`, `a/../b`, `a//b`, `a\\b`, `""`), `test_same_wave_conflict_with_directory_prefix` (files `src/` and `src/a.py` in wave 1 give `wave 1: tasks 1 and 2 share`), `test_conflict_cleared_by_dependency`, `test_prior_art_missing`, `test_invalid_mode`, `test_wrong_types_do_not_raise` (`tasks="x"`, `files=5`, `depends_on=None` each yield errors).
 - `test_waves`: 1 and 2 independent, 3 depends on 1 and 2, 4 on 3: `{1: 1, 2: 1, 3: 2, 4: 3}`.
 - `test_paths_overlap`: `("src/", "src/a.py")` True, `("src/a.py", "src/a.py")` True, `("src", "src2")` False, `("src/a", "src/ab")` False.
 - `test_next_wave`: nothing done gives wave 1 with tasks 1 and 2; `done=[1]` still gives wave 1 with task 2 (a stuck task keeps its wave open); `done=[1, 2]` gives wave 2; all done gives `None`.
@@ -156,16 +159,16 @@ git commit -m "tech-lead: ledger core validation, waves and next"
   - `initiative_state(folder: Path) -> dict` with keys `name`, `path` (absolute str), `date` (`YYYY-MM-DD` from the folder name prefix, else `""`), `state`, `waves_done`, `waves_total`, `next_wave` (int or `None`).
   - `read_backlog(path: Path) -> list[str]`: the open items, each line starting `- [ ] ` with that prefix removed, in file order.
   - `render_full(root: Path) -> str`, `render_brief(root: Path) -> str`, `write_status(root: Path) -> Path`.
-  - CLI `status.py [ROOT] [--brief | --write]`.
+  - `main(argv: list[str]) -> int` and CLI `status.py [ROOT] [--brief | --write]`.
 
 State rules, checked in this order: a line in `journal.md` starting `Closed:` → `closed`; `ledger.json` present but failing `load` or `validate` → `unknown (ledger error)`; `ledger.json` with every task id in `done` → `done`; some done → `in progress`; none done → `planned`; `spec.md` → `specified`; otherwise `proposed`. `waves_done` counts waves whose tasks are all done.
 
 Output rules:
 - `render_full`: `# Project status` and one `## <State>` section per non-empty state in the order in progress, planned, specified, proposed, unknown, then `## Recently done` (the 5 newest done or closed by `date`), then `## Backlog`. An initiative line: `- <name> (<state>, waves <done>/<total>, next wave <n>): <absolute path>`, dropping the parts that do not apply. Without `docs/initiatives/` it prints `No initiatives yet.`
 - `write_status`: writes `docs/STATUS.md` starting with `<!-- generated by tech-lead status.py, do not edit -->`, returns its path; the CLI prints `Wrote <absolute path>`.
-- `render_brief`: empty string when `docs/initiatives/` is missing. Otherwise at most 25 lines: `tech-lead status for <absolute root>`, initiatives in progress, planned and specified (one line each, as above), the first 5 backlog items, then exactly: `Propose next steps to the user as a short list based on this status, and wait for their choice before starting work. Full status: <absolute path of docs/STATUS.md>`. Initiative lines are cut first when over the limit.
+- `render_brief`: empty string when `docs/initiatives/` is missing. Otherwise at most 25 lines: `tech-lead status for <absolute root>`, initiatives in progress, planned and specified (one line each, as above), the first 5 backlog items, then exactly: `Propose next steps to the user as a short list based on this status, and wait for their choice before starting work.`, followed by ` Full status: <absolute path of docs/STATUS.md>` on the same line only when that file exists. Initiative lines are cut first when over the limit.
 - ROOT defaults to `$CLAUDE_PROJECT_DIR`, else the current directory.
-- `--brief` prints nothing and exits 0 when `TECH_LEAD_STATUS=0`, and on any exception.
+- `--brief` prints nothing and exits 0 when `TECH_LEAD_STATUS=0`, and on any exception; the `ledger_core` import sits inside the guarded code, so a broken install cannot break a session.
 
 - [ ] **Step 1: Write the failing tests**
 
@@ -180,7 +183,9 @@ Each builds a temporary project with `tempfile.TemporaryDirectory` and ledgers f
 - `test_write_header_and_path`: the file starts with the generated header.
 - `test_non_ascii_round_trip`: a backlog item `- [ ] B3 Zażółć gęślą jaźń` appears unchanged in `render_full`.
 - `test_root_from_env`: running the CLI with `cwd` elsewhere and `CLAUDE_PROJECT_DIR` set reports that root.
-- `test_brief_disabled_by_env` and `test_brief_swallows_errors` (a `docs/initiatives` that is a file, not a directory): no output, exit 0.
+- `test_brief_disabled_by_env`: no output, exit 0.
+- `test_brief_swallows_errors`: with `status.render_brief` patched to raise `RuntimeError`, `main([root, "--brief"])` returns 0 and prints nothing (capture stdout).
+- `test_brief_status_path_only_when_present`: no `Full status:` before `write_status`, present after.
 
 - [ ] **Step 2: Run tests to verify they fail**
 
@@ -260,8 +265,8 @@ git commit -m "tech-lead: ledger show report"
   - `class CheckpointError(Exception)`.
   - `@dataclass CheckpointResult`: `tasks: list[tuple[int, int]]` (task id, worst exit code of its `verify` commands, 0 when all pass), `checks: list[tuple[str, int]]`, `out_of_scope: list[str]`, `log_path: str` (absolute); property `passed: bool` (every code is 0; out-of-scope files do not fail).
   - `out_of_scope(changed: list[str], allowed: list[str]) -> list[str]`: changed paths that overlap no allowed path, in input order.
-  - `run_checkpoint(ledger: dict, wave: int, base: str, repo: str, log_path: str) -> CheckpointResult`: `git diff --name-only <base>..HEAD` in `repo` (a git failure or unknown ref raises `CheckpointError("git diff failed: <stderr first line>")`); runs each `verify` command of the wave's non-lead tasks, then each of `checks`, with `shell=True`, `cwd=repo`; appends each command's header (`$ <command>`), combined output and exit code to the log, creating its parent directories. Nothing from the commands goes to stdout.
-  - `format_result(result: CheckpointResult) -> str`: `Task N: pass` or `Task N: fail (exit X)` per task, `Checks: pass` or `Check failed: <command> (exit X)` per failing check, `Out of scope: <path>` per file, and `Log: <absolute path>`.
+  - `run_checkpoint(ledger: dict, wave: int, base: str, repo: str, log_path: str) -> CheckpointResult`: `git diff --name-only <base>..HEAD` in `repo` (a git failure or unknown ref raises `CheckpointError("git diff failed: <stderr first line>")`); runs each `verify` command of the wave's non-lead tasks, then each of `checks`, with `shell=True`, `cwd=repo`; truncates the log, then appends each command's header (`$ <command>`), combined output and exit code, creating its parent directories. Nothing from the commands goes to stdout.
+  - `format_result(result: CheckpointResult) -> str`: `Task N: pass` or `Task N: fail (exit X)` per task, `Checks: pass` or `Check failed: <command> (exit X)` per failing check, and `Out of scope: <path>` per file. The log path is printed by the CLI as `Wrote <path>`, not here.
   - `mark_done(ledger_path: str, ledger: dict, wave: int, progress_path: str | None, today: str) -> list[str]`: adds the wave's task ids to `done` (keeping existing order, appending new ids ascending, no duplicates), rewrites the ledger, appends to `journal.md` in the ledger's folder (created if missing), returns the absolute paths written.
 
 Journal entry appended by `mark_done`:
@@ -269,7 +274,7 @@ Journal entry appended by `mark_done`:
 ```
 ## <today> wave <W>
 Tasks done: <ids comma-separated>
-<each line of progress.md starting "Ruling:" or "Attempt:" that does not already appear in journal.md>
+<each line of progress.md that contains "Ruling:" or starts with "Attempt:" (after stripping), and does not already appear in journal.md>
 ```
 
 - [ ] **Step 1: Write the failing tests**
@@ -281,7 +286,7 @@ Fixture: a temporary git repository (`git init`, `user.email`/`user.name` set lo
 - `test_failing_check`: check `exit 2` gives `Check failed: exit 2 (exit 2)`.
 - `test_output_goes_to_log_only`: verify `echo hello` writes `hello` into the log; `format_result` does not contain it.
 - `test_bad_base_raises`: base `nope` raises `CheckpointError` starting `git diff failed`.
-- `test_mark_done_updates_ledger_and_journal`: `done` becomes `[1]`; the journal contains `## 2026-11-11 wave 1`, `Tasks done: 1` and the `Ruling:` line from a sample `progress.md`.
+- `test_mark_done_updates_ledger_and_journal`: `done` becomes `[1]`; the journal contains `## 2026-11-11 wave 1`, `Tasks done: 1`, and from a sample `progress.md` the lines `Ruling: a`, `Task 2: Ruling: b`, `Task 3: parked — f — Ruling: c` and `Attempt: Task 1 sonnet/low failed, cause brief, x`, but not `Task 1: complete`.
 - `test_mark_done_does_not_duplicate_copied_lines`: two marks with the same `progress.md` copy each `Ruling:` line once.
 - `test_mark_done_without_progress`: `progress_path=None` writes the entry without copied lines.
 - `test_non_ascii_journal`: a `Ruling: zmiana nazwy pliku — powód` line round-trips unchanged; the ledger file contains `ż` literally, not `ż`.
@@ -328,13 +333,15 @@ git commit -m "tech-lead: wave checkpoint and mark"
 
 - [ ] **Step 1: Write the failing tests**
 
-Run the script with `subprocess.run([sys.executable, LEDGER_PY, ...])`:
+Run the script with `subprocess.run([sys.executable, LEDGER_PY, ...])`. `checkpoint` takes the repository root from `git rev-parse --show-toplevel`; its failure is reported as `error: not a git repository`.
 - `test_check_valid_and_invalid`: exit 0 with empty stdout; a cycle gives exit 1 and the cycle line.
 - `test_show_prints_report`: contains `## Wave 1` and `## Summary`.
 - `test_next_and_all_complete`: `Wave 1` and `Task 1: Task 1 (sonnet/low)`; all done gives `all tasks complete`.
 - `test_checkpoint_mark_end_to_end`: in a temporary git repo, `--mark` exits 0, prints `Task 1: pass`, two or more `Wrote /` lines, and the ledger's `done` is `[1]`.
 - `test_checkpoint_failure_does_not_mark`: verify `false` exits 1 and leaves `done` empty.
 - `test_malformed_json_one_line`: exit 1, stderr is one line starting `error:`, no `Traceback`.
+- `test_checkpoint_errors`: run from a temporary directory that is not a git repository, and separately with `--base nope` in a repository: each exits 1 with one stderr line starting `error:`, and the ledger file is byte-identical afterwards.
+- `test_usage_error_one_line`: an unknown subcommand exits 1 with one stderr line starting `error:`.
 
 - [ ] **Step 2: Run tests to verify they fail**
 
@@ -368,6 +375,18 @@ git commit -m "tech-lead: ledger command line"
 - Consumes: the CLI contracts of Tasks 2 and 5 (command names and flags as written there); prompt file names from Task 7.
 - Produces: skill `tech-lead:tech-lead`.
 
+Command synopsis to document (the scripts are built in parallel; this is their contract):
+
+```
+python3 ../../scripts/ledger.py check LEDGER
+python3 ../../scripts/ledger.py show LEDGER
+python3 ../../scripts/ledger.py next LEDGER
+python3 ../../scripts/ledger.py checkpoint LEDGER --wave W --base REF --progress "<SDD workspace>/progress.md" --mark
+python3 ../../scripts/status.py [ROOT] [--brief | --write]
+```
+
+`REF` is the integration branch head recorded before the wave started. The SDD workspace is the directory printed by SDD's `scripts/sdd-workspace PLAN_FILE`. Paths are relative to the skill's base directory.
+
 Source: spec sections Decisions, Relationship to other plugins, Lead process, Tier table, Escalation, Lanes, Turn economy (into `SKILL.md`); Project document hierarchy, Journal, and the absolute-path rule (into `layout.md`). Write for an agent, imperative, no history or rationale beyond one clause where a rule would otherwise look arbitrary. Follow superpowers:writing-skills for structure. `SKILL.md` stays under 300 lines and points to `layout.md` instead of repeating it.
 
 `SKILL.md` requirements:
@@ -381,10 +400,10 @@ Source: spec sections Decisions, Relationship to other plugins, Lead process, Ti
 - [ ] **Step 1: Write the failing test `test_skill_docs.py`**
 
 - `test_frontmatter`: exactly the keys `name` and `description`; name `tech-lead`; description starts `Use when`.
-- `test_mentions_required_items`: `SKILL.md` contains each of `model-manager:model-manager`, `superpowers:brainstorming`, `superpowers:writing-plans`, `superpowers:subagent-driven-development`, `superpowers:verification-before-completion`, `superpowers:finishing-a-development-branch`, `ledger.py check`, `ledger.py show`, `ledger.py next`, `ledger.py checkpoint`, `--mark`, `status.py`, `layout.md`, `scout-prompt.md`, `mockup-prompt.md`, `batch-review-prompt.md`, `plan-review-prompt.md`, `autopilot`, `--auto`, `brief`, `context`, `capability`, `.worktrees/`, `absolute`.
+- `test_mentions_required_items`: `SKILL.md` contains each of `model-manager:model-manager`, `superpowers:brainstorming`, `superpowers:writing-plans`, `superpowers:subagent-driven-development`, `superpowers:verification-before-completion`, `superpowers:finishing-a-development-branch`, `ledger.py check`, `ledger.py show`, `ledger.py next`, `ledger.py checkpoint`, `--mark`, `status.py`, `layout.md`, `scout-prompt.md`, `mockup-prompt.md`, `batch-review-prompt.md`, `plan-review-prompt.md`, `autopilot`, `--auto`, `--progress`, `--wave`, `--base`, `sdd-workspace`, `../../scripts/`, `superpowers:test-driven-development`, `superpowers:requesting-code-review`, `security-review`, `engineering:architecture`, `modern-web-guidance`, `fable`, `` `brief` ``, `` `context` ``, `` `plan` ``, `` `capability` ``, `.worktrees/`, `absolute`.
 - `test_section_order`: the nine section headings appear in the order above.
 - `test_length`: `SKILL.md` under 300 lines.
-- `test_layout_paths`: `layout.md` contains `docs/STATUS.md`, `docs/backlog.md`, `docs/standards.md`, `docs/adr/`, `docs/initiatives/`, `journal.md`, `ledger.json`, `mockup.html`, `research/`, `.tech-lead/scratch/`, `Closed:`, `- [ ] B`.
+- `test_layout_paths`: `layout.md` contains `docs/STATUS.md`, `docs/backlog.md`, `docs/standards.md`, `docs/adr/`, `docs/initiatives/`, `journal.md`, `ledger.json`, `mockup.html`, `research/`, `.tech-lead/scratch/`, `Closed:`, `- [ ] B`, `.gitignore`, `docs/superpowers/`, `git mv`.
 - `test_no_model_switch`: neither file contains `/model `.
 
 - [ ] **Step 2: Run the test to verify it fails**
@@ -440,7 +459,7 @@ Content (source: spec steps 4, 5, 8 and 10.3, and the path rule):
 Run: `python3 -m unittest discover tech-lead/tests -p 'test_prompts.py'`
 Expected: FAIL (files missing)
 
-- [ ] **Step 3: Write the three prompt files**
+- [ ] **Step 3: Write the four prompt files**
 
 - [ ] **Step 4: Run the test to verify it passes**
 
@@ -484,7 +503,7 @@ Values:
 - `test_marketplace_entry_matches_plugin`: entry exists, `source`, `version` and `description` equal `plugin.json`'s.
 - `test_hook_points_to_existing_script`: the command contains `scripts/status.py --brief` and the file exists.
 - `test_command_frontmatter`: `run.md` has `description` and `argument-hint`, no `model` or `effort`, and mentions `tech-lead:tech-lead`, `$ARGUMENTS` and `--auto`.
-- `test_skill_references_exist`: every `*.md` file name mentioned in `SKILL.md` exists next to it.
+- `test_skill_references_exist`: `layout.md` and every `*-prompt.md` name mentioned in `SKILL.md` exist next to it.
 - `test_readmes`: `tech-lead/README.md` mentions `/tech-lead:run`, `model-manager`, `superpowers` and `TECH_LEAD_STATUS`; root `README.md` has `### tech-lead`.
 
 - [ ] **Step 2: Run the test to verify it fails**
@@ -515,4 +534,5 @@ git commit -m "tech-lead: packaging, session-start hook, command and docs"
 - [ ] Run `python3 tech-lead/scripts/status.py --write`: writes `docs/STATUS.md` and prints its absolute path; `--brief` lists this initiative.
 - [ ] Simulate the hook: `CLAUDE_PROJECT_DIR=$PWD python3 tech-lead/scripts/status.py --brief` from another directory prints the brief; with `TECH_LEAD_STATUS=0` prints nothing.
 - [ ] Read `SKILL.md`, `layout.md` and the four prompts against the spec, section by section.
+- [ ] Dry run: write a small sample spec with a UI under `.tech-lead/scratch/sample/` and run `claude -p --plugin-dir tech-lead "/tech-lead:run <sample spec path>"` in a scratch git repository; it must reach the gate (mockup built, plan reviewed, ledger shown) without editing code. Then start a session there and confirm the status brief proposes next steps. If the `claude` CLI cannot run here, record that in the journal and ask the user to run both checks in a new session.
 - [ ] Dispatch the final whole-branch review (opus medium), then `superpowers:verification-before-completion`.

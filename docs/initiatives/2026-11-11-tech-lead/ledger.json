@@ -40,7 +40,7 @@
     },
     {
       "id": "R10",
-      "text": "layout.md defines the document hierarchy, journal and backlog formats"
+      "text": "layout.md defines the document hierarchy, journal and backlog formats, .gitignore entries and the docs/superpowers migration offer"
     },
     {
       "id": "R11",
@@ -118,8 +118,8 @@
         "python3 -m unittest discover tech-lead/tests -p 'test_status.py'"
       ],
       "model": "sonnet",
-      "effort": "low",
-      "reason": "Precise spec with exact output rules, two files"
+      "effort": "medium",
+      "reason": "Runs in every session through the hook; many state and output rules"
     },
     {
       "id": 3,
