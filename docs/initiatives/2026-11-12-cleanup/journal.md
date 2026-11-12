@@ -18,3 +18,8 @@
 ## 2026-11-12 gate
 
 - Approved by the user: execution in waves (gated mode; no stop between waves unless a decision is the user's). Superdesign integration discussed; backlog decision pending with the user.
+
+## 2026-11-12 wave 1
+Tasks done: 1, 2, 3, 4, 5
+Timing: Task 1 2.3s, Task 2 2.3s, Task 3 2.3s, Task 4 2.2s, Task 5 2.1s, checks 0.0s
+- Out-of-scope mockup-prompt.md in wave 1 is B8 (expected). Suite after wave 1: median 2.33 s, 156 tests (14.9 ms per test, +39%; total +0.88 s, under the 2 s floor) — target for the hygiene pass.

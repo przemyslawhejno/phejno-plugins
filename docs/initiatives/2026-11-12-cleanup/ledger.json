@@ -45,7 +45,13 @@
       "text": "Hygiene pass over the changes"
     }
   ],
-  "done": [],
+  "done": [
+    1,
+    2,
+    3,
+    4,
+    5
+  ],
   "tasks": [
     {
       "id": 1,
