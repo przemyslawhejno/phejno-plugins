@@ -46,6 +46,8 @@ Each task can carry `experts`: review lenses chosen from its risk and files. The
 
 Projects with a graphical interface set `ui: true`. The lead makes a mockup, a UI/UX expert reviews it with the spec, and `kind: ui` tasks are checked against WCAG 2.2 AA, responsive layout and theme standards, with screenshots, axe and Lighthouse output as evidence.
 
+The lead adds a `## Project docs` section to `CLAUDE.md` unless `CLAUDE.md` already routes specs and plans to `docs/initiatives/`.
+
 ## Optional: superdesign mockups
 
 With the `superdesign` plugin installed, the lead can make the step 4 mockup on superdesign's canvas instead of the built-in builder. The chosen draft is exported to `mockup.html`, which stays the canonical artifact.
@@ -54,7 +56,7 @@ With the `superdesign` plugin installed, the lead can make the step 4 mockup on 
 - Install: `/plugin marketplace add superdesigndev/superdesign-skill`, then `/plugin install superdesign@superdesign`. Log in once with `npx --yes @superdesign/cli@latest login`.
 - Consent is per user, stored in git-ignored `.tech-lead/superdesign-consent`. The lead asks once and says what it costs and sends: generation credits on your superdesign account, lead tokens for the superdesign skill, and, to superdesign's servers, the written spec, your request, selected project files, uploaded images, fonts and logos (which become public URLs) and component templates converted from project source. The CLI runs unpinned from npm.
 - A "no" is stored and not asked again; withdraw consent by setting `consent: no` or deleting the file. The request is stored verbatim by superdesign and drafts stay on your account until deleted there. The lead adds a `.superdesign/*` allowlist (keeping `design-system.md`) and `.tech-lead/` to `.gitignore` before the first CLI call.
-- Only the lead runs superdesign, never subagents. In an `--auto` run where you are not answering in the conversation at step 4, the built-in builder always runs, whatever consent is recorded; superdesign needs you there to pick and approve the draft.
+- Only the lead runs superdesign, never subagents. In an autopilot run (`--auto` is one way to agree to it) where you are not answering in the conversation at step 4, the built-in builder always runs, whatever consent is recorded; superdesign needs you there to pick and approve the draft.
 - Without the plugin, login or consent, the built-in mockup builder runs as before.
 - The integration has not yet been run live (backlog B1).
 

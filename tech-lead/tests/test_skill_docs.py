@@ -179,6 +179,8 @@ class SkillDocsTest(unittest.TestCase):
         start = skill.split("## Start of work", 1)[1].split("## Process", 1)[0]
         self.assertIn("CLAUDE.md", start)
         self.assertIn("## Project docs", start)
+        self.assertIn("anywhere in the file", start)
+        self.assertIn("uncommitted changes", start)
         layout = LAYOUT.read_text()
         self.assertIn("CLAUDE.md", layout)
         self.assertIn("## Project docs\nWork is tracked in docs/initiatives/<date>-<topic>/ (spec, plan, ledger, journal);\n"
