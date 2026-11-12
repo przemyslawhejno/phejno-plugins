@@ -87,6 +87,12 @@ class CheckpointTests(unittest.TestCase):
         self.assertIn("$ echo hello", text)
         self.assertNotIn("hello", cp.format_result(r))
 
+    def test_stdin_is_closed(self):
+        import time
+        t = time.time()
+        r = self.run_cp(verify=["read x; echo got"], checks=["read y; echo got"])
+        self.assertLess(time.time() - t, 10)
+
     def test_bad_base_raises(self):
         with self.assertRaises(cp.CheckpointError) as cm:
             self.run_cp(base="nope")

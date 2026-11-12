@@ -47,7 +47,7 @@ def _changed_files(base: str, repo: str) -> list:
 
 
 def _run(command: str, repo: str, log) -> int:
-    p = subprocess.run(command, shell=True, cwd=repo, stdout=subprocess.PIPE,
+    p = subprocess.run(command, shell=True, cwd=repo, stdin=subprocess.DEVNULL, stdout=subprocess.PIPE,
                        stderr=subprocess.STDOUT)
     out = p.stdout.decode("utf-8", "replace")
     log.write(f"$ {command}\n{out}")

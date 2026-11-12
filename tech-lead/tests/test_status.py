@@ -123,6 +123,7 @@ class StatusTests(unittest.TestCase):
         self.assertLessEqual(len(lines), 25)
         self.assertTrue(lines[0].startswith("tech-lead status for "))
         self.assertTrue(lines[-1].startswith("Propose next steps"))
+        self.assertIn("If you are already carrying out an approved tech-lead plan or autopilot in this session, continue it instead.", lines[-1])
         self.assertEqual(sum(1 for l in lines if l.startswith("- B")), 5)
 
     def test_write_header_and_path(self):
