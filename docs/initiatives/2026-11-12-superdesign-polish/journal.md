@@ -19,3 +19,7 @@
 Tasks done: 1
 Timing: Task 1 1.0s, checks 0.0s
 - Wave 1 (B17) done. Lens yield: security 4 Critical/Important (3 + 1 after the first fix), 7 Minor; all Important fixed over two fix rounds and re-reviewed by the lens. Two lens minors moved into Task 3.
+
+## 2026-11-12 wave 2
+Tasks done: 3
+Timing: Task 3 1.1s, checks 0.0s
