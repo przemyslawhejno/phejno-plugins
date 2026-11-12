@@ -11,3 +11,6 @@
 - [ ] B9 tech-lead README: list the optional skills (`engineering:architecture`, `security-review`, `modern-web-guidance`); packaging test also checks the scripts the skill names — from 2026-11-11-tech-lead — 2026-11-12
 - [ ] B10 ledger_core.py: tighten type annotations; remaining test gaps from the Task 1 review — from 2026-11-11-tech-lead — 2026-11-12
 - [ ] B11 ledger_checkpoint stdin test can pass without stdin=DEVNULL under a runner without a terminal; make it fail without the fix — from 2026-11-11-tech-lead — 2026-11-12
+- [ ] B12 [hygiene] ledger_core.py: split the long `_schema2_errors`; reject `schema: 2.0`; drop the double risk-vocabulary check; test that `ui` tasks count toward the hygiene thresholds; state the lead-task interpretation — from 2026-11-12-quality — 2026-11-12
+- [ ] B13 [hygiene] tests: assert the 8-line lens checklist limit; `m.group(1)` without a None check in test_ledger_checkpoint.py; the instruction line asserted twice in test_status.py; bare `tuple` annotation on `_run` — from 2026-11-12-quality — 2026-11-12
+- [ ] B14 SKILL.md and layout.md: one place for the Suite time writes; a re-review path for lens reports — from 2026-11-12-quality — 2026-11-12

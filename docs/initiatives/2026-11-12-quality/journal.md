@@ -66,3 +66,16 @@ Timing: Task 8 1.4s, checks 0.0s
 
 - Suite timed after the hygiene pass: median 1.45 s, 136 tests (10.7 ms per test, baseline 17.4 ms); ratchet in docs/standards.md updated.
 - Lens yield: no lenses this initiative (no task carried a risk).
+
+## 2026-11-12 wave 5
+Tasks done: 9
+Timing: checks 0.0s
+
+## 2026-11-12 session
+
+- Done: tech-lead 0.2.0 — hygiene (standards sections, suite timing and ratchet, inventory, hygiene pass), risk-scaled expert panels (lenses, schema 2 ledger), UI/UX expertise (current standards, render harness, ui-ux lens), codemap integration (navigation, pending sync across lanes, session-start proposals). 10 tasks in 5 waves on autopilot; sonnet 7, opus 1, lead 2, plus haiku for the integration fix and the inventory.
+- Reviews: design 2 rounds, plan 2 rounds, per-task reviews with fix rounds on Tasks 3, 4, 7 (one each), final whole-branch review (opus/medium): ready with fixes; one fix wave (harness output reaches reviewers, codemap read-only for subagents, named agents replace the generic lens, hard-bug panel worktrees, codemap sync failure is a warning), scoped re-review clean.
+- Suite: 91 tests 1.58 s before, 137 tests 1.42 s after (17.4 to about 10 ms per test); the hygiene pass cut 2.16 s to 1.34 s.
+- Lens yield: no lens ran (no task carried a risk).
+- Open: backlog B12-B14 ([hygiene] items from reviews), earlier B1-B11.
+- Next: user decides on merging PR #1.
