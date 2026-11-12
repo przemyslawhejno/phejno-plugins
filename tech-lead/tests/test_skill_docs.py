@@ -47,6 +47,26 @@ REQUIRED_IN_SKILL = [
     "backlog.md",
     "research/plan-review.md",
     "docs/superpowers/",
+    "lenses.md",
+    "lens-review-prompt.md",
+    "inventory-prompt.md",
+    '"schema": 2',
+    "replaces",
+    "risk",
+    "experts",
+    "hygiene",
+    "ui-ux",
+    "`unknown`",
+    "Suite time",
+    "WCAG 2.2",
+    "superpowers:systematic-debugging",
+    ".claude/codemap/",
+    "/codemap update",
+    "pending.md",
+    "engineering:tech-debt",
+    "simplify",
+    "Lens yield",
+    "{{CANDIDATES_PATH}}",
 ]
 
 SECTIONS = [
@@ -77,6 +97,10 @@ REQUIRED_IN_LAYOUT = [
     ".gitignore",
     "docs/superpowers/",
     "git mv",
+    "[hygiene]",
+    "Suite time:",
+    "Lens yield",
+    "Timing:",
 ]
 
 
@@ -119,7 +143,7 @@ class SkillDocsTest(unittest.TestCase):
         start = text.index("\n## Escalation")
         end = text.index("\n## ", start + 1)
         section = text[start:end]
-        for cause in ("`brief`", "`context`", "`plan`", "`capability`"):
+        for cause in ("`brief`", "`context`", "`plan`", "`capability`", "`unknown`"):
             self.assertIn(cause, section)
 
     def test_section_order(self):
