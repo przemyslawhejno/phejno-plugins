@@ -69,6 +69,21 @@ class ValidateTests(unittest.TestCase):
         errs = errors_of(make_task(1, depends_on=[2]), make_task(2, depends_on=[1]))
         self.assertHas(errs, "dependency cycle: 1 -> 2 -> 1")
 
+    def test_cycle_starts_at_smallest_id(self):
+        errs = errors_of(make_task(1, depends_on=[3]), make_task(2, depends_on=[1]),
+                         make_task(3, depends_on=[2]))
+        self.assertHas(errs, "dependency cycle: 1 -> 3 -> 2 -> 1")
+        errs = errors_of(make_task(1), make_task(2, depends_on=[3]),
+                         make_task(3, depends_on=[4]), make_task(4, depends_on=[2]))
+        self.assertHas(errs, "dependency cycle: 2 -> 3 -> 4 -> 2")
+
+    def test_bad_requirements_do_not_raise(self):
+        for reqs in ([{"id": []}], ["x"], [{"id": ""}], [{"text": "t"}], [{"id": {}}]):
+            errs = validate(make_ledger([make_task(1, covers=[[]])], requirements=reqs))
+            self.assertTrue(errs, reqs)
+        self.assertHas(validate(make_ledger([make_task(1)], requirements=[{"id": []}])),
+                       "id must be a non-empty string")
+
     def test_uncovered_requirement(self):
         errs = validate(make_ledger([make_task(1)], requirements=[
             {"id": "R1", "text": "r"}, {"id": "R2", "text": "r"}]))

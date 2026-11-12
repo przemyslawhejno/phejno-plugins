@@ -90,7 +90,10 @@ def _find_cycle(deps_of: dict):
                 continue
             if state.get(nxt) == 1:
                 path = stack[stack.index(nxt):] + [nxt]
-                return path
+                path = path[:-1]
+                k = path.index(min(path))
+                path = path[k:] + path[:k]
+                return path + [path[0]]
             if nxt not in state:
                 state[nxt] = 1
                 stack.append(nxt)
@@ -125,8 +128,11 @@ def validate(ledger: dict) -> list:
 
     req_ids: list = []
     for r in requirements:
-        if not isinstance(r, dict) or "id" not in r:
-            errors.append(f"requirement {r!r}: missing field 'id'")
+        if not isinstance(r, dict):
+            errors.append(f"requirement {r!r}: requirement must be an object")
+            continue
+        if not isinstance(r.get("id"), str) or not r["id"]:
+            errors.append(f"requirement {r.get('id')!r}: id must be a non-empty string")
             continue
         if r["id"] in req_ids:
             errors.append(f"duplicate requirement id {r['id']}")
