@@ -83,13 +83,15 @@ user: <git config user.email>
 date: 2026-11-12
 ```
 
-Consent is valid only while the file is git-ignored (`git check-ignore -q .tech-lead/superdesign-consent` succeeds) and `user:` equals the current `git config user.email` (an empty or unset email never matches: ask again each time, store no consent); otherwise ask again. In autopilot with no user present the built-in builder always runs. A `consent: no` whose `user:` matches is not asked again. Consent covers every initiative in this clone. The user withdraws it by setting `consent: no` or deleting the file. Ask while the user is present, and state:
+Consent is valid only while the file is git-ignored (`git check-ignore -q .tech-lead/superdesign-consent` succeeds) and `user:` equals the current `git config user.email` (an empty or unset email never matches: ask again each time, store no consent); otherwise ask again. In an `--auto` run where the user is not answering in this conversation at step 4 the built-in builder always runs; if the user is still in the conversation, ask as usual. A `consent: no` whose `user:` matches is not asked again. Consent covers every initiative in this clone. The user withdraws it by setting `consent: no` or deleting the file. Ask while the user is present, and state:
 
 - Generation credits on the user's superdesign account: on an existing codebase at least one reproduction draft of the current screen plus each requested variant.
 - Lead tokens: the superdesign skill (about 900 lines) and, the first time, its repository analysis.
-- Sent to superdesign's servers: the written spec as the design brief, the user's request, selected project files as design context, and uploaded images, which become public URLs. After the repository analysis the lead lists the exact files, uploads (images, fonts, logos) and component templates and gets a yes before the first generation, and again for anything added later; it never selects `.env*`, `*.pem`, `*.key`, `*.p12`, `id_*`, `credentials*`, `secrets*`, files ignored by git, or screenshots containing real user data.
+- Sent to superdesign's servers: the written spec as the design brief, the user's request, selected project files as design context, and uploaded images, fonts and logos, which become public URLs, and component templates converted from project source (`create-component`). After the repository analysis the lead lists the exact files, uploads (images, fonts and logos as brand assets: public URLs) and component templates converted from project source (`create-component`) and gets a yes before the first upload or generation, and again for anything added later; it never selects `.env*`, `*.pem`, `*.key`, `*.p12`, `id_*`, `credentials*`, `secrets*`, files ignored by git, or screenshots containing real user data.
 - Stored by superdesign: the request verbatim, to improve generation; drafts, uploaded assets and context stay on the user's superdesign account until deleted there.
 - The CLI runs unpinned from npm (`@latest`) on each run.
+
+Init subagent check, around the repository analysis: with the `.gitignore` entries already added, the lead saves `git status --porcelain --ignored` as a baseline before dispatch; after the subagent returns it runs the same command and compares. Any new or changed entry outside `.superdesign/init/` is never reverted automatically; the lead shows it to the user and stops using superdesign for this run until the user decides. If `git status` fails, the lead stops using superdesign for this run and tells the user. Limit: further edits to files that were already dirty before dispatch, and writes inside `.git/` or outside the repository, do not show up in this comparison.
 
 ## State
 
@@ -137,8 +139,10 @@ Superdesign mockup, written by the lead at step 4 (generations counted by the le
 
 ```
 ## 2026-11-12 superdesign mockup
-CLI: <output of `npm view @superdesign/cli version`>. Project: <project id>. Draft: <draft id>. Canvas: <link>. Preview: <link>. Generations used: 3
+CLI: <output of `npm view @superdesign/cli version`>, registry latest at run time (npx may have run a cached version). Project: <project id>. Draft: <draft id>. Generations used: 3
 ```
+
+Ids only: canvas and preview links stay in the CLI output and on the user's account.
 
 When the built-in builder runs although the plugin is installed, write `Ruling: built-in mockup builder — <reason>` (no consent, not logged in, headless).
 

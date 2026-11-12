@@ -35,7 +35,7 @@ class PackagingTests(unittest.TestCase):
         d = load(PLUGIN / ".claude-plugin" / "plugin.json")
         self.assertEqual(d["name"], "tech-lead")
         self.assertEqual(d["description"], DESC)
-        self.assertEqual(d["version"], "0.3.0")
+        self.assertEqual(d["version"], "0.3.1")
         self.assertEqual(d["author"]["name"], "Przemyslaw Hejno")
 
     def test_marketplace_entry_matches_plugin(self):
@@ -89,6 +89,8 @@ class PackagingTests(unittest.TestCase):
         for s in ("superdesign", "/plugin marketplace add superdesigndev/superdesign-skill", "npx --yes @superdesign/cli@latest login", "credits"):
             self.assertIn(s, r)
         for s in ("not asked again", "deleting the file", "verbatim", ".superdesign/*", "the built-in builder always runs"):
+            self.assertIn(s, r)
+        for s in ("fonts and logos", "component templates", "not answering"):
             self.assertIn(s, r)
         self.assertNotIn("recorded before the start", r)
         root = (ROOT / "README.md").read_text(encoding="utf-8")

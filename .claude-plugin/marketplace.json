@@ -34,7 +34,7 @@
       "name": "tech-lead",
       "source": "./tech-lead",
       "description": "Lead orchestrator: plans a spec into waves of tasks, assigns the cheapest capable model to each, delegates, reviews and verifies; adds hygiene passes, expert panels and UI/UX review; keeps project docs, status and backlog in one hierarchy; optional superdesign mockup provider",
-      "version": "0.3.0"
+      "version": "0.3.1"
     }
   ]
 }

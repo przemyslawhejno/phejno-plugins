@@ -105,8 +105,14 @@ class PromptTests(unittest.TestCase):
             self.assert_has(name, [NEVER_SUPERDESIGN])
 
     def test_mockup_superdesign_export_mode(self):
-        self.assert_has("mockup-prompt.md", ["superdesign-export", "sd-component", "Tailwind CDN", "Lucide",
+        self.assert_has("mockup-prompt.md", ["superdesign-export", "sd-component", "Tailwind", "Lucide",
                                              "list-components", "screen id", "mapping"])
+        self.assert_has("mockup-prompt.md", ["fetch", "XMLHttpRequest", "WebSocket", "<iframe>", "x.y.z",
+                                             "rebuild", "locally", "Content-Security-Policy", "connect-src 'none'",
+                                             "https://cdn.tailwindcss.com/<x.y.z>", "https://cdn.jsdelivr.net/npm/tailwindcss@<x.y.z>/",
+                                             "https://cdn.jsdelivr.net/npm/@tailwindcss/browser@<x.y.z>", "https://cdn.jsdelivr.net/npm/lucide@<x.y.z>/",
+                                             "Always remove every existing", "as the first element in `<head>`", "https://unpkg.com/lucide@<x.y.z>/",
+                                             "<object>", "<embed>", "http-equiv=\"refresh\""])
 
     def test_absolute_paths(self):
         for name in PLACEHOLDERS:
