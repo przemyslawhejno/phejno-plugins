@@ -97,14 +97,14 @@ def run_checkpoint(ledger: dict, wave: int, base: str, repo: str,
         raise CheckpointError(f"cannot write log {result.log_path}: {e.strerror or e}")
     try:
         for t in members:
-            worst = 0
+            first_failure = 0
             total = 0.0
             for cmd in t.get("verify", []):
                 code, seconds = _run(cmd, repo, log)
                 total += seconds
-                if code != 0 and worst == 0:
-                    worst = code
-            result.tasks.append((t["id"], worst, total))
+                if code != 0 and first_failure == 0:
+                    first_failure = code
+            result.tasks.append((t["id"], first_failure, total))
         for cmd in ledger.get("checks", []):
             code, seconds = _run(cmd, repo, log)
             result.checks.append((cmd, code, seconds))
