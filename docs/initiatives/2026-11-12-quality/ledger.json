@@ -73,7 +73,12 @@
       "text": "Status and session brief report codemap health and propose mapping"
     }
   ],
-  "done": [],
+  "done": [
+    1,
+    2,
+    3,
+    4
+  ],
   "tasks": [
     {
       "id": 1,

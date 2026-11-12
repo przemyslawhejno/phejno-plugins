@@ -44,3 +44,9 @@
 ## 2026-11-12 gate (autopilot)
 
 - Status note posted; execution starts. 10 tasks in 5 waves: sonnet 7, opus 1, lead 2.
+
+## 2026-11-12 wave 1
+Tasks done: 1, 2, 3, 4
+Task 3: Ruling: gaps found while following batch-review-prompt.md (none placeholders, lenses per task, implementer report path, severity scale) are Important though reported as observations — every future reviewer hits them — cost if wrong: one fix round
+Task 4: Ruling: the cross-lane reference failure is expected within wave 1 and is verified by the wave checkpoint after both lanes merge — tasks in one wave may reference each other's new files by plan contract — cost if wrong: one fix round after merge
+Task 3: Ruling: lens-review-prompt "up to 4 tasks" conflicts with one dispatch per lens per wave; fixed at integration after the wave 1 merge (file is in lane-1) — cost if wrong: one small fix dispatch
