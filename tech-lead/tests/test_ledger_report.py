@@ -46,7 +46,7 @@ class RenderShowTests(unittest.TestCase):
             make_task(3, depends_on=[1, 2])]))
         self.assertIn("Lens dispatches: wave 1: 1, wave 2: 0 (total 1)", out)
 
-    def test_v1_ledger_renders_dashes_and_none(self):
+    def test_ledger_without_risk_or_experts_renders_dashes(self):
         out = render_show(self._ledger())
         self.assertIn("| sonnet/low | - | - | r |", out)
         self.assertIn("Lens dispatches: none", out)

@@ -4,20 +4,13 @@ import json
 import os
 import re
 import shutil
-import subprocess
 import tempfile
+import time
 import unittest
 
-import helpers  # noqa: F401  (adds scripts to sys.path)
-from helpers import make_ledger, make_task
+from helpers import git, init_repo, make_ledger, make_task
 
 import ledger_checkpoint as cp
-
-
-def git(repo, *args):
-    env = {k: v for k, v in os.environ.items() if k not in ("GIT_DIR", "GIT_WORK_TREE")}
-    return subprocess.run(["git", "-C", repo, *args], check=True, capture_output=True,
-                          text=True, env=env).stdout.strip()
 
 
 PROGRESS = """# Progress
@@ -31,26 +24,30 @@ Plain note
 
 
 class CheckpointTests(unittest.TestCase):
+    @classmethod
+    def setUpClass(cls):
+        cls.shared = os.path.realpath(tempfile.mkdtemp())
+        cls.repo = os.path.join(cls.shared, "repo")
+        init_repo(cls.repo)
+        with open(os.path.join(cls.repo, "README"), "w") as f:
+            f.write("x\n")
+        git(cls.repo, "add", "-A")
+        git(cls.repo, "commit", "-q", "-m", "init")
+        cls.base = git(cls.repo, "rev-parse", "HEAD")
+        os.makedirs(os.path.join(cls.repo, "src"))
+        for p in ("src/t1.py", "other.txt"):
+            with open(os.path.join(cls.repo, p), "w") as f:
+                f.write("y\n")
+        git(cls.repo, "add", "-A")
+        git(cls.repo, "commit", "-q", "-m", "work")
+
+    @classmethod
+    def tearDownClass(cls):
+        shutil.rmtree(cls.shared, True)
+
     def setUp(self):
         self.tmp = os.path.realpath(tempfile.mkdtemp())
         self.addCleanup(shutil.rmtree, self.tmp, True)
-        self.repo = os.path.join(self.tmp, "repo")
-        os.makedirs(self.repo)
-        git(self.repo, "init", "-q")
-        git(self.repo, "config", "user.email", "t@example.com")
-        git(self.repo, "config", "user.name", "T")
-        git(self.repo, "config", "commit.gpgsign", "false")
-        with open(os.path.join(self.repo, "README"), "w") as f:
-            f.write("x\n")
-        git(self.repo, "add", "-A")
-        git(self.repo, "commit", "-q", "-m", "init")
-        self.base = git(self.repo, "rev-parse", "HEAD")
-        os.makedirs(os.path.join(self.repo, "src"))
-        for p in ("src/t1.py", "other.txt"):
-            with open(os.path.join(self.repo, p), "w") as f:
-                f.write("y\n")
-        git(self.repo, "add", "-A")
-        git(self.repo, "commit", "-q", "-m", "work")
         self.log = os.path.join(self.tmp, "scratch", "sub", "log.txt")
         self.ledger_path = os.path.join(self.tmp, "ledger.json")
 
@@ -81,10 +78,11 @@ class CheckpointTests(unittest.TestCase):
         self.assertIn("Check failed: exit 2 (exit 2", cp.format_result(r))
 
     def test_durations_formatted(self):
-        r = self.run_cp(verify=["sleep 0.2"], checks=["true"])
-        m = re.search(r"Task 1: pass \((\d+\.\d)s\)", cp.format_result(r))
+        out = cp.format_result(self.run_cp(verify=["sleep 0.1"], checks=["true"]))
+        m = re.search(r"Task 1: pass \((\d+\.\d)s\)", out)
+        self.assertIsNotNone(m, out)
         self.assertTrue(0.1 <= float(m.group(1)) <= 2.0)
-        self.assertRegex(cp.format_result(r), r"Checks: pass \(\d+\.\ds\)")
+        self.assertRegex(out, r"Checks: pass \(\d+\.\ds\)")
         self.assertIn("Checks: pass (0.0s)", cp.format_result(self.run_cp()))
 
     def test_output_goes_to_log_only(self):
@@ -96,9 +94,8 @@ class CheckpointTests(unittest.TestCase):
         self.assertNotIn("hello", cp.format_result(r))
 
     def test_stdin_is_closed(self):
-        import time
         t = time.time()
-        r = self.run_cp(verify=["read x; echo got"], checks=["read y; echo got"])
+        self.run_cp(verify=["read x; echo got"], checks=["read y; echo got"])
         self.assertLess(time.time() - t, 10)
 
     def test_bad_base_raises(self):
@@ -107,13 +104,15 @@ class CheckpointTests(unittest.TestCase):
         self.assertTrue(str(cm.exception).startswith("git diff failed"))
 
     def test_non_ascii_declared_file_is_in_scope(self):
+        repo = os.path.join(self.tmp, "repo")
+        shutil.copytree(self.repo, repo)
         name = "src/za\u017c\u00f3\u0142\u0107.py"
-        with open(os.path.join(self.repo, name), "w") as f:
+        with open(os.path.join(repo, name), "w") as f:
             f.write("z\n")
-        git(self.repo, "add", "-A")
-        git(self.repo, "commit", "-q", "-m", "nonascii")
+        git(repo, "add", "-A")
+        git(repo, "commit", "-q", "-m", "nonascii")
         ledger = make_ledger([make_task(1, files=[name, "other.txt", "src/t1.py"])])
-        r = cp.run_checkpoint(ledger, 1, self.base, self.repo, self.log)
+        r = cp.run_checkpoint(ledger, 1, self.base, repo, self.log)
         self.assertEqual(r.out_of_scope, [])
 
     def test_empty_wave_raises(self):
@@ -205,20 +204,12 @@ class CheckpointTests(unittest.TestCase):
         self.assertNotIn("\\u017c", raw)
 
 
-if __name__ == "__main__":
-    unittest.main()
-
-
 class CodemapSyncTests(unittest.TestCase):
     @classmethod
     def setUpClass(cls):
         cls.tmp = os.path.realpath(tempfile.mkdtemp())
         cls.repo = os.path.join(cls.tmp, "repo")
-        os.makedirs(cls.repo)
-        git(cls.repo, "init", "-q")
-        git(cls.repo, "config", "user.email", "t@example.com")
-        git(cls.repo, "config", "user.name", "T")
-        git(cls.repo, "config", "commit.gpgsign", "false")
+        init_repo(cls.repo)
         for p in ("keep.py", "gone.py"):
             with open(os.path.join(cls.repo, p), "w") as f:
                 f.write("x\n")
@@ -262,3 +253,7 @@ class CodemapSyncTests(unittest.TestCase):
     def test_action_boundaries(self):
         self.assertEqual([cp.codemap_action(n) for n in (15, 16, 50, 51)],
                          ["inline", "update", "update", "rebuild"])
+
+
+if __name__ == "__main__":
+    unittest.main()

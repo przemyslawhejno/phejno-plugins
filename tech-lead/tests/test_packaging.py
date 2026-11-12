@@ -82,7 +82,7 @@ class PackagingTests(unittest.TestCase):
 
     def test_readmes(self):
         r = (PLUGIN / "README.md").read_text(encoding="utf-8")
-        for s in ("/tech-lead:run", "model-manager", "superpowers", "TECH_LEAD_STATUS", "lenses", "hygiene", "WCAG 2.2", "schema", "codemap"):
+        for s in ("/tech-lead:run", "model-manager", "superpowers", "TECH_LEAD_STATUS", "The lenses are `security`", "`kind: hygiene`", "WCAG 2.2", '"schema": 2', "`## Codemap` section"):
             self.assertIn(s, r)
         root = (ROOT / "README.md").read_text(encoding="utf-8")
         self.assertIn("### tech-lead", root)
