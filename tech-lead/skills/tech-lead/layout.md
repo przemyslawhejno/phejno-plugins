@@ -83,11 +83,11 @@ user: <git config user.email>
 date: 2026-11-12
 ```
 
-Consent is valid only while the file is git-ignored (`git check-ignore -q .tech-lead/superdesign-consent` succeeds) and `user:` equals the current `git config user.email`; otherwise ask again, or in autopilot with no user present use the built-in builder. `consent: no` is not asked again. Consent covers every initiative in this clone. The user withdraws it by setting `consent: no` or deleting the file. Ask while the user is present, and state:
+Consent is valid only while the file is git-ignored (`git check-ignore -q .tech-lead/superdesign-consent` succeeds) and `user:` equals the current `git config user.email` (an empty or unset email never matches: ask again each time, store no consent); otherwise ask again. In autopilot with no user present the built-in builder always runs. A `consent: no` whose `user:` matches is not asked again. Consent covers every initiative in this clone. The user withdraws it by setting `consent: no` or deleting the file. Ask while the user is present, and state:
 
 - Generation credits on the user's superdesign account: on an existing codebase at least one reproduction draft of the current screen plus each requested variant.
 - Lead tokens: the superdesign skill (about 900 lines) and, the first time, its repository analysis.
-- Sent to superdesign's servers: the written spec as the design brief, the user's request, selected project files as design context, and uploaded images, which become public URLs. The lead lists the exact files and images and gets a yes before the first generation; it never selects `.env*`, `*.pem`, `*.key`, `*.p12`, `id_*`, `credentials*`, `secrets*`, files ignored by git, or screenshots containing real user data.
+- Sent to superdesign's servers: the written spec as the design brief, the user's request, selected project files as design context, and uploaded images, which become public URLs. After the repository analysis the lead lists the exact files, uploads (images, fonts, logos) and component templates and gets a yes before the first generation, and again for anything added later; it never selects `.env*`, `*.pem`, `*.key`, `*.p12`, `id_*`, `credentials*`, `secrets*`, files ignored by git, or screenshots containing real user data.
 - Stored by superdesign: the request verbatim, to improve generation; drafts, uploaded assets and context stay on the user's superdesign account until deleted there.
 - The CLI runs unpinned from npm (`@latest`) on each run.
 
@@ -137,7 +137,7 @@ Superdesign mockup, written by the lead at step 4 (generations counted by the le
 
 ```
 ## 2026-11-12 superdesign mockup
-CLI: <version from the preflight>. Project: <project id>. Draft: <draft id>. Canvas: <link>. Preview: <link>. Generations used: 3
+CLI: <output of `npm view @superdesign/cli version`>. Project: <project id>. Draft: <draft id>. Canvas: <link>. Preview: <link>. Generations used: 3
 ```
 
 When the built-in builder runs although the plugin is installed, write `Ruling: built-in mockup builder — <reason>` (no consent, not logged in, headless).
@@ -207,7 +207,7 @@ When superdesign is used, also:
 !.superdesign/design-system.md
 ```
 
-Add them before the repository analysis or the first CLI call. Everything else there (`init/`, `resume.json` with per-account ids, `tmp/`, `replica_html_template/`, `website/`) stays local; a fresh clone pays the repository analysis again, which `journal.md` notes.
+Add them, and `.tech-lead/`, before the first superdesign CLI call (the auth preflight included). Everything else there (`init/`, `resume.json` with per-account ids, `tmp/`, `replica_html_template/`, `website/`) stays local; a fresh clone pays the repository analysis again, which `journal.md` notes.
 
 `.superpowers/sdd/` ignores itself; SDD manages it.
 
