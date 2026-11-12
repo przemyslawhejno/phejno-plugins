@@ -1,0 +1,7 @@
+# tech-lead 0.3.1 superdesign polish: journal
+
+## 2026-11-12 session
+
+- The user asked to execute B17 ("B17 wykonaj"); treated as advance agreement to go to implementation (autopilot), merge left to the user.
+- Final-review minors 1, 2, 3, 5, 6 were already fixed in 0.3.0; the rest are decided in the spec. Ruling: superdesign source names no CDN hosts, so remote scripts must carry a pinned version instead of an allowlisted host — cost if wrong: an unpinned script the builder could not pin is removed from the mockup.
+- One task (sonnet medium, risk security with the security lens) plus lead verification; hygiene pass not required (one code task, no replaces).
