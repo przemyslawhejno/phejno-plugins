@@ -76,14 +76,14 @@ Waves: 1 = Tasks 1-5 (lane 1: Tasks 1, 3, 5; lane 2: Tasks 2, 4); 2 = Task 6; 3 
 **Files:** `tech-lead/skills/tech-lead/SKILL.md`, `layout.md`, `lenses.md`, `batch-review-prompt.md` (same directory), `tech-lead/tests/test_prompts.py`, `tech-lead/tests/test_packaging.py`, `tech-lead/tests/test_skill_docs.py`, `tech-lead/.claude-plugin/plugin.json`, `.claude-plugin/marketplace.json`
 
 - [ ] Tests first: `test_prompts.py` asserts `id="` in `mockup-prompt.md` and that each lens checklist in `lenses.md` has at most 8 bullet lines (bullets are lines starting `- ` between a lens's `##` heading and the next heading or its `Uses when installed` line); `test_packaging.py` asserts every `../../scripts/<name>.py` in `SKILL.md` exists (the existing test already checks that both manifests carry the same version). Keep the strings `test_skill_docs.py` asserts (`Suite time`, `Suite time:`, `Timing:`, `Lens yield`, section order); update that test only where a decided wording changes.
-- [ ] Edits per the spec rows B7, B8, B12 (lead tasks do not count as `code`/`ui`), B13 (state the 8-line limit), B14 (SKILL.md and layout.md say: the `Suite time:` line in `docs/standards.md` is the ratchet; `journal.md` records each timing as `Suite timed: <s>s, <n> tests (ratchet <r>s)`; re-review report path `research/lens-<lens>-<wave>-fix<n>.md` in `lenses.md` and `layout.md`); version `0.2.1`.
+- [ ] Edits per the spec rows B7, B8, B12 (lead tasks do not count as `code`/`ui`), B13 (state the 8-line limit), B14 (SKILL.md and layout.md say: the `Suite time:` line in `docs/standards.md` is the ratchet; `journal.md` records each measurement as `Suite time: <s>s, <n> tests (measured; ratchet <r>s in standards.md)`; re-review report path `research/lens-<lens>-<wave>-fix<n>.md` in `lenses.md` and `layout.md`); version `0.2.1`.
 - [ ] Full suite passes; commit `tech-lead: skill and prompt cleanup, 0.2.1 (B7, B8, B9, B12, B13, B14)`.
 
 ### Task 6: Hygiene pass
 
 **Files:** `tech-lead/scripts/`, `tech-lead/tests/`
 
-Input: `research/hygiene-candidates-2.md` from the lead's inventory (haiku low) over this initiative's changes. Remove what the wave made obsolete or duplicated, starting with the tasks' `replaces` lists; no behaviour change. Acceptance: suite green; median of 3 runs per test not more than 20% above 1.45 s / 136 tests unless the total grew by 2 s or less; report timings and every removed test with its replacement. Commit `tech-lead: hygiene — <kind>` per kind.
+Input: `research/hygiene-candidates-2.md` from the lead's inventory (haiku low) over this initiative's changes. Remove what the wave made obsolete or duplicated, starting with the tasks' `replaces` lists, and confirm in the report that each `replaces` entry is gone; no behaviour change. Acceptance: suite green; median of 3 runs per test not more than 20% above 1.45 s / 136 tests unless the total grew by 2 s or less; report timings and every removed test with its replacement. Commit `tech-lead: hygiene — <kind>` per kind.
 
 ### Task 7: Lead verification (lead)
 

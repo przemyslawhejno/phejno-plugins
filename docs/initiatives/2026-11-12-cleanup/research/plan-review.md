@@ -28,3 +28,15 @@ None.
 No wave-1 file overlap among Tasks 1-5. Hygiene task 6 depends on all code tasks as required. No risks or lenses are set, which fits routine work.
 
 PLAN NEEDS CHANGES
+
+## Round 2
+
+Round-1 findings: I1 resolved (Task 5 owns test_skill_docs.py, B14 wording concrete). I2 resolved (flags, falsifiability stated). I3 resolved (in-process patch, command named). I4 resolved (`replaces` in plan and ledger tasks 1-4; Task 6 hedge dropped). M1 resolved. M2 resolved. M3 resolved. M4 resolved. M5 resolved. M6 resolved. M7 partly: lanes and helpers.py done; "136 tests" remains in the ratchet line, standards.md and the spec (plan now says 137 at start).
+
+New findings:
+- Minor: B14 journal format `Suite timed: <s>s` differs from the `Suite time:` string that test_skill_docs.py asserts; "Suite timed:" does not contain "Suite time:". Fix: Task 5 states which string each file must keep, or use `Suite time: <s>s ...` as the event line.
+- Minor: the ledger `replaces` entries are prose, not testable; fine, but Task 6 should confirm each is gone.
+
+No contradictions among spec, plan and ledger; no wave-1 file overlap; all tests are writable as specified.
+
+PLAN APPROVED
