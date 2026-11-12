@@ -174,6 +174,17 @@ class SkillDocsTest(unittest.TestCase):
             positions.append(matches[0])
         self.assertEqual(positions, sorted(positions))
 
+    def test_project_docs_pointer(self):
+        skill = SKILL.read_text()
+        start = skill.split("## Start of work", 1)[1].split("## Process", 1)[0]
+        self.assertIn("CLAUDE.md", start)
+        self.assertIn("## Project docs", start)
+        layout = LAYOUT.read_text()
+        self.assertIn("CLAUDE.md", layout)
+        self.assertIn("## Project docs\nWork is tracked in docs/initiatives/<date>-<topic>/ (spec, plan, ledger, journal);\n"
+                      "status in docs/STATUS.md, open work in docs/backlog.md.\n"
+                      "Save superpowers specs and plans into the initiative folder, not docs/superpowers/.", layout)
+
     def test_length(self):
         self.assertLess(len(read(SKILL).splitlines()), 300)
 

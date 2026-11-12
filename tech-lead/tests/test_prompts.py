@@ -110,9 +110,9 @@ class PromptTests(unittest.TestCase):
         self.assert_has("mockup-prompt.md", ["fetch", "XMLHttpRequest", "WebSocket", "<iframe>", "x.y.z",
                                              "rebuild", "locally", "Content-Security-Policy", "connect-src 'none'",
                                              "https://cdn.tailwindcss.com/<x.y.z>", "https://cdn.jsdelivr.net/npm/tailwindcss@<x.y.z>/",
-                                             "https://cdn.jsdelivr.net/npm/@tailwindcss/browser@<x.y.z>", "https://cdn.jsdelivr.net/npm/lucide@<x.y.z>/",
+                                             "https://cdn.jsdelivr.net/npm/@tailwindcss/browser@<x.y.z>/", "https://cdn.jsdelivr.net/npm/lucide@<x.y.z>/",
                                              "Always remove every existing", "as the first element in `<head>`", "https://unpkg.com/lucide@<x.y.z>/",
-                                             "<object>", "<embed>", "http-equiv=\"refresh\""])
+                                             "<object>", "<embed>", "http-equiv=\"refresh\"", "`http-equiv` compared case-insensitively"])
 
     def test_absolute_paths(self):
         for name in PLACEHOLDERS:

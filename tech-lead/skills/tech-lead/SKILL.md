@@ -28,6 +28,7 @@ Where documents live, their formats and how state is derived: `layout.md` in thi
 4. At every start of work, new or resumed, add `.worktrees/` and `.tech-lead/` to `.gitignore` when missing.
 5. `/tech-lead:run --auto`, or the user saying beforehand that the work should go from plan to goal without stopping, means autopilot (step 9). Record it in `journal.md`.
 6. When the project has documents under `docs/superpowers/`, offer once to move them (see `layout.md`). Never move them silently.
+7. When `CLAUDE.md` has no `## Project docs` section, add the one from `layout.md` (create the file if needed) and commit it with the initiative; leave an existing section as it is.
 
 ## Process
 
