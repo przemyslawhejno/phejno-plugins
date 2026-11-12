@@ -14,3 +14,7 @@
 
 - PLAN APPROVED; two minor findings applied (journal measurement line keeps `Suite time:`; hygiene pass confirms each `replaces` entry is gone). The 136 in the ratchet is correct: it was set at 136 tests.
 - Next: gate (this initiative is gated, not autopilot).
+
+## 2026-11-12 gate
+
+- Approved by the user: execution in waves (gated mode; no stop between waves unless a decision is the user's). Superdesign integration discussed; backlog decision pending with the user.
