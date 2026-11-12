@@ -1,7 +1,11 @@
 from __future__ import annotations
 
+import atexit
 import os
+import shutil
+import subprocess
 import sys
+import tempfile
 
 SCRIPTS = os.path.abspath(
     os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", "scripts")
@@ -43,3 +47,37 @@ def make_ledger(tasks, **overrides):
     }
     ledger.update(overrides)
     return ledger
+
+
+def clean_env():
+    return {k: v for k, v in os.environ.items() if k not in ("GIT_DIR", "GIT_WORK_TREE")}
+
+
+def git(repo, *args, env=None):
+    return subprocess.run(["git", "-C", repo, *args], check=True, capture_output=True,
+                          text=True, env=env or clean_env()).stdout.strip()
+
+
+def init_repo(repo):
+    os.makedirs(repo, exist_ok=True)
+    git(repo, "init", "-q")
+    git(repo, "config", "user.email", "t@example.com")
+    git(repo, "config", "user.name", "T")
+    git(repo, "config", "commit.gpgsign", "false")
+
+
+_template = []
+
+
+def make_repo(dest):
+    """Copy a one-commit repository (README) into dest; built once per process."""
+    if not _template:
+        root = tempfile.mkdtemp()
+        atexit.register(shutil.rmtree, root, True)
+        init_repo(root)
+        with open(os.path.join(root, "README"), "w") as f:
+            f.write("x\n")
+        git(root, "add", "-A")
+        git(root, "commit", "-q", "-m", "init")
+        _template.append(root)
+    shutil.copytree(_template[0], dest, dirs_exist_ok=True)

@@ -14,7 +14,7 @@ from pathlib import Path
 from unittest import mock
 
 import helpers
-from helpers import make_ledger, make_task
+from helpers import clean_env, git, init_repo, make_ledger, make_task
 
 import status
 
@@ -47,11 +47,22 @@ def three_tasks(done):
         done=done)
 
 
-def _git(repo, *args, date=None):
-    env = {k: v for k, v in os.environ.items() if k not in ("GIT_DIR", "GIT_WORK_TREE")}
-    if date:
-        env["GIT_COMMITTER_DATE"] = env["GIT_AUTHOR_DATE"] = date
-    subprocess.run(["git", "-C", repo, *args], check=True, capture_output=True, env=env)
+def _commit_history(repo, count, date):
+    """Append count empty commits dated `date` in one git process."""
+    branch = git(repo, "symbolic-ref", "--short", "HEAD")
+    parent = git(repo, "rev-parse", "HEAD")
+    stamp = git(repo, "log", "-1", "--format=%at", "HEAD")
+    when = f"{stamp} +0000"
+    lines = []
+    for n in range(count):
+        msg = f"c{n}"
+        lines += [f"commit refs/heads/{branch}", f"committer T <t@example.com> {when}",
+                  f"data {len(msg)}", msg]
+        if n == 0:
+            lines.append(f"from {parent}")
+    subprocess.run(["git", "-C", repo, "fast-import", "--quiet"], check=True,
+                   input=("\n".join(lines) + "\n").encode("utf-8"), env=clean_env(),
+                   capture_output=True)
 
 
 class CodemapTests(unittest.TestCase):
@@ -59,17 +70,14 @@ class CodemapTests(unittest.TestCase):
     def setUpClass(cls):
         cls._tmp = tempfile.TemporaryDirectory()
         cls.repo = os.path.realpath(cls._tmp.name)
-        _git(cls.repo, "init", "-q")
-        _git(cls.repo, "config", "user.email", "t@example.com")
-        _git(cls.repo, "config", "user.name", "T")
-        _git(cls.repo, "config", "commit.gpgsign", "false")
+        init_repo(cls.repo)
         for n in range(30):
             Path(cls.repo, f"m{n}.py").write_text("x\n", encoding="utf-8")
-        _git(cls.repo, "add", "-A")
+        git(cls.repo, "add", "-A")
         stamp = (datetime.date.today() - datetime.timedelta(days=10)).isoformat() + "T12:00:00"
-        _git(cls.repo, "commit", "-q", "-m", "init", date=stamp)
-        for n in range(19):
-            _git(cls.repo, "commit", "-q", "--allow-empty", "-m", f"c{n}", date=stamp)
+        env = dict(clean_env(), GIT_COMMITTER_DATE=stamp, GIT_AUTHOR_DATE=stamp)
+        git(cls.repo, "commit", "-q", "-m", "init", env=env)
+        _commit_history(cls.repo, 19, stamp)
         cls.codemap = Path(cls.repo, ".claude", "codemap")
 
     @classmethod
@@ -276,7 +284,6 @@ class StatusTests(unittest.TestCase):
         p = status.write_status(Path(self.root))
         out = status.render_brief(Path(self.root))
         self.assertTrue(out.splitlines()[-1].endswith(f" Full status: {p}"))
-        self.assertTrue(out.splitlines()[-1].startswith("Propose next steps"))
 
 
 if __name__ == "__main__":

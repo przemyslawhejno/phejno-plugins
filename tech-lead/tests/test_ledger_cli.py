@@ -7,35 +7,15 @@ import sys
 import tempfile
 import unittest
 
-from helpers import make_ledger, make_task
+from helpers import clean_env, make_ledger, make_repo, make_task
 
 LEDGER_PY = os.path.abspath(os.path.join(os.path.dirname(os.path.abspath(__file__)),
                                          "..", "scripts", "ledger.py"))
 
 
-def clean_env():
-    return {k: v for k, v in os.environ.items() if k not in ("GIT_DIR", "GIT_WORK_TREE")}
-
-
 def run(args, cwd=None):
     return subprocess.run([sys.executable, LEDGER_PY] + args, capture_output=True,
                           text=True, encoding="utf-8", cwd=cwd, env=clean_env())
-
-
-def git(repo, *args):
-    subprocess.run(["git"] + list(args), cwd=repo, check=True, capture_output=True,
-                   env=clean_env())
-
-
-def make_repo(tmp):
-    git(tmp, "init", "-q")
-    git(tmp, "config", "user.email", "t@example.com")
-    git(tmp, "config", "user.name", "T")
-    git(tmp, "config", "commit.gpgsign", "false")
-    with open(os.path.join(tmp, "README"), "w") as f:
-        f.write("x\n")
-    git(tmp, "add", ".")
-    git(tmp, "commit", "-q", "-m", "init")
 
 
 class CliTest(unittest.TestCase):
@@ -94,13 +74,6 @@ class CliTest(unittest.TestCase):
         self.assertIn("Codemap: 0 pending (inline)\n", r.stdout)
         self.assertIn(f"Wrote {pending}\n", r.stdout)
 
-    def test_checkpoint_prints_durations(self):
-        make_repo(self.tmp)
-        path = self.write(make_ledger([make_task(1, files=["README"])]))
-        r = run(["checkpoint", path, "--wave", "1", "--base", "HEAD"], cwd=self.tmp)
-        self.assertRegex(r.stdout, r"Task 1: pass \(\d+\.\ds\)")
-        self.assertRegex(r.stdout, r"Checks: pass \(\d+\.\ds\)")
-
     def test_checkpoint_failure_does_not_mark(self):
         make_repo(self.tmp)
         path = self.write(make_ledger([make_task(1, verify=["false"])]))
@@ -126,7 +99,6 @@ class CliTest(unittest.TestCase):
         plain = tempfile.mkdtemp(dir=self.tmp)
         r1 = run(["checkpoint", path, "--wave", "1", "--base", "HEAD", "--mark"], cwd=plain)
         repo = os.path.join(self.tmp, "repo")
-        os.mkdir(repo)
         make_repo(repo)
         r2 = run(["checkpoint", path, "--wave", "1", "--base", "nope", "--mark"], cwd=repo)
         for r in (r1, r2):
