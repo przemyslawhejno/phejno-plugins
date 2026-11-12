@@ -24,7 +24,7 @@
 
 ---
 
-Waves: 1 = Task 1; 2 = Task 2.
+Waves: 1 = Task 1; 2 = Task 3; 3 = Task 2.
 
 ### Task 1: Superdesign polish and 0.3.1
 
@@ -34,6 +34,15 @@ Waves: 1 = Task 1; 2 = Task 2.
 - [ ] Apply decisions 1-9; version 0.3.1 in both manifests.
 - [ ] Full suite passes; commit `tech-lead: superdesign polish (B17), 0.3.1`.
 
+### Task 3: Project docs pointer (B18)
+
+**Files:** `tech-lead/skills/tech-lead/SKILL.md`, `tech-lead/skills/tech-lead/layout.md`, `tech-lead/tests/test_skill_docs.py`
+
+- [ ] Tests first: SKILL.md "Start of work" mentions `CLAUDE.md` and `## Project docs`; layout.md lists `CLAUDE.md` and contains the section text from the spec verbatim.
+- [ ] Add one Start-of-work item to SKILL.md (add the section when missing, leave an existing one, commit it with the initiative) and the layout.md entry with the exact section text.
+- [ ] Full suite passes; commit `tech-lead: project docs pointer in CLAUDE.md (B18)`.
+
 ### Task 2: Lead verification (lead)
 
-- [ ] Full suite; `ledger.py check` on all ledgers; close B17 in `docs/backlog.md`; `status.py --write`; review.
+- [ ] Add the `## Project docs` section to this repository's `CLAUDE.md`.
+- [ ] Full suite; `ledger.py check` on all ledgers; close B17 and B18 in `docs/backlog.md`; `status.py --write`; review.

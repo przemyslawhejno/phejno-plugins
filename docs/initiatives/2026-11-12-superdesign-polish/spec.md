@@ -20,6 +20,19 @@ Close backlog B17: the open minor findings from the 0.3.0 reviews (`docs/initiat
 | 8 | The init subagent still has Bash | The Agent tool cannot remove Bash from that subagent. Before dispatch the lead saves `git status --porcelain --ignored` as a baseline; after the subagent returns it runs the same command and compares. Any new or changed entry outside `.superdesign/init/` is never reverted automatically (it could be the user's work): the lead shows it to the user and stops using superdesign for this run until the user decides. Entries under `.superdesign/` are allowed (an ignored directory may show as one `!! .superdesign/` line). Limit, stated in layout.md: further edits to files that were already dirty before dispatch do not show up in this comparison. |
 | 9 | `test_readmes` checks four superdesign strings | Extend the existing README test with the strings it does not yet assert among: stored "no", withdrawal, verbatim retention, the allowlist, the autopilot rule. |
 
+## B18: project docs pointer in CLAUDE.md
+
+Without the tech-lead skill, superpowers saves specs and plans under `docs/superpowers/` and knows nothing of the initiative hierarchy. At the start of work the lead adds this section to the project's `CLAUDE.md` when no `## Project docs` section exists (creating the file if needed), then commits it with the initiative:
+
+```
+## Project docs
+Work is tracked in docs/initiatives/<date>-<topic>/ (spec, plan, ledger, journal);
+status in docs/STATUS.md, open work in docs/backlog.md.
+Save superpowers specs and plans into the initiative folder, not docs/superpowers/.
+```
+
+An existing `## Project docs` section is left as it is. `layout.md` lists `CLAUDE.md` in the hierarchy with this purpose.
+
 Version 0.3.1.
 
 ## Out of scope
