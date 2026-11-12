@@ -43,3 +43,9 @@
 Tasks done: 1, 2
 Timing: Task 1 1.0s, Task 2 1.1s, checks 0.0s
 - Lens yield: security 3 Critical/Important, 6 Minor (wave 1, Task 1); all three Important fixed and re-reviewed by the lens.
+
+## 2026-11-12 wave 2
+Tasks done: 3
+Timing: Task 3 1.0s, checks 0.0s
+Ruling: no separate inventory before Task 3 — wave 1 changed no scripts and added only document tests; the B16 list is the input — cost if wrong: a duplicate test survives to the next pass
+- Wave 2 done; suite median 1.12 s, 166 tests (6.7 ms per test, ratchet was 7.1 ms); ratchet updated. B15 and B16 closed in the backlog.

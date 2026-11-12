@@ -2,7 +2,7 @@
 # Project status
 
 ## In progress
-- 2026-11-12-superdesign (in progress, waves 1/3, next wave 2): /home/user/phejno-plugins/docs/initiatives/2026-11-12-superdesign
+- 2026-11-12-superdesign (in progress, waves 2/3, next wave 3): /home/user/phejno-plugins/docs/initiatives/2026-11-12-superdesign
 
 ## Recently done
 - 2026-11-12-quality (done, waves 5/5): /home/user/phejno-plugins/docs/initiatives/2026-11-12-quality
@@ -18,5 +18,3 @@
 
 ## Backlog
 - B1 Interactive dry run: `/tech-lead:run` on a sample spec with a UI in a new session, up to the gate (mockup, plan review, `ledger.py show`) — from 2026-11-11-tech-lead — 2026-11-12
-- B15 Superdesign as optional mockup provider (tech-lead 0.3.0): see docs/initiatives/2026-11-12-superdesign/ — from user request — 2026-11-12
-- B16 [hygiene] tech-lead: `run()` test helper drops its env parameter and tests use process-global `os.chdir`; variable `worst` in ledger_checkpoint.py holds the first failing exit code; remaining annotations in the new ledger_core helpers; `_esc` used only by `_cell` — from 2026-11-12-cleanup — 2026-11-12
