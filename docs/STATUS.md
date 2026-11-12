@@ -2,7 +2,7 @@
 # Project status
 
 ## In progress
-- 2026-11-12-cleanup (in progress, waves 1/3, next wave 2): /home/user/phejno-plugins/docs/initiatives/2026-11-12-cleanup
+- 2026-11-12-cleanup (in progress, waves 2/3, next wave 3): /home/user/phejno-plugins/docs/initiatives/2026-11-12-cleanup
 
 ## Proposed
 - 2026-11-12-superdesign (proposed): /home/user/phejno-plugins/docs/initiatives/2026-11-12-superdesign
@@ -20,17 +20,4 @@
 
 ## Backlog
 - B1 Interactive dry run: `/tech-lead:run` on a sample spec with a UI in a new session, up to the gate (mockup, plan review, `ledger.py show`) — from 2026-11-11-tech-lead — 2026-11-12
-- B2 tech-lead tests: cover log truncation, lead-task verify skip, first failing exit code and multi-wave selection in checkpoint; rounding and empty ledger in show; missing argument, bad `--wave`, relative `--log`, unknown wave and non-UTF-8 locale in the CLI; status.py per-initiative `waves` failure — from 2026-11-11-tech-lead — 2026-11-12
-- B3 status.py: a failed `ledger_core` import shows every initiative as `unknown (ledger error)`; report one clear error instead (status.py:82-90) — from 2026-11-11-tech-lead — 2026-11-12
-- B4 ledger_checkpoint.py: lead tasks' files are not part of `allowed` for the scope check; document that `mark_done` mutates the ledger it receives — from 2026-11-11-tech-lead — 2026-11-12
-- B5 ledger.py: `-h` prints multi-line help and exits 0; set `allow_abbrev=False`; a missing git binary is reported as "not a git repository" — from 2026-11-11-tech-lead — 2026-11-12
-- B6 ledger_report.py: escape newlines in list cells consistently — from 2026-11-11-tech-lead — 2026-11-12
-- B7 SKILL.md polish: define "integration branch"; give the ledger format block its own heading; remove the absolute-path bullets duplicated in layout.md; state when model-manager is loaded in flows that dispatch before step 7 — from 2026-11-11-tech-lead — 2026-11-12
-- B8 Prompts: say what `{{MOCKUP_PATH}}` holds for batches without UI tasks; stronger `id` assertion in test_prompts — from 2026-11-11-tech-lead — 2026-11-12
-- B9 tech-lead README: list the optional skills (`engineering:architecture`, `security-review`, `modern-web-guidance`); packaging test also checks the scripts the skill names — from 2026-11-11-tech-lead — 2026-11-12
-- B10 ledger_core.py: tighten type annotations; remaining test gaps from the Task 1 review — from 2026-11-11-tech-lead — 2026-11-12
-- B11 ledger_checkpoint stdin test can pass without stdin=DEVNULL under a runner without a terminal; make it fail without the fix — from 2026-11-11-tech-lead — 2026-11-12
-- B12 [hygiene] ledger_core.py: split the long `_schema2_errors`; reject `schema: 2.0`; drop the double risk-vocabulary check; test that `ui` tasks count toward the hygiene thresholds; state the lead-task interpretation — from 2026-11-12-quality — 2026-11-12
-- B13 [hygiene] tests: assert the 8-line lens checklist limit; `m.group(1)` without a None check in test_ledger_checkpoint.py; the instruction line asserted twice in test_status.py; bare `tuple` annotation on `_run` — from 2026-11-12-quality — 2026-11-12
-- B14 SKILL.md and layout.md: one place for the Suite time writes; a re-review path for lens reports — from 2026-11-12-quality — 2026-11-12
 - B15 Superdesign as optional mockup provider (tech-lead 0.3.0): see docs/initiatives/2026-11-12-superdesign/ — from user request — 2026-11-12

@@ -23,3 +23,10 @@
 Tasks done: 1, 2, 3, 4, 5
 Timing: Task 1 2.3s, Task 2 2.3s, Task 3 2.3s, Task 4 2.2s, Task 5 2.1s, checks 0.0s
 - Out-of-scope mockup-prompt.md in wave 1 is B8 (expected). Suite after wave 1: median 2.33 s, 156 tests (14.9 ms per test, +39%; total +0.88 s, under the 2 s floor) — target for the hygiene pass.
+
+## 2026-11-12 wave 2
+Tasks done: 6
+Timing: Task 6 1.0s, checks 0.0s
+Task 5: Ruling: mockup-prompt.md edit outside the declared files is B8's own requirement (test asserts id= there) — cost if wrong: none
+- Wave 2 done; suite after hygiene: median 1.11 s, 156 tests (7.1 ms per test); ratchet updated in docs/standards.md.
+- Backlog B2-B14 closed with notes (closures recorded: B4 files, B5 help, B9 README, B10 test gaps, B11 and B13 parts done in 0.2.0).
