@@ -1,0 +1,138 @@
+{
+  "prior_art": "done",
+  "mode": "autopilot",
+  "schema": 2,
+  "checks": [],
+  "requirements": [
+    {
+      "id": "R1",
+      "text": "Superdesign used only when the plugin is available, consent is recorded in standards.md and the CLI is authenticated"
+    },
+    {
+      "id": "R2",
+      "text": "Consent asked once per project stating credits and code upload"
+    },
+    {
+      "id": "R3",
+      "text": "The lead runs superdesign in the main session; subagents never do"
+    },
+    {
+      "id": "R4",
+      "text": "Export to mockup.html with standalone check and fallback to the built-in builder; journal records ids and generations"
+    },
+    {
+      "id": "R5",
+      "text": "Design system pointer and .superdesign commit/ignore rules"
+    },
+    {
+      "id": "R6",
+      "text": "README optional section and version 0.3.0"
+    },
+    {
+      "id": "R7",
+      "text": "B16 hygiene leftovers"
+    }
+  ],
+  "done": [],
+  "tasks": [
+    {
+      "id": 1,
+      "title": "Superdesign in the skill documents",
+      "depends_on": [],
+      "files": [
+        "tech-lead/skills/tech-lead/SKILL.md",
+        "tech-lead/skills/tech-lead/layout.md",
+        "tech-lead/skills/tech-lead/mockup-prompt.md",
+        "tech-lead/tests/test_skill_docs.py",
+        "tech-lead/tests/test_prompts.py"
+      ],
+      "covers": [
+        "R1",
+        "R2",
+        "R3",
+        "R4",
+        "R5"
+      ],
+      "acceptance": [
+        "Provider check, consent with both costs, lead-only run, export with standalone check and fallback, journal record",
+        "Built-in path unchanged; no brief tells a subagent to run superdesign"
+      ],
+      "verify": [
+        "python3 -m unittest discover tech-lead/tests"
+      ],
+      "model": "sonnet",
+      "effort": "high",
+      "risk": [
+        "system-wide"
+      ],
+      "experts": [
+        "architecture"
+      ],
+      "reason": "Changes the behaviour of every UI run and adds a paid external service; wording must be unambiguous"
+    },
+    {
+      "id": 2,
+      "title": "README and version 0.3.0",
+      "depends_on": [],
+      "files": [
+        "tech-lead/README.md",
+        "tech-lead/.claude-plugin/plugin.json",
+        ".claude-plugin/marketplace.json",
+        "tech-lead/tests/test_packaging.py"
+      ],
+      "covers": [
+        "R6"
+      ],
+      "acceptance": [
+        "README optional superdesign section with costs and install",
+        "Version 0.3.0 in both manifests"
+      ],
+      "verify": [
+        "python3 -m unittest discover tech-lead/tests"
+      ],
+      "model": "sonnet",
+      "effort": "low",
+      "reason": "Short prose and fixed values"
+    },
+    {
+      "id": 3,
+      "title": "Hygiene pass (B16)",
+      "depends_on": [
+        1,
+        2
+      ],
+      "files": [
+        "tech-lead/scripts/",
+        "tech-lead/tests/"
+      ],
+      "covers": [
+        "R7"
+      ],
+      "acceptance": [
+        "B16 items closed with no behaviour change",
+        "Guard tests still fail without their fixes; suite not slower per test"
+      ],
+      "verify": [
+        "python3 -m unittest discover tech-lead/tests"
+      ],
+      "model": "sonnet",
+      "effort": "medium",
+      "kind": "hygiene",
+      "reason": "Required hygiene pass; carries the B16 items"
+    },
+    {
+      "id": 4,
+      "title": "Lead verification",
+      "depends_on": [
+        3
+      ],
+      "files": [],
+      "covers": [],
+      "acceptance": [
+        "B15 and B16 closed; ratchet updated; final review clean"
+      ],
+      "model": "lead",
+      "reason": "Integration and verification belong to the lead"
+    }
+  ]
+}

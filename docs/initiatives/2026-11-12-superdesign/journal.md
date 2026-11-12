@@ -15,3 +15,11 @@
   - The UI/UX expert still reviews the mockup (WCAG 2.2, states, accessibility).
   - In autopilot only with consent given before start.
 - Next: spec via brainstorming when the user picks this initiative.
+
+## 2026-11-12 session (start)
+
+- The user asked to execute B15 and B16 ("Wykonaj b15 i b16"). Ruling: read as advance agreement to go from plan to implementation (ledger `mode: autopilot`), with an independent review of spec and plan first; merging to master stays the user's decision — cost if wrong: the user stops the run.
+- B16 folded in as the required hygiene pass (Task 3).
+- Export syntax checked in the skill source: `get-design --draft-id <id> --json` and `get-design --output`; drafts may use `<sd-component>` templates and public asset URLs, hence the standalone check and fallback.
+- Task 1 carries risk `system-wide` (behaviour of every UI run, paid external service) with the `architecture` lens.
+- Spec, plan and ledger written.
