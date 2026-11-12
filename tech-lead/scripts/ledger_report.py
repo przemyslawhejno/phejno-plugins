@@ -4,14 +4,13 @@ from __future__ import annotations
 from ledger_core import MODELS, waves
 
 
-def _esc(x) -> str:
-    return str(x).replace("|", "\\|").replace("\n", " ")
-
-
 def _cell(x) -> str:
+    def esc(v) -> str:
+        return str(v).replace("|", "\\|").replace("\n", " ")
+
     if isinstance(x, (list, tuple)):
-        return "<br>".join(_esc(i) for i in x) or "-"
-    return _esc(x)
+        return "<br>".join(esc(i) for i in x) or "-"
+    return esc(x)
 
 
 def _model(t: dict) -> str:
