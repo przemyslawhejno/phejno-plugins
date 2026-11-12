@@ -29,3 +29,14 @@ Timing: Task 3 1.1s, checks 0.0s
 - Ready with fixes: 1 Important (security-lens minors not recorded → backlog B20), fix-now minor (case-insensitive http-equiv in the export bullet), optional wording items folded into the fix wave.
 - From the user's dom-z-widokiem CLAUDE.md (commit 33da20b, a bullet in Work Tracking, not a ## Project docs heading): B18 must detect the rule by content (any mention routing specs and plans to docs/initiatives/), not by heading, or it adds a duplicate. Folded into the fix wave.
 - Proposed to the user: B19, status.py finds docs/initiatives/ at the git top level when the session starts in a subdirectory (dom-z-widokiem sessions start in topology/).
+
+## 2026-11-12 wave 3
+Tasks done: 2
+Timing: checks 0.0s
+
+## 2026-11-12 session
+
+- Done: tech-lead 0.3.1 — B17 (superdesign wording and safety: consent names every channel, exact CDN URL shapes, a Content-Security-Policy always replaced and first in the mockup head, baseline check after the repository analysis that fails closed and never reverts user work, ids only in the journal) and B18 (the lead adds a `## Project docs` section to CLAUDE.md unless CLAUDE.md already routes specs and plans to docs/initiatives/; asks first when CLAUDE.md has uncommitted changes). This repository now has a CLAUDE.md with that section.
+- 3 tasks in 3 waves on autopilot: sonnet 2, lead 1. The security lens ran on Task 1 twice more after fixes (4 Important in total, all fixed). Final review (opus/medium): ready with fixes; one fix wave, scoped re-review clean.
+- Open: B1 (live run), B19 (proposed: status from a subdirectory session, awaiting the user), B20 (security leftovers).
+- Next: user decides on merging the PR and on B19.
