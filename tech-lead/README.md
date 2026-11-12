@@ -32,12 +32,36 @@ Everything lives under `docs/`: `STATUS.md`, `backlog.md`, `standards.md`, `adr/
 
 ## Session-start status
 
-A SessionStart hook injects a short status brief (in progress, planned, backlog head) so the lead can propose next steps. Set `TECH_LEAD_STATUS=0` to turn it off.
+A SessionStart hook injects a short status brief (in progress, planned, backlog head) so the lead can propose next steps. When `.claude/codemap/` is missing or stale, the brief adds at most one `Codemap:` line proposing `/codemap` (no index for 30+ code files; more than 50 pending paths or `symbols.md` missing; index older than 30 days with 20+ commits since) or `/codemap update` (16-50 pending). The full status has a `## Codemap` section. Set `TECH_LEAD_STATUS=0` to turn it off.
+
+## Hygiene
+
+Plans with several `code` or `ui` tasks get a final `kind: hygiene` task: dead code, duplicated tests and obsolete leftovers are removed, with `simplify` when installed. A haiku inventory finds candidates first. The suite time is kept as a ratchet in `standards.md`, and open `[hygiene]` backlog items can trigger a proposed cleanup initiative.
+
+## Expert panels
+
+Each task can carry `experts`: review lenses chosen from its risk and files. The lenses are `security`, `data`, `api`, `architecture`, `performance`, `errors`, `tests` and `ui-ux`; checklists, dispatch rules and yield tracking are in `skills/tech-lead/lenses.md`. Lens findings enter the task's fix loop, and any Important finding blocks the task.
+
+## UI/UX
+
+Projects with a graphical interface set `ui: true`. The lead makes a mockup, a UI/UX expert reviews it with the spec, and `kind: ui` tasks are checked against WCAG 2.2 AA, responsive layout and theme standards, with screenshots, axe and Lighthouse output as evidence.
+
+## Ledger schema
+
+New ledgers carry `"schema": 2`, which enables the hygiene, lens and UI rules. Ledgers without `schema` keep the 0.1.0 validation unchanged.
+
+## Codemap integration
+
+When `.claude/codemap/` exists (from the `claude-codemap` plugin), the lead navigates through `INDEX.md` and `symbols.md` before Glob or Grep and gives subagents their paths. After a wave it proposes or, in autopilot, runs `/codemap update` when changes are pending, and a plain `/codemap` rebuild after a rebuild action or moved modules. `checkpoint --mark` appends the wave's changed paths to `.claude/codemap/pending.md`, correcting lane-worktree paths and dropping `.worktrees/` and `.claude/codemap/` entries, and prints `Codemap: <n> pending (inline|update|rebuild)`; it does this only when `.claude/codemap/` exists.
+
+## Optional skills
+
+Used when installed: `engineering:architecture`, `engineering:tech-debt`, `engineering:code-review`, `engineering:testing-strategy`, `design:design-critique`, `design:accessibility-review`, `design:ux-copy`, `design:design-system`, `modern-web-guidance`, `simplify` and `security-review`. Nothing requires them.
 
 ## Scripts
 
-- `scripts/ledger.py`: `check`, `show`, `next` and `checkpoint` for an initiative's `ledger.json`.
-- `scripts/status.py`: project status on stdout, `--brief` for the hook, `--write` to regenerate `docs/STATUS.md`.
+- `scripts/ledger.py`: `check`, `show`, `next` and `checkpoint` for an initiative's `ledger.json`; `checkpoint --mark` also records codemap pending paths.
+- `scripts/status.py`: project status on stdout, `--brief` for the hook, `--write` to regenerate `docs/STATUS.md`; includes codemap health.
 
 ## Limits
 
