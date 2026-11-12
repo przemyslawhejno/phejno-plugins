@@ -31,3 +31,7 @@
 Tasks done: 1, 6, 7
 Ruling: T8 hook test asserts the command contains `scripts/status.py` and `--brief` separately — the plan's literal substring cannot match the plan's own quoted command — cost if wrong: none, both parts are still pinned.
 Checkpoint run by hand (ledger.py not built yet): 40 tests pass, no out-of-scope files. Fix rounds: Task 1 x1 (requirement id type safety, cycle rotation), Task 6 x1 (migration targets, lead tasks in waves).
+
+## 2026-11-12 wave 2
+Tasks done: 2, 3, 4
+Task 4: Ruling: unknown wave raises CheckpointError and an OSError on the log becomes CheckpointError — the reviewer's ⚠️ item and the no-traceback global constraint make both real gaps — cost if wrong: two extra error paths
