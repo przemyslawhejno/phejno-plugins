@@ -30,3 +30,16 @@ Timing: Task 6 1.0s, checks 0.0s
 Task 5: Ruling: mockup-prompt.md edit outside the declared files is B8's own requirement (test asserts id= there) — cost if wrong: none
 - Wave 2 done; suite after hygiene: median 1.11 s, 156 tests (7.1 ms per test); ratchet updated in docs/standards.md.
 - Backlog B2-B14 closed with notes (closures recorded: B4 files, B5 help, B9 README, B10 test gaps, B11 and B13 parts done in 0.2.0).
+
+## 2026-11-12 wave 3
+Tasks done: 7
+Timing: checks 0.0s
+- Suite time: 1.11s, 156 tests (measured; ratchet 1.11s in standards.md)
+
+## 2026-11-12 session
+
+- Done: tech-lead 0.2.1 — backlog B2-B14 closed (fixes and recorded closures), 7 tasks in 3 waves (gated, approved): sonnet 6, lead 1; haiku for the backlog check and the inventory. Every per-task review clean on the first pass; guard tests verified to fail without their fixes by implementers and reviewers.
+- Suite: 137 tests in about 1.4 s at the start, 156 tests in 1.11 s at the finish (7.1 ms per test, ratchet was 10.7 ms); the hygiene pass moved the one-line-error CLI tests in process.
+- Final review (opus/medium): ready to merge; two minors fixed at the finish, the rest in backlog B16.
+- Open: B1 (interactive dry run), B15 (superdesign initiative, proposed), B16 ([hygiene] leftovers).
+- Next: user decides on merging the PR.
