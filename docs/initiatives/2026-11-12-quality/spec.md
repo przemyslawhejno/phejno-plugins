@@ -1,4 +1,4 @@
-# tech-lead 0.2.0: code hygiene and expert panels — design (draft, under review)
+# tech-lead 0.2.0: code hygiene, expert panels and UI/UX — design (draft, under review)
 
 Date: 2026-11-12
 
@@ -8,6 +8,7 @@ Two additions to the `tech-lead` plugin (spec of 0.1.0: `docs/initiatives/2026-1
 
 1. **Hygiene.** After many iterations a project keeps no obsolete code, no obsolete or duplicated tests, and no noise comments, and its test suite gets faster rather than slower.
 2. **Expert panels.** Each task gets the number of parallel experts its risk and complexity justify, so quality is the best the work needs, without spending experts on routine work.
+3. **UI/UX.** Every project with a graphical interface gets a UI/UX expert at spec, review and finish, and follows current standards.
 
 Both reference existing skills instead of copying them, and work without them.
 
@@ -75,7 +76,7 @@ A new `lenses.md` in the skill directory: for each lens a short checklist and th
 | `security` | input validation, authn/authz, secrets, injection, dependencies | `security-review`, `engineering:code-review` security dimension |
 | `performance` | complexity, queries, memory, hot paths | `engineering:code-review` performance dimension |
 | `data` | migrations, consistency, reversibility, backups | — |
-| `ui` | match with the mockup, accessibility, states | `design:accessibility-review` |
+| `ui-ux` | see Part 3; mandatory for `kind: ui` tasks | see Part 3 |
 | `tests` | hygiene rules above, duplicates across the suite, speed | `engineering:testing-strategy`, `pr-review-toolkit:pr-test-analyzer` |
 | `api` | contracts, backward compatibility, errors | — |
 | `architecture` | module boundaries, dependencies, coupling | `engineering:code-review` maintainability, `pr-review-toolkit:type-design-analyzer` |
@@ -97,15 +98,48 @@ Named agents are routed to a model by model-manager's `agents.json`; a generic l
 
 ### Ledger and gate
 
-- Task field `experts`: list of lens names, optional, default `[]`. Task field `kind`: `code` (default), `hygiene`, `docs`.
+- Task field `experts`: list of lens names, optional, default `[]`. Task field `kind`: `code` (default), `ui`, `hygiene`, `docs`. Top-level `ui`: boolean, default `false`.
 - `ledger.py check`: unknown lens name; more than 4 lenses; `experts` on a `lead` task; missing hygiene task (Part 1).
 - `ledger.py show`: an `Experts` column, and in the summary the total number of lens dispatches.
 - Plan review checks expert choice both ways: a missing lens on a risky task, a needless lens on a routine one.
+
+## Part 3: UI and UX expertise
+
+Applies to every project with a graphical interface (web, desktop, mobile). The lead records it in the ledger as top-level `"ui": true`.
+
+### Current standards
+
+`docs/standards.md` gets a `UI` section, set when the project has a UI:
+
+- Accessibility: WCAG 2.2 level AA (the current W3C recommendation), including focus visibility, target size, keyboard operation, contrast, reduced motion and accessible names.
+- Performance: Core Web Vitals "good" thresholds at the 75th percentile: LCP ≤ 2.5 s, INP ≤ 200 ms, CLS ≤ 0.1.
+- Web platform choices (HTML, CSS, client JS) are checked against `modern-web-guidance` when installed, because platform APIs change faster than model training; native apps follow the current platform guidelines (Apple Human Interface Guidelines, Material Design 3).
+- Responsive from the smallest supported viewport; light and dark themes when the product has both; all states designed (empty, loading, error, success).
+- A design system or component library comes from prior art before custom components are built; design tokens instead of hard-coded values.
+
+Existing project conventions win where they are stricter; a weaker existing convention is raised to these standards only with the user's approval, recorded as a ruling.
+
+### UI/UX expert
+
+A `ui-ux` expert replaces the `ui` lens. It is mandatory, not risk-scaled, wherever a UI is designed or changed:
+
+| Stage | What the expert does | Uses when installed |
+|---|---|---|
+| Spec and mockup (step 4) | Reviews the written spec and `mockup.html` before the user sees them: user flows, information hierarchy, states, copy, accessibility, responsiveness, fit with the standards above. The mockup builder fixes its findings; then the user reviews spec and mockup together. | `design:design-critique`, `design:accessibility-review`, `design:ux-copy`, `modern-web-guidance` |
+| Planning | Every task that creates or changes UI has `"kind": "ui"`; its `verify` includes an automated accessibility check (for web: axe-core run through Playwright) when the stack allows it. | `design:design-handoff` for component specs |
+| Review | Every `kind: ui` task gets the `ui-ux` lens in its wave: compares the result with the mockup (Playwright screenshots at mobile and desktop widths), checks the UI standards, copy and states. | as above |
+| Finish | One whole-UI pass over the flows changed in the initiative, when more than one UI task ran. | `design:design-critique` |
+
+- Model: sonnet medium; opus medium for a new product UI or a redesign.
+- `ledger.py check`: a `kind: ui` task without `ui-ux` in `experts` is an error; `kind: ui` in a ledger without `"ui": true` is an error.
+- The `ui-ux` lens counts toward the 4-lens limit.
+- `design:accessibility-review` targets WCAG 2.1 AA; the expert applies it and adds the 2.2 criteria (focus not obscured, target size minimum, dragging movements, consistent help, redundant entry, accessible authentication).
 
 ## Changes by file
 
 - `skills/tech-lead/SKILL.md`: hygiene in standards, briefs and finish; suite baseline and timing; expert stages, lens selection and dispatch; version references.
 - `skills/tech-lead/layout.md`: `standards.md` Hygiene section; baseline journal line.
+- `skills/tech-lead/mockup-prompt.md`: UI standards and the expert review loop.
 - `skills/tech-lead/lenses.md` (new), `skills/tech-lead/lens-review-prompt.md` (new, placeholders `{{LENS}}`, `{{TASKS}}`, `{{SPEC_PATH}}`, `{{STANDARDS_PATH}}`, `{{LENSES_PATH}}`, `{{REPORT_PATH}}`).
 - `batch-review-prompt.md`, `plan-review-prompt.md`: hygiene and expert checks.
 - `scripts/ledger_core.py`: `kind`, `experts` validation, hygiene rule. `scripts/ledger_checkpoint.py` and `ledger.py`: timings. `scripts/ledger_report.py`: Experts column and total.
