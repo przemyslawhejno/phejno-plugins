@@ -69,7 +69,10 @@
       ],
       "model": "sonnet",
       "effort": "medium",
-      "reason": "Refactor of the validation core with byte-identical messages"
+      "reason": "Refactor of the validation core with byte-identical messages",
+      "replaces": [
+        "duplicate risk-vocabulary guard in _schema2_errors"
+      ]
     },
     {
       "id": 2,
@@ -96,7 +99,10 @@
       ],
       "model": "sonnet",
       "effort": "medium",
-      "reason": "Many new tests with git, locale and PATH setups across two modules"
+      "reason": "Many new tests with git, locale and PATH setups across two modules",
+      "replaces": [
+        "timing-based stdin test in test_ledger_checkpoint.py"
+      ]
     },
     {
       "id": 3,
@@ -119,7 +125,10 @@
       ],
       "model": "sonnet",
       "effort": "low",
-      "reason": "Small precise change in one module"
+      "reason": "Small precise change in one module",
+      "replaces": [
+        "ad hoc per-column escaping in render_show"
+      ]
     },
     {
       "id": 4,
@@ -141,8 +150,11 @@
         "python3 -m unittest discover tech-lead/tests"
       ],
       "model": "sonnet",
-      "effort": "low",
-      "reason": "Precise change in one module plus tests"
+      "effort": "medium",
+      "reason": "Import refactor in the session-start hook path, plus tests",
+      "replaces": [
+        "duplicate instruction-line assertion in test_status.py"
+      ]
     },
     {
       "id": 5,
@@ -156,7 +168,8 @@
         "tech-lead/tests/test_prompts.py",
         "tech-lead/tests/test_packaging.py",
         "tech-lead/.claude-plugin/plugin.json",
-        ".claude-plugin/marketplace.json"
+        ".claude-plugin/marketplace.json",
+        "tech-lead/tests/test_skill_docs.py"
       ],
       "covers": [
         "R8",
@@ -170,8 +183,8 @@
         "python3 -m unittest discover tech-lead/tests"
       ],
       "model": "sonnet",
-      "effort": "low",
-      "reason": "Small edits with exact wording decided in the spec"
+      "effort": "medium",
+      "reason": "Four documents plus tests coupled to test_skill_docs; wording decided in the spec"
     },
     {
       "id": 6,
