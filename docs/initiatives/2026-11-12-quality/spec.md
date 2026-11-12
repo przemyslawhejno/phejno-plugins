@@ -1,153 +1,169 @@
-# tech-lead 0.2.0: code hygiene, expert panels and UI/UX — design (draft, under review)
+# tech-lead 0.2.0: code hygiene, expert panels and UI/UX — design (draft, round 2)
 
 Date: 2026-11-12
 
 ## Goal
 
-Two additions to the `tech-lead` plugin (spec of 0.1.0: `docs/initiatives/2026-11-11-tech-lead/spec.md`):
+Three additions to the `tech-lead` plugin (0.1.0 spec: `docs/initiatives/2026-11-11-tech-lead/spec.md`):
 
-1. **Hygiene.** After many iterations a project keeps no obsolete code, no obsolete or duplicated tests, and no noise comments, and its test suite gets faster rather than slower.
-2. **Expert panels.** Each task gets the number of parallel experts its risk and complexity justify, so quality is the best the work needs, without spending experts on routine work.
+1. **Hygiene.** After many iterations a project keeps no obsolete code, no obsolete or duplicated tests and no noise comments, and its test suite gets faster rather than slower.
+2. **Expert panels.** Each task gets the parallel experts its risk justifies, decidable from ledger data, and the lead learns from their yield which experts pay off.
 3. **UI/UX.** Every project with a graphical interface gets a UI/UX expert at spec, review and finish, and follows current standards.
 
-Both reference existing skills instead of copying them, and work without them.
+All three reference existing skills instead of copying them, and work without them. The standing goal holds: maximum quality at the lowest token, time and cost; no stronger model or extra agent where it adds nothing.
 
-## What already exists (not to be duplicated)
+## What already exists (not duplicated)
 
-- `superpowers:test-driven-development` and its `writing-good-tests.md`: Red-Green-Refactor, "Name the Break", exercise the real thing, the mutation check, tests ship with the implementation.
-- `superpowers:subagent-driven-development` reviewer rubric: separation of concerns, error handling, DRY without premature abstraction; Important for verbatim duplication, swallowed errors, tests that assert nothing.
-- `superpowers:brainstorming` / `writing-plans`: YAGNI, DRY, one responsibility per file. `receiving-code-review`: remove unused code (YAGNI).
-- `superpowers:dispatching-parallel-agents`: parallel independent investigations.
-- Optional `engineering` plugin: `code-review` (security, performance, correctness, maintainability), `testing-strategy` (pyramid, what not to test), `tech-debt` (categories, priority = (impact + risk) x (6 - effort)), `system-design`, `architecture` (ADR), `debug`.
-- Optional `simplify` skill: reuse, simplification and efficiency cleanups of changed code.
+- `superpowers:test-driven-development` and `writing-good-tests.md`: Red-Green-Refactor, "Name the Break", exercise the real thing, the mutation check.
+- SDD reviewer rubric: separation of concerns, error handling, DRY; Important for verbatim duplication, swallowed errors, tests that assert nothing.
+- `superpowers:systematic-debugging`: one hypothesis at a time. `superpowers:dispatching-parallel-agents`: parallel work on independent problems only.
+- Optional `engineering`: `code-review`, `testing-strategy`, `tech-debt`, `system-design`, `architecture`, `debug`. Optional `design`: `design-critique`, `accessibility-review` (WCAG 2.1 AA), `ux-copy`, `design-handoff`. Optional `modern-web-guidance`.
+- `security-review` and `simplify` review a branch's pending changes, not one lane task's diff; tech-lead uses them only where a whole branch or working tree is the subject.
+- Named review agents (`pr-review-toolkit:*`) may not be installed; where they are, model-manager routes them to opus high/xhigh or sonnet high unless the call passes `model` and `effort`.
 
-Gaps none of them covers: comment policy; removing code and tests made obsolete by a behaviour change; duplicate tests across iterations (reviews see only the task diff); test-suite speed as a measured requirement; choosing how many experts a task gets.
+Gaps none of them covers: comment policy; removing what a behaviour change made obsolete; duplicates across the whole suite; suite speed as a measured requirement; choosing experts by risk; current UI standards.
+
+## Ledger additions
+
+| Field | Where | Values | Default |
+|---|---|---|---|
+| `ui` | top level | boolean | `false` |
+| `kind` | task | `code`, `ui`, `hygiene` | `code` (`lead` tasks: ignored) |
+| `risk` | task | list of `security`, `data`, `irreversible`, `system-wide` | `[]` |
+| `experts` | task | list of lens names (Part 2) | `[]` |
+| `replaces` | task | existing paths or test names this task makes obsolete and removes | `[]` |
+
+`ledger.py check` adds the rules stated in Parts 1-3. `ledger.py show` adds `Risk` and `Experts` columns and, in the summary, the number of lens dispatches per wave.
 
 ## Part 1: Hygiene
 
 ### Standards
 
-When the lead creates or discovers `docs/standards.md`, it adds a `Hygiene` section (existing project conventions win where they conflict, recorded as a ruling):
+When the lead creates or discovers `docs/standards.md`, it adds two sections. Existing project conventions win where they are stricter; a weaker convention is raised only with the user's approval, recorded as a ruling.
 
-- Comments only where the code cannot say it: why, a non-obvious constraint, a workaround with its link. No change history, no commented-out code, no restating what the code does, no TODO without a backlog id (`B<n>`). History lives in git.
-- A change of behaviour removes the code and the tests it made obsolete, in the same task.
-- One behaviour, one test. A new test extends or replaces an existing one instead of duplicating it, including tests from earlier iterations.
-- Tests follow `superpowers:test-driven-development` `writing-good-tests.md`; test strategy follows `engineering:testing-strategy` when installed.
-- Suite speed is a requirement: the fastest test level that proves the behaviour; no sleeps; no repeated expensive setup that a fixture can share.
+`Hygiene`:
+- Comments only where the code cannot say it: why, a non-obvious constraint, a workaround with its link. No change history, no commented-out code, no restating the code, no TODO without a backlog id (`B<n>`). History lives in git.
+- A change of behaviour removes the code and tests it made obsolete in the same task, listed in the task's `replaces`.
+- One behaviour, one test: a new test extends or replaces an existing one instead of duplicating it, anywhere in the suite.
+- Tests follow `writing-good-tests.md`; strategy follows `engineering:testing-strategy` when installed.
+- Speed: the fastest test level that proves the behaviour, no sleeps, shared fixtures for expensive setup.
+- Mechanical enforcement: where the stack has them, the lint rules for commented-out code and untracked TODOs (for example ruff `ERA001` and `FIX002`, ESLint `no-warning-comments`) go into `Checks`; otherwise a grep command does.
 
-### Briefs and reviews
-
-- Implementer briefs carry "leave the area cleaner": remove what the change made dead; no history comments; follow `standards.md` Hygiene.
-- `batch-review-prompt.md` checks hygiene in the diff and in the tests of the touched modules: obsolete code or test left behind, or a new test duplicating an existing one, is **Important**; a noise comment is **Minor**.
-- `plan-review-prompt.md` checks that the plan says which old code and tests a task removes or replaces, and that planned tests do not duplicate existing ones.
+`Suite`:
+- `Suite: <command>` — the full test suite command; `Suite time: <seconds>s (<date>, <test count> tests)` — the ratchet.
 
 ### Suite timing
 
-- `ledger.py checkpoint` measures each command's wall time and prints it: `Task 3: pass (2.1s)`, `Checks: pass (14.8s)`; the wave journal entry records the same.
-- Before the first wave the lead runs the full suite once and records `Suite baseline: <command> <seconds>s` in `journal.md`.
-- At the finish, the lead re-times the full suite. More than 20% slower than baseline without a reason stated in the plan → a hygiene task now (autopilot) or a backlog item with both numbers (gated, if the user declines).
+- `ledger.py checkpoint` prints each command's wall time (`Task 3: pass (2.1s)`, `Checks: pass (14.8s)`); the wave journal entry records them.
+- Timing the suite means: the median of 3 runs of the `Suite` command, or one run when a single run exceeds 4 minutes (then in the background per model-manager, the log triaged by haiku low). When `checks` contains the suite command, the last checkpoint timing counts as one run.
+- At the first wave the lead records the suite time in `journal.md`; at the finish it times the suite again.
+- Regression: the time per test grew by more than 20% **and** the total grew by more than 2 seconds compared with the ratchet. Then the hygiene pass gets the slowest tests (the runner's durations report, top 10) as a target; if it cannot recover, a `[hygiene]` backlog item records both numbers.
+- At the finish, when there is no regression, `Suite time` in `standards.md` is updated, so the ratchet carries across initiatives.
+
+### Obsolete and duplicate test discovery
+
+Before the batch review of a wave with any `replaces`, and before the hygiene pass, a haiku low inventory dispatch searches the **whole** test tree (and the code tree, for removed symbols) for the symbols, strings and behaviours the changed tasks touched or removed. When installed, it also runs a dead-code tool (`vulture`, `knip`, or the stack's equivalent) and coverage contexts. It writes candidates to `research/hygiene-candidates-<wave>.md`; reviewers and the hygiene task receive that path.
+
+### Briefs and reviews
+
+- Implementer briefs: "leave the area cleaner" — remove what the change made dead, list it in the report, follow `standards.md` Hygiene.
+- `batch-review-prompt.md`: obsolete code or test left behind, or a new test duplicating one in the candidates file or the diff, is **Important**; a noise comment is **Minor**.
+- `plan-review-prompt.md`: each behaviour change names its `replaces`; planned tests do not duplicate existing ones.
 
 ### Hygiene pass
 
-- Every plan that changes code ends its implementation with one task of `"kind": "hygiene"`, depending on all other code tasks: sonnet medium, scoped to the files changed in the initiative and the tests of those modules. It removes dead code, merges duplicate tests, deletes obsolete tests, strips noise comments, uses `simplify` when installed, and must keep the full suite green and not slower than baseline.
-- `ledger.py check`: a ledger with at least one non-lead task and no `hygiene` task is an error; the `hygiene` task must be in the last code wave.
+- Required when the plan has at least 3 tasks of kind `code` or `ui`, or any task with a non-empty `replaces`. Otherwise the batch review's hygiene checks suffice.
+- One task of kind `hygiene`, sonnet medium, depending on every `code` and `ui` task. `files`: the union of those tasks' files plus their test directories. `verify`: the `Suite` command. Acceptance: suite green; no regression by the rule above.
+- It removes dead code, merges duplicate tests, deletes obsolete tests and noise comments, using the candidates file, and runs `simplify` on its working tree when installed.
+- `ledger.py check`: a required hygiene task is missing, or it does not depend on every `code`/`ui` task.
 
 ### Periodic audit
 
-When the suite is >20% over the initiative's baseline after a hygiene pass, or `docs/backlog.md` holds 10 or more open hygiene items, the lead proposes a cleanup initiative at the finish, prioritised with `engineering:tech-debt` when installed.
+At the finish, when `docs/backlog.md` has 10 or more open `[hygiene]` items, or the suite regressed and the hygiene pass could not recover it, the lead proposes a cleanup initiative prioritised with `engineering:tech-debt` when installed. The backlog line format gains an optional tag: `- [ ] B<n> [hygiene] <title> — from … — <date>`.
 
 ## Part 2: Expert panels
 
 ### Where experts are used
 
-| Stage | Parallel experts | Rule |
+| Stage | Experts | Rule |
 |---|---|---|
-| Architectural decision or ambiguous requirement | 2-3 independent proposals | Each expert gets the same brief and designs alone (`engineering:system-design` when installed); the lead, or a fable subagent when the decision is beyond the lead's model, compares and decides; the decision becomes an ADR |
-| Hard bug (failed once, cause unknown) | 2-3 hypotheses | Via `superpowers:dispatching-parallel-agents`, read-only, each testing one hypothesis (`engineering:debug` when installed); the lead picks the confirmed cause, then one implementer fixes it |
-| Task review | batch reviewer plus lens experts | Below |
-| Implementation | always one implementer per task | Parallel implementers on the same code conflict; quality comes from lenses and review |
+| Architectural choice | 2-3 independent proposals, sonnet medium (opus medium when the task has a risk) | Only when spikes and prior art leave 2 or more viable options. Ambiguous requirements go to brainstorming with the user, never to a panel. The lead compares, or a fable subagent when the decision is beyond the lead's model; the decision becomes an ADR (`engineering:architecture` when installed). |
+| Hard bug | 1, then at most 3 | New escalation cause `unknown`: first one sonnet medium investigation following `superpowers:systematic-debugging`. Only when it ends with 2 or more concrete competing hypotheses, one expert per hypothesis, each in its own scratch worktree under `.tech-lead/scratch/` so it can experiment; `dispatching-parallel-agents` for the dispatch mechanics. The lead picks the confirmed cause; one implementer fixes it. |
+| Task review | batch reviewer plus lenses | Below. |
+| Implementation | one implementer per task | Parallel implementers on the same code conflict. |
 
 ### Lenses
 
-A new `lenses.md` in the skill directory: for each lens a short checklist and the installed skill or named agent it uses when available.
+`lenses.md` in the skill directory: a short checklist per lens and what it uses when installed.
 
 | Lens | Checks | Uses when installed |
 |---|---|---|
-| `security` | input validation, authn/authz, secrets, injection, dependencies | `security-review`, `engineering:code-review` security dimension |
-| `performance` | complexity, queries, memory, hot paths | `engineering:code-review` performance dimension |
+| `security` | input validation, authn/authz, secrets, injection, dependencies | `engineering:code-review` security dimension |
 | `data` | migrations, consistency, reversibility, backups | — |
-| `ui-ux` | see Part 3; mandatory for `kind: ui` tasks | see Part 3 |
-| `tests` | hygiene rules above, duplicates across the suite, speed | `engineering:testing-strategy`, `pr-review-toolkit:pr-test-analyzer` |
-| `api` | contracts, backward compatibility, errors | — |
-| `architecture` | module boundaries, dependencies, coupling | `engineering:code-review` maintainability, `pr-review-toolkit:type-design-analyzer` |
+| `api` | contracts, backward compatibility, error shapes | — |
+| `architecture` | module boundaries, dependencies, coupling, types | `engineering:code-review` maintainability; `pr-review-toolkit:type-design-analyzer` |
+| `performance` | complexity, queries, memory, hot paths | `engineering:code-review` performance dimension |
 | `errors` | swallowed errors, silent fallbacks | `pr-review-toolkit:silent-failure-hunter` |
+| `tests` | test architecture: fixtures, runners, levels, speed | `engineering:testing-strategy`; `pr-review-toolkit:pr-test-analyzer` |
+| `ui-ux` | Part 3 | Part 3 |
 
-Named agents are routed to a model by model-manager's `agents.json`; a generic lens expert runs on sonnet medium, `security` and `architecture` on opus medium for risky tasks.
+### Which and how many
 
-### How many
+- Each `risk` needs at least one matching lens: `security` → `security`; `data` → `data`; `irreversible` → `data`, `api` or `architecture`; `system-wide` → `architecture`.
+- Further lenses only when the task's files are in the lens's domain (`performance` on a hot path, `errors` on error handling, `tests` on test infrastructure), with the reason in `reason`.
+- Tasks on haiku, or sonnet low with no `risk`, have no lenses, except `ui-ux` on `kind: ui` tasks.
+- At most 4 lenses per task.
+- `ledger.py check` enforces the first, third and fourth rules and rejects unknown lens names and lenses on `lead` tasks.
 
-| Task | Lenses |
-|---|---|
-| Routine (haiku, or sonnet low on 1-2 files, no risk) | 0: the batch review suffices |
-| Standard | 0-1, only when the change touches a lens's domain |
-| Risky (security, data migration, hard to undo, system-wide) | 2-4 |
+### Dispatch
 
-- At most 4 lenses per task. Each lens must follow from the files changed or a stated risk; a lens "just in case" is a plan defect.
-- All lens experts of a wave go out in one message, with the batch reviews.
-- A lens finding enters the same fix loop as review findings; an Important finding from any expert blocks the task.
+- One dispatch per lens per wave, covering every task of the wave that lists it, in the same message as the batch reviews. Brief: `lens-review-prompt.md` with `{{LENS}}`, `{{TASKS}}` (task id, brief path, diff path per task), `{{SPEC_PATH}}`, `{{STANDARDS_PATH}}`, `{{LENSES_PATH}}`, `{{CANDIDATES_PATH}}`, `{{REPORT_PATH}}`.
+- The lead always passes `model` and `effort` on the call, overriding model-manager's routing: sonnet medium; opus medium for `security` and `architecture` on tasks with a risk. A named agent from the table is used only for tasks with a risk, given the diff path.
+- A lens finding enters the task's fix loop like a review finding; the lens that raised it re-reviews only the fix diff. Any Important finding blocks the task.
+- At the finish, the whole-branch `security-review` is skipped when every task with risk `security` had the `security` lens and nothing outside those tasks touched security code.
 
-### Ledger and gate
+### Yield
 
-- Task field `experts`: list of lens names, optional, default `[]`. Task field `kind`: `code` (default), `ui`, `hygiene`, `docs`. Top-level `ui`: boolean, default `false`.
-- `ledger.py check`: unknown lens name; more than 4 lenses; `experts` on a `lead` task; missing hygiene task (Part 1).
-- `ledger.py show`: an `Experts` column, and in the summary the total number of lens dispatches.
-- Plan review checks expert choice both ways: a missing lens on a risky task, a needless lens on a routine one.
+The wave journal entry records each lens's result: `Lens yield: security 1 Important, 2 Minor; data 0`. The finish report sums yield per lens. A lens with zero Important findings across three consecutive initiatives is flagged by the plan review when chosen without a risk, so lenses that do not pay off fall away.
 
-## Part 3: UI and UX expertise
+## Part 3: UI and UX
 
-Applies to every project with a graphical interface (web, desktop, mobile). The lead records it in the ledger as top-level `"ui": true`.
+Applies to every project with a graphical interface (web, desktop, mobile): the ledger has `"ui": true`.
 
 ### Current standards
 
-`docs/standards.md` gets a `UI` section, set when the project has a UI:
+`docs/standards.md` gets a `UI` section (stricter existing conventions win; weaker ones are raised with the user's approval):
 
-- Accessibility: WCAG 2.2 level AA (the current W3C recommendation), including focus visibility, target size, keyboard operation, contrast, reduced motion and accessible names.
-- Performance: Core Web Vitals "good" thresholds at the 75th percentile: LCP ≤ 2.5 s, INP ≤ 200 ms, CLS ≤ 0.1.
-- Web platform choices (HTML, CSS, client JS) are checked against `modern-web-guidance` when installed, because platform APIs change faster than model training; native apps follow the current platform guidelines (Apple Human Interface Guidelines, Material Design 3).
-- Responsive from the smallest supported viewport; light and dark themes when the product has both; all states designed (empty, loading, error, success).
-- A design system or component library comes from prior art before custom components are built; design tokens instead of hard-coded values.
-
-Existing project conventions win where they are stricter; a weaker existing convention is raised to these standards only with the user's approval, recorded as a ruling.
+- Accessibility: WCAG 2.2 level AA, including focus not obscured, target size minimum, dragging movements, consistent help, redundant entry and accessible authentication.
+- Performance: Core Web Vitals "good" at the 75th percentile: LCP ≤ 2.5 s, INP ≤ 200 ms, CLS ≤ 0.1.
+- Web platform choices (HTML, CSS, client JS) checked against `modern-web-guidance` when installed; native apps follow current platform guidelines (Apple Human Interface Guidelines, Material Design 3).
+- Responsive from the smallest supported viewport; light and dark themes when the product has both; empty, loading, error and success states designed.
+- A design system or component library from prior art before custom components; design tokens instead of hard-coded values.
 
 ### UI/UX expert
 
-A `ui-ux` expert replaces the `ui` lens. It is mandatory, not risk-scaled, wherever a UI is designed or changed:
-
-| Stage | What the expert does | Uses when installed |
+| Stage | Work | Uses when installed |
 |---|---|---|
-| Spec and mockup (step 4) | Reviews the written spec and `mockup.html` before the user sees them: user flows, information hierarchy, states, copy, accessibility, responsiveness, fit with the standards above. The mockup builder fixes its findings; then the user reviews spec and mockup together. | `design:design-critique`, `design:accessibility-review`, `design:ux-copy`, `modern-web-guidance` |
-| Planning | Every task that creates or changes UI has `"kind": "ui"`; its `verify` includes an automated accessibility check (for web: axe-core run through Playwright) when the stack allows it. | `design:design-handoff` for component specs |
-| Review | Every `kind: ui` task gets the `ui-ux` lens in its wave: compares the result with the mockup (Playwright screenshots at mobile and desktop widths), checks the UI standards, copy and states. | as above |
-| Finish | One whole-UI pass over the flows changed in the initiative, when more than one UI task ran. | `design:design-critique` |
+| Spec and mockup | Reviews spec and `mockup.html` before the user sees them: flows, hierarchy, states, copy, accessibility, responsiveness, the standards above. The mockup builder fixes the findings (resumed), then the user reviews spec and mockup together. | `design:design-critique`, `design:accessibility-review` plus the WCAG 2.2 additions, `design:ux-copy`, `modern-web-guidance` |
+| Planning | Every task creating or changing UI is `kind: ui`; its `verify` includes an automated accessibility check (web: axe-core through Playwright) when the stack allows it. | `design:design-handoff` |
+| Review | The `ui-ux` lens on every `kind: ui` task: compares with the mockup using Playwright screenshots at mobile and desktop widths, checks the UI standards, copy and states. | as above |
+| Finish | One pass over the changed flows when more than one `kind: ui` task ran. | `design:design-critique` |
 
 - Model: sonnet medium; opus medium for a new product UI or a redesign.
-- `ledger.py check`: a `kind: ui` task without `ui-ux` in `experts` is an error; `kind: ui` in a ledger without `"ui": true` is an error.
-- The `ui-ux` lens counts toward the 4-lens limit.
-- `design:accessibility-review` targets WCAG 2.1 AA; the expert applies it and adds the 2.2 criteria (focus not obscured, target size minimum, dragging movements, consistent help, redundant entry, accessible authentication).
+- `ledger.py check`: a `kind: ui` task without the `ui-ux` lens; `kind: ui` in a ledger without `"ui": true`.
 
 ## Changes by file
 
-- `skills/tech-lead/SKILL.md`: hygiene in standards, briefs and finish; suite baseline and timing; expert stages, lens selection and dispatch; version references.
-- `skills/tech-lead/layout.md`: `standards.md` Hygiene section; baseline journal line.
-- `skills/tech-lead/mockup-prompt.md`: UI standards and the expert review loop.
-- `skills/tech-lead/lenses.md` (new), `skills/tech-lead/lens-review-prompt.md` (new, placeholders `{{LENS}}`, `{{TASKS}}`, `{{SPEC_PATH}}`, `{{STANDARDS_PATH}}`, `{{LENSES_PATH}}`, `{{REPORT_PATH}}`).
-- `batch-review-prompt.md`, `plan-review-prompt.md`: hygiene and expert checks.
-- `scripts/ledger_core.py`: `kind`, `experts` validation, hygiene rule. `scripts/ledger_checkpoint.py` and `ledger.py`: timings. `scripts/ledger_report.py`: Experts column and total.
-- Tests for each; README; plugin and marketplace version `0.2.0`.
-- Finish: a hygiene pass over the plugin itself (91 tests after 0.1.0 iterations).
+- `skills/tech-lead/SKILL.md`: standards sections; suite timing and ratchet; inventory step; hygiene pass rule; expert stages, lens choice, dispatch and yield; escalation cause `unknown`; UI/UX stages.
+- `skills/tech-lead/layout.md`: `standards.md` Hygiene, Suite and UI sections; `[hygiene]` backlog tag; journal lines for suite time and lens yield.
+- New `skills/tech-lead/lenses.md`, `lens-review-prompt.md`, `inventory-prompt.md`.
+- `batch-review-prompt.md`, `plan-review-prompt.md`, `mockup-prompt.md`: hygiene, candidates, risk/expert checks, UI standards and the UI/UX review loop.
+- `scripts/ledger_core.py`: new fields and rules. `ledger_checkpoint.py`, `ledger.py`: timings. `ledger_report.py`: Risk and Experts columns, lens totals.
+- Tests, README, plugin and marketplace version `0.2.0`.
+- Finish: a hygiene pass over the plugin itself.
 
 ## Out of scope
 
-- Competing parallel implementations of the same task.
-- Automatic test deduplication tooling; duplicates are found by review and the hygiene pass.
-- Changing superpowers or engineering skills.
+- Competing parallel implementations of one task.
+- Building deduplication or dead-code tooling; existing tools are used when installed.
+- Changing superpowers, engineering, design or model-manager.
