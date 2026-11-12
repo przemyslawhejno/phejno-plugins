@@ -62,3 +62,72 @@ Replace the minimum of 2 with at least 1 lens per risk, at most 4 lenses in tota
 5. **Debt outside the initiative's files is never reached** until the vague audit threshold fires (Minor 5).
 
 DESIGN NEEDS CHANGES
+
+## Round 2
+
+Scope: the changes since round 1 (49e9e84..ca10aa9) and the new Part 3. Sources checked: spec, journal, tech-lead 0.1.0 SKILL.md and batch-review-prompt.md, and the installed `design` skills.
+
+### Round-1 findings
+
+- B1: partially resolved. A single task with `replaces` still forces a hygiene pass (minor 1).
+- B2: resolved.
+- B3: partially resolved. The inventory runs only for waves with `replaces`, so a new test that duplicates one elsewhere goes unchecked (minor 2).
+- B4: resolved.
+- B5: resolved.
+- B6: resolved.
+- Minor findings 1-8: resolved.
+- Gap 1: partially resolved. Yield over three initiatives has no place to persist (minor 3).
+- Gaps 2-4: resolved.
+- Gap 5: partially resolved. It is still reached only through the 10-item trigger, which is acceptable as the journal records it.
+
+### Blocking
+
+**R2-B1. The mandatory `ui-ux` lens is disproportionate and duplicates the batch review (Part 2 "Which and how many", Part 3 Review row, check rule).**
+- A one-line CSS fix on haiku gets a sonnet medium lens, Playwright screenshots at 2 widths, and a re-review for each fix. That can cost several times the task itself.
+- The 0.1.0 batch reviewer already checks "For UI tasks, the result matches the mockup" (batch-review-prompt.md item 4), so the mockup comparison runs twice.
+
+Fix:
+- Require `ui-ux` only for `kind: ui` tasks that are not on haiku, or that add or change a screen, flow or component. Make this decidable by a `ux` value in `risk` or by a model test.
+- Other `kind: ui` tasks get the axe check in `verify` and the existing batch-review mockup check.
+- When the lens runs, remove the mockup check from that task's batch review.
+
+**R2-B2. Screenshot and axe verification has no realistic path across stacks (Part 3 Planning and Review rows).**
+- The lens is a reviewer. As written it would have to install browsers, start the app in a lane worktree and serve it, for each wave.
+- Playwright does not reach native iOS/Android or most desktop toolkits. Its browser download needs network access.
+- The Review row has no fallback. Only Planning has one ("when the stack allows it").
+- `@axe-core/playwright` is a new dependency, but nothing routes it through prior art or `show`.
+
+Fix:
+- The implementer's `verify` captures the screenshots (mobile and desktop widths) and the axe JSON into `.tech-lead/scratch/<task>/`. The lens reads those files and runs nothing.
+- When the stack has no browser harness, the lens reviews code against the mockup, and the report says "not rendered".
+- The first UI wave sets up the harness as a task, and its dependency is recorded like any other.
+
+### Minor
+
+1. **Hygiene pass trigger (Part 1, Hygiene pass).** The pass is required when there are 3 or more `code`/`ui` tasks, or when there are at least 2 tasks and any task has `replaces`. On a 1-task plan, the task cleans up after itself.
+2. **Inventory scope (Part 1, Obsolete and duplicate test discovery).** Also run the inventory for any wave that adds test files. Haiku low is cheap.
+3. **Yield history (Part 2, Yield).** Persist each lens's yield across initiatives, for example as a `Lens yield:` line in `standards.md` that is updated at the finish, the same way as the Suite ratchet. Otherwise the three-initiative rule cannot be decided.
+4. **Suite timing (Part 1).** Say that the first-wave timing becomes the ratchet only when `Suite time` is absent. Otherwise the timing has no purpose.
+5. **WCAG 2.2 (Current standards).** Name the success criteria:
+   - 2.4.11 Focus Not Obscured (Minimum)
+   - 2.5.7 Dragging Movements
+   - 2.5.8 Target Size (Minimum), 24×24 CSS px
+   - 3.2.6 Consistent Help (A)
+   - 3.3.7 Redundant Entry (A)
+   - 3.3.8 Accessible Authentication (Minimum)
+
+   Note that 4.1.1 Parsing is obsolete. `design:accessibility-review` is WCAG 2.1 and lists 2.5.5 (44×44 px), which is AAA, as if it were AA. The brief must say that 2.5.8 governs.
+6. **Core Web Vitals (Current standards).** The thresholds and the 75th percentile are correct, but they are field metrics and apply only to the web. State that:
+   - the p75 figures are a production target;
+   - the verify gate uses lab budgets (Lighthouse: LCP ≤ 2.5 s, CLS ≤ 0.1, TBT as the INP proxy), on the web only.
+7. **Platform guidelines (Current standards).** Add Fluent 2 (Windows) and the platform's accessibility API (desktop and native). Apple HIG and Material Design 3 are current.
+8. **UI lens model (Part 3).** "Opus medium for a new product UI or a redesign" cannot be decided from the ledger and contradicts Part 2's dispatch rule. Move it into the Part 2 dispatch rule, keyed on a risk value.
+9. **Design skills (What already exists, Part 3).** The skills are real and correctly named. However:
+   - they are interactive slash commands that expect a Figma URL, a screenshot, or a description from the user;
+   - the brief must give them the mockup path and screenshots and forbid questions to the user;
+   - `design-handoff` at Planning has no defined dispatcher, so drop it or have the mockup builder use it;
+   - `design:design-system` fits the tokens rule but is not referenced.
+10. **axe limits (Part 3 Planning).** axe finds only a subset of issues. The lens still checks keyboard order and focus by reading the code.
+11. **Finish UI pass (Part 3 Finish).** It names no model, and it overlaps the final whole-branch review. Use sonnet medium, and give it the finish reviewer's screenshots only.
+
+DESIGN NEEDS CHANGES

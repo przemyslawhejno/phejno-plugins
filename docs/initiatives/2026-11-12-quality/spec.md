@@ -1,4 +1,4 @@
-# tech-lead 0.2.0: code hygiene, expert panels and UI/UX — design (draft, round 2)
+# tech-lead 0.2.0: code hygiene, expert panels and UI/UX — design (after design review, awaiting approval)
 
 Date: 2026-11-12
 
@@ -17,7 +17,7 @@ All three reference existing skills instead of copying them, and work without th
 - `superpowers:test-driven-development` and `writing-good-tests.md`: Red-Green-Refactor, "Name the Break", exercise the real thing, the mutation check.
 - SDD reviewer rubric: separation of concerns, error handling, DRY; Important for verbatim duplication, swallowed errors, tests that assert nothing.
 - `superpowers:systematic-debugging`: one hypothesis at a time. `superpowers:dispatching-parallel-agents`: parallel work on independent problems only.
-- Optional `engineering`: `code-review`, `testing-strategy`, `tech-debt`, `system-design`, `architecture`, `debug`. Optional `design`: `design-critique`, `accessibility-review` (WCAG 2.1 AA), `ux-copy`, `design-handoff`. Optional `modern-web-guidance`.
+- Optional `engineering`: `code-review`, `testing-strategy`, `tech-debt`, `system-design`, `architecture`, `debug`. Optional `design`: `design-critique`, `accessibility-review` (WCAG 2.1 AA), `ux-copy`, `design-system` — interactive commands that expect a mockup, screenshot or description. Optional `modern-web-guidance`.
 - `security-review` and `simplify` review a branch's pending changes, not one lane task's diff; tech-lead uses them only where a whole branch or working tree is the subject.
 - Named review agents (`pr-review-toolkit:*`) may not be installed; where they are, model-manager routes them to opus high/xhigh or sonnet high unless the call passes `model` and `effort`.
 
@@ -29,7 +29,7 @@ Gaps none of them covers: comment policy; removing what a behaviour change made 
 |---|---|---|---|
 | `ui` | top level | boolean | `false` |
 | `kind` | task | `code`, `ui`, `hygiene` | `code` (`lead` tasks: ignored) |
-| `risk` | task | list of `security`, `data`, `irreversible`, `system-wide` | `[]` |
+| `risk` | task | list of `security`, `data`, `irreversible`, `system-wide`, `ux` | `[]` |
 | `experts` | task | list of lens names (Part 2) | `[]` |
 | `replaces` | task | existing paths or test names this task makes obsolete and removes | `[]` |
 
@@ -52,17 +52,19 @@ When the lead creates or discovers `docs/standards.md`, it adds two sections. Ex
 `Suite`:
 - `Suite: <command>` — the full test suite command; `Suite time: <seconds>s (<date>, <test count> tests)` — the ratchet.
 
+`Lens yield`: one line per lens, updated at each finish (Part 2).
+
 ### Suite timing
 
 - `ledger.py checkpoint` prints each command's wall time (`Task 3: pass (2.1s)`, `Checks: pass (14.8s)`); the wave journal entry records them.
 - Timing the suite means: the median of 3 runs of the `Suite` command, or one run when a single run exceeds 4 minutes (then in the background per model-manager, the log triaged by haiku low). When `checks` contains the suite command, the last checkpoint timing counts as one run.
-- At the first wave the lead records the suite time in `journal.md`; at the finish it times the suite again.
+- At the first wave the lead times the suite and records it in `journal.md`; it becomes the ratchet only when `standards.md` has no `Suite time` yet. At the finish it times the suite again.
 - Regression: the time per test grew by more than 20% **and** the total grew by more than 2 seconds compared with the ratchet. Then the hygiene pass gets the slowest tests (the runner's durations report, top 10) as a target; if it cannot recover, a `[hygiene]` backlog item records both numbers.
 - At the finish, when there is no regression, `Suite time` in `standards.md` is updated, so the ratchet carries across initiatives.
 
 ### Obsolete and duplicate test discovery
 
-Before the batch review of a wave with any `replaces`, and before the hygiene pass, a haiku low inventory dispatch searches the **whole** test tree (and the code tree, for removed symbols) for the symbols, strings and behaviours the changed tasks touched or removed. When installed, it also runs a dead-code tool (`vulture`, `knip`, or the stack's equivalent) and coverage contexts. It writes candidates to `research/hygiene-candidates-<wave>.md`; reviewers and the hygiene task receive that path.
+Before the batch review of a wave with any `replaces` or any added test file, and before the hygiene pass, a haiku low inventory dispatch searches the **whole** test tree (and the code tree, for removed symbols) for the symbols, strings and behaviours the changed tasks touched or removed. When installed, it also runs a dead-code tool (`vulture`, `knip`, or the stack's equivalent) and coverage contexts. It writes candidates to `research/hygiene-candidates-<wave>.md`; reviewers and the hygiene task receive that path.
 
 ### Briefs and reviews
 
@@ -72,7 +74,7 @@ Before the batch review of a wave with any `replaces`, and before the hygiene pa
 
 ### Hygiene pass
 
-- Required when the plan has at least 3 tasks of kind `code` or `ui`, or any task with a non-empty `replaces`. Otherwise the batch review's hygiene checks suffice.
+- Required when the plan has at least 3 tasks of kind `code` or `ui`, or at least 2 such tasks and any of them has a non-empty `replaces`. Otherwise each task cleans up after itself and the batch review's hygiene checks suffice.
 - One task of kind `hygiene`, sonnet medium, depending on every `code` and `ui` task. `files`: the union of those tasks' files plus their test directories. `verify`: the `Suite` command. Acceptance: suite green; no regression by the rule above.
 - It removes dead code, merges duplicate tests, deletes obsolete tests and noise comments, using the candidates file, and runs `simplify` on its working tree when installed.
 - `ledger.py check`: a required hygiene task is missing, or it does not depend on every `code`/`ui` task.
@@ -109,55 +111,61 @@ At the finish, when `docs/backlog.md` has 10 or more open `[hygiene]` items, or 
 
 ### Which and how many
 
-- Each `risk` needs at least one matching lens: `security` → `security`; `data` → `data`; `irreversible` → `data`, `api` or `architecture`; `system-wide` → `architecture`.
+- Each `risk` needs at least one matching lens: `security` → `security`; `data` → `data`; `irreversible` → `data`, `api` or `architecture`; `system-wide` → `architecture` (or `ui-ux` on a `kind: ui` task); `ux` → `ui-ux`.
 - Further lenses only when the task's files are in the lens's domain (`performance` on a hot path, `errors` on error handling, `tests` on test infrastructure), with the reason in `reason`.
-- Tasks on haiku, or sonnet low with no `risk`, have no lenses, except `ui-ux` on `kind: ui` tasks.
+- Tasks on haiku, or sonnet low with no `risk`, have no lenses.
 - At most 4 lenses per task.
 - `ledger.py check` enforces the first, third and fourth rules and rejects unknown lens names and lenses on `lead` tasks.
 
 ### Dispatch
 
 - One dispatch per lens per wave, covering every task of the wave that lists it, in the same message as the batch reviews. Brief: `lens-review-prompt.md` with `{{LENS}}`, `{{TASKS}}` (task id, brief path, diff path per task), `{{SPEC_PATH}}`, `{{STANDARDS_PATH}}`, `{{LENSES_PATH}}`, `{{CANDIDATES_PATH}}`, `{{REPORT_PATH}}`.
-- The lead always passes `model` and `effort` on the call, overriding model-manager's routing: sonnet medium; opus medium for `security` and `architecture` on tasks with a risk. A named agent from the table is used only for tasks with a risk, given the diff path.
+- The lead always passes `model` and `effort` on the call, overriding model-manager's routing: sonnet medium; opus medium for `security` and `architecture` on tasks with a risk, and for `ui-ux` on tasks with risk `system-wide`. A named agent from the table is used only for tasks with a risk, given the diff path.
 - A lens finding enters the task's fix loop like a review finding; the lens that raised it re-reviews only the fix diff. Any Important finding blocks the task.
 - At the finish, the whole-branch `security-review` is skipped when every task with risk `security` had the `security` lens and nothing outside those tasks touched security code.
 
 ### Yield
 
-The wave journal entry records each lens's result: `Lens yield: security 1 Important, 2 Minor; data 0`. The finish report sums yield per lens. A lens with zero Important findings across three consecutive initiatives is flagged by the plan review when chosen without a risk, so lenses that do not pay off fall away.
+The wave journal entry records each lens's result: `Lens yield: security 1 Important, 2 Minor; data 0`. The finish report sums yield per lens. At the finish the lead also updates a `Lens yield` section in `standards.md`: per lens, the initiatives it ran in, its Important findings in total, and the count of consecutive initiatives with none. A lens at three or more such initiatives is flagged by the plan review when chosen without a risk, so lenses that do not pay off fall away.
 
 ## Part 3: UI and UX
 
-Applies to every project with a graphical interface (web, desktop, mobile): the ledger has `"ui": true`.
+Applies to every project with a graphical interface (web, desktop, mobile): the ledger has `"ui": true`. The UI/UX expert always reviews the spec and mockup and the changed flows at the finish; per task it is risk-scaled like every other lens.
 
 ### Current standards
 
 `docs/standards.md` gets a `UI` section (stricter existing conventions win; weaker ones are raised with the user's approval):
 
-- Accessibility: WCAG 2.2 level AA, including focus not obscured, target size minimum, dragging movements, consistent help, redundant entry and accessible authentication.
-- Performance: Core Web Vitals "good" at the 75th percentile: LCP ≤ 2.5 s, INP ≤ 200 ms, CLS ≤ 0.1.
-- Web platform choices (HTML, CSS, client JS) checked against `modern-web-guidance` when installed; native apps follow current platform guidelines (Apple Human Interface Guidelines, Material Design 3).
+- Accessibility: WCAG 2.2 level AA, explicitly including 2.4.11 Focus Not Obscured (Minimum), 2.5.7 Dragging Movements, 2.5.8 Target Size (Minimum, 24×24 CSS px), 3.2.6 Consistent Help, 3.3.7 Redundant Entry, 3.3.8 Accessible Authentication (Minimum); 4.1.1 Parsing is obsolete. Where a WCAG 2.1 checklist (such as `design:accessibility-review`) cites 2.5.5 Target Size (44×44 px, level AAA), 2.5.8 governs at AA.
+- Performance (web): Core Web Vitals "good" at the 75th percentile of field data (LCP ≤ 2.5 s, INP ≤ 200 ms, CLS ≤ 0.1) is the production target; the verify gate uses lab budgets (Lighthouse: LCP ≤ 2.5 s, CLS ≤ 0.1, TBT ≤ 200 ms as the INP proxy).
+- Web platform choices (HTML, CSS, client JS) checked against `modern-web-guidance` when installed; native and desktop apps follow current platform guidelines (Apple Human Interface Guidelines, Material Design 3, Fluent 2) and expose controls through the platform accessibility API.
 - Responsive from the smallest supported viewport; light and dark themes when the product has both; empty, loading, error and success states designed.
-- A design system or component library from prior art before custom components; design tokens instead of hard-coded values.
+- A design system or component library from prior art before custom components; design tokens instead of hard-coded values (`design:design-system` when installed).
+
+### Render harness
+
+- The first wave that contains a `kind: ui` task includes a harness task (`kind: code`) unless the project has one: for the web, Playwright with `@axe-core/playwright` and Lighthouse CI, chosen through prior art and listed in the ledger's `reuse`, so `show` presents the new dependencies at the gate; for native apps, the platform's UI test and accessibility audit tooling when it exists.
+- A `kind: ui` task's `verify` runs the harness for its screens and writes screenshots (mobile and desktop widths), the axe JSON and the Lighthouse summary to `.tech-lead/scratch/<initiative>/task-<N>/`. Reviewers read these files and run nothing.
+- When the stack has no harness (no browser download possible, no native tooling), `verify` runs the remaining checks and the reviewers review code against the mockup, reporting "not rendered".
 
 ### UI/UX expert
 
-| Stage | Work | Uses when installed |
+| Stage | Work | Model |
 |---|---|---|
-| Spec and mockup | Reviews spec and `mockup.html` before the user sees them: flows, hierarchy, states, copy, accessibility, responsiveness, the standards above. The mockup builder fixes the findings (resumed), then the user reviews spec and mockup together. | `design:design-critique`, `design:accessibility-review` plus the WCAG 2.2 additions, `design:ux-copy`, `modern-web-guidance` |
-| Planning | Every task creating or changing UI is `kind: ui`; its `verify` includes an automated accessibility check (web: axe-core through Playwright) when the stack allows it. | `design:design-handoff` |
-| Review | The `ui-ux` lens on every `kind: ui` task: compares with the mockup using Playwright screenshots at mobile and desktop widths, checks the UI standards, copy and states. | as above |
-| Finish | One pass over the changed flows when more than one `kind: ui` task ran. | `design:design-critique` |
+| Spec and mockup | Reviews spec and `mockup.html` before the user sees them: flows, hierarchy, states, copy, accessibility, responsiveness, the standards above. The mockup builder fixes the findings (resumed); then the user reviews spec and mockup together. | sonnet medium; opus medium when the initiative is a new product UI or a redesign (the lead records this as risk `system-wide` on the UI tasks) |
+| Per task | The `ui-ux` lens (Part 2), only for tasks with risk `ux`; it reads the harness output, compares with the mockup, checks the UI standards, copy and states, and checks keyboard order and focus by reading the code, because axe finds only part of the issues. For a task with the lens, the batch review skips its mockup check. | Part 2 dispatch rule |
+| Finish | One pass over the changed flows when more than one `kind: ui` task ran, using the last harness output. | sonnet medium |
 
-- Model: sonnet medium; opus medium for a new product UI or a redesign.
-- `ledger.py check`: a `kind: ui` task without the `ui-ux` lens; `kind: ui` in a ledger without `"ui": true`.
+- Risk `ux`: the task adds or changes a screen, a user flow or a component. A `kind: ui` task not on haiku must carry `ux`; a haiku `kind: ui` task (a style or copy fix) is covered by its axe check and the batch review's mockup check.
+- Briefs for experts that use `design:design-critique`, `design:accessibility-review`, `design:ux-copy` or `design:design-system` give them the mockup path and the harness output, and forbid questions to the user: these are interactive commands that otherwise ask for a Figma link or a description.
+- `ledger.py check`: a `kind: ui` task not on haiku without risk `ux`; `kind: ui` in a ledger without `"ui": true`.
 
 ## Changes by file
 
-- `skills/tech-lead/SKILL.md`: standards sections; suite timing and ratchet; inventory step; hygiene pass rule; expert stages, lens choice, dispatch and yield; escalation cause `unknown`; UI/UX stages.
-- `skills/tech-lead/layout.md`: `standards.md` Hygiene, Suite and UI sections; `[hygiene]` backlog tag; journal lines for suite time and lens yield.
+- `skills/tech-lead/SKILL.md`: standards sections; suite timing and ratchet; inventory step; hygiene pass rule; expert stages, lens choice, dispatch and yield; escalation cause `unknown`; UI/UX stages and render harness.
+- `skills/tech-lead/layout.md`: `standards.md` Hygiene, Suite, Lens yield and UI sections; `[hygiene]` backlog tag; journal lines for suite time and lens yield.
 - New `skills/tech-lead/lenses.md`, `lens-review-prompt.md`, `inventory-prompt.md`.
-- `batch-review-prompt.md`, `plan-review-prompt.md`, `mockup-prompt.md`: hygiene, candidates, risk/expert checks, UI standards and the UI/UX review loop.
+- `batch-review-prompt.md`, `plan-review-prompt.md`, `mockup-prompt.md`: hygiene, candidates, risk/expert checks, UI standards, the UI/UX review loop, harness output paths.
 - `scripts/ledger_core.py`: new fields and rules. `ledger_checkpoint.py`, `ledger.py`: timings. `ledger_report.py`: Risk and Experts columns, lens totals.
 - Tests, README, plugin and marketplace version `0.2.0`.
 - Finish: a hygiene pass over the plugin itself.
