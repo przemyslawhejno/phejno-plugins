@@ -254,6 +254,9 @@ class SkillDocsTest(unittest.TestCase):
             self.assertIn(item, both)
         self.assertIn("never reverted automatically", skill)
         self.assertIn("never reverted automatically", layout)
+        for text in (skill, layout):
+            self.assertIn("outside `.superdesign/init/`", text)
+            self.assertNotIn("outside `.superdesign/` ", text)
         step6 = [l for l in skill.splitlines() if "(6) Record" in l]
         self.assertTrue(step6)
         self.assertIn("ids only", step6[0])

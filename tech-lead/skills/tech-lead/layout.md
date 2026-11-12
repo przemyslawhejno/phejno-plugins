@@ -91,7 +91,7 @@ Consent is valid only while the file is git-ignored (`git check-ignore -q .tech-
 - Stored by superdesign: the request verbatim, to improve generation; drafts, uploaded assets and context stay on the user's superdesign account until deleted there.
 - The CLI runs unpinned from npm (`@latest`) on each run.
 
-Init subagent check, around the repository analysis: before dispatch the lead saves `git status --porcelain --ignored` as a baseline; after the subagent returns it runs the same command and compares. Entries under `.superdesign/` are allowed (an ignored directory may show as one `!! .superdesign/` line). Any new or changed entry outside `.superdesign/init/` is never reverted automatically; the lead shows it to the user and stops using superdesign for this run until the user decides. Limit: further edits to files that were already dirty before dispatch do not show up in this comparison.
+Init subagent check, around the repository analysis: with the `.gitignore` entries already added, the lead saves `git status --porcelain --ignored` as a baseline before dispatch; after the subagent returns it runs the same command and compares. Any new or changed entry outside `.superdesign/init/` is never reverted automatically; the lead shows it to the user and stops using superdesign for this run until the user decides. If `git status` fails, the lead stops using superdesign for this run and tells the user. Limit: further edits to files that were already dirty before dispatch, and writes inside `.git/` or outside the repository, do not show up in this comparison.
 
 ## State
 
