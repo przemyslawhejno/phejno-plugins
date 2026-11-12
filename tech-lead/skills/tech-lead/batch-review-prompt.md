@@ -2,7 +2,7 @@
 
 Review the tasks below. You are read-only: do not edit any file except your report. Do not trust the implementer reports: read each diff once and judge it yourself; do not re-run tests.
 
-Tasks (up to 4), one entry per task: task id, title, brief path, implementer report path, diff path, lenses assigned, mockup section (`#id` in the mockup) or `none`:
+Tasks (up to 4), one entry per task: task id, title, brief path, implementer report path, diff path, lenses assigned, mockup section (`#id` in the mockup) or `none`, harness output path or `none`:
 {{TASKS}}
 
 Spec: {{SPEC_PATH}}
@@ -12,14 +12,14 @@ Hygiene candidates: {{CANDIDATES_PATH}}
 
 A value of `none` in a placeholder or entry field means that input does not exist: skip the checks that need it.
 
-When `.claude/codemap/INDEX.md` exists, find code through `symbols.md` and `INDEX.md` there before Glob or Grep.
+When `.claude/codemap/INDEX.md` exists, find code through `symbols.md` and `INDEX.md` there before Glob or Grep. The index is read-only for you: never edit topic files, `symbols.md` or `pending.md`.
 
 ## For each task check
 
 1. Spec compliance: the diff does what the brief and spec require, nothing missing, nothing extra.
 2. Code quality against {{STANDARDS_PATH}}.
 3. Tests prove the acceptance criteria and were not weakened, skipped or deleted.
-4. For UI tasks, the result matches the mockup section of the entry. Skip this check for tasks whose lenses include `ui-ux`, and when the mockup section is `none`.
+4. For UI tasks, the result matches the mockup section of the entry and, when the entry has a harness output path, its screenshots and axe JSON. Skip this check for tasks whose lenses include `ui-ux`, and when the mockup section is `none`.
 5. Hygiene: obsolete code or tests left behind, or a new test duplicating one in the diff or in {{CANDIDATES_PATH}}, is **Important**; a noise comment (restating code, change history, commented-out code) is **Minor**.
 
 ## Output

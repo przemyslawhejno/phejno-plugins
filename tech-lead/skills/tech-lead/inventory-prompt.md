@@ -8,7 +8,7 @@ Changes (symbols, strings and behaviours changed or removed):
 Test roots: {{TEST_ROOTS}}
 Code roots: {{CODE_ROOTS}}
 
-When `.claude/codemap/INDEX.md` exists, find code through `symbols.md` and `INDEX.md` there before Glob or Grep.
+When `.claude/codemap/INDEX.md` exists, find code through `symbols.md` and `INDEX.md` there before Glob or Grep. The index is read-only for you: never edit topic files, `symbols.md` or `pending.md`.
 
 ## Search
 
