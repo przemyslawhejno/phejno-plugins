@@ -11,7 +11,9 @@ Date: 2026-11-12
 - New function `status.resolve_root(root: Path) -> Path`: return `root` when `root/docs/initiatives/` is a directory; otherwise, when `git -C <root> rev-parse --show-toplevel` succeeds and the top level has `docs/initiatives/` as a directory, return the top level; otherwise return `root` unchanged.
 - `main` applies it to the root it computed, for every mode (full, `--write`, `--brief`). An explicit `ROOT` argument is resolved the same way.
 - Everything downstream (initiatives, backlog, `docs/STATUS.md`, codemap health, absolute paths printed) uses the resolved root, so a subdirectory session sees and writes the repository-level files.
-- Safety: the git call has a short timeout (5 s), never raises (any failure keeps `root`), and `--brief` stays silent on every error as before. No other behaviour change.
+- Safety: the git call reuses the existing `_git` helper with a new `timeout` parameter (5 s here, default unchanged), with `GIT_DIR` and `GIT_WORK_TREE` removed from its environment; `OSError` (git missing), `subprocess.TimeoutExpired` and a non-zero exit all keep `root`; `--brief` stays silent on every error as before. No other behaviour change.
+- An explicit `ROOT` with `--write` writes `docs/STATUS.md` at the resolved root (documented). When a subdirectory has its own `docs/initiatives/`, everything, codemap health included, stays at that subdirectory.
+- SKILL.md's line "`ROOT` defaults to the project directory" says it falls back to the repository top level when the project directory has no `docs/initiatives/`.
 - README: one sentence that the status works from a session started in a subdirectory of the repository.
 - Version 0.3.2.
 
@@ -21,3 +23,4 @@ Date: 2026-11-12
 - `root` with its own `docs/initiatives/` is returned unchanged even inside a repository whose top level also has one.
 - Not a git repository and no `docs/initiatives/`: `root` unchanged; `--brief` prints nothing.
 - Top level without `docs/initiatives/`: `root` unchanged.
+- git failing: with the git call patched to raise `FileNotFoundError`, and separately `subprocess.TimeoutExpired`, `resolve_root` returns `root`, and `--brief` prints nothing and exits 0.

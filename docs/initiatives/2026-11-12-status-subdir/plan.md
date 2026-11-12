@@ -27,10 +27,10 @@ Waves: 1 = Task 1; 2 = Task 2.
 
 ### Task 1: resolve_root and 0.3.2
 
-**Files:** `tech-lead/scripts/status.py`, `tech-lead/tests/test_status.py`, `tech-lead/README.md`, `tech-lead/.claude-plugin/plugin.json`, `.claude-plugin/marketplace.json`
+**Files:** `tech-lead/scripts/status.py`, `tech-lead/tests/test_status.py`, `tech-lead/skills/tech-lead/SKILL.md`, `tech-lead/README.md`, `tech-lead/.claude-plugin/plugin.json`, `.claude-plugin/marketplace.json`
 
-- [ ] Tests first: the four cases in the spec's Tests section (each must fail before the change where it guards new behaviour).
-- [ ] Implement `resolve_root(root: Path) -> Path` and apply it in `main`; README sentence; version 0.3.2 in both manifests.
+- [ ] Tests first: the five cases in the spec's Tests section (each must fail before the change where it guards new behaviour).
+- [ ] Implement `resolve_root(root: Path) -> Path` via `_git` with a `timeout` parameter and apply it in `main`; SKILL.md ROOT line; README sentence; version 0.3.2 in both manifests.
 - [ ] Full suite passes; commit `tech-lead: status finds docs/initiatives from a subdirectory session (B19), 0.3.2`.
 
 ### Task 2: Lead verification (lead)

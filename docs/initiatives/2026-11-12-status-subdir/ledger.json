@@ -22,6 +22,7 @@
       "files": [
         "tech-lead/scripts/status.py",
         "tech-lead/tests/test_status.py",
+        "tech-lead/skills/tech-lead/SKILL.md",
         "tech-lead/README.md",
         "tech-lead/.claude-plugin/plugin.json",
         ".claude-plugin/marketplace.json"
