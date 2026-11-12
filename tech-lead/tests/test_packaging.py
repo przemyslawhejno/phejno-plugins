@@ -88,6 +88,9 @@ class PackagingTests(unittest.TestCase):
             self.assertIn(s, r)
         for s in ("superdesign", "/plugin marketplace add superdesigndev/superdesign-skill", "npx --yes @superdesign/cli@latest login", "credits"):
             self.assertIn(s, r)
+        for s in ("not asked again", "deleting the file", "verbatim", ".superdesign/*", "the built-in builder always runs"):
+            self.assertIn(s, r)
+        self.assertNotIn("recorded before the start", r)
         root = (ROOT / "README.md").read_text(encoding="utf-8")
         self.assertIn("### tech-lead", root)
 

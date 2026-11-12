@@ -228,6 +228,22 @@ class SkillDocsTest(unittest.TestCase):
         self.assertIn(".env", layout)
         self.assertIn("verbatim", layout)
 
+    def test_superdesign_final_review_fixes(self):
+        skill, layout = read(SKILL), read(LAYOUT)
+        for item in (
+            "the built-in builder always runs",
+            "if it starts on its own earlier",
+            "an empty or unset email never matches",
+            "npm view @superdesign/cli version",
+            "have the repository analysis done first",
+            "again for any file or asset added later",
+        ):
+            self.assertIn(item, skill)
+        self.assertNotIn("recorded before the start", skill)
+        for item in ("an empty or unset email never matches", "npm view @superdesign/cli version", "before the first superdesign CLI call"):
+            self.assertIn(item, layout)
+        self.assertLess(len(skill.splitlines()), 300)
+
     def test_layout_superdesign(self):
         text = read(LAYOUT)
         missing = [item for item in REQUIRED_SUPERDESIGN_IN_LAYOUT if item not in text]
