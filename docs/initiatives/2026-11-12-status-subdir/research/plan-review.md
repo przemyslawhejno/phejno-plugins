@@ -19,3 +19,20 @@ Verdict basis: spec and plan read against status.py, SKILL.md, hooks.json, ledge
 Other checks: coverage (R1, R2 to Task 1), single task, wave order, model/effort (sonnet/medium) and verify command are adequate; no hygiene task required (one code task, no `replaces`); no lenses needed. Fast path is good: a root with its own `docs/initiatives/` spawns no git process. The four specified tests are writable with the shared-repo helpers (`init_repo`, `clean_env`).
 
 PLAN NEEDS CHANGES
+
+## Round 2
+
+Round 1 findings:
+- Important 1 (no git-failure test): resolved (spec Tests adds FileNotFoundError and TimeoutExpired cases; plan says five cases).
+- Important 2 (catch exceptions, reuse `_git` with timeout): resolved; spec names `_git` with a `timeout` parameter, env stripping, OSError, TimeoutExpired, non-zero exit.
+- Minor 1 (SKILL.md ROOT line, Task 1 files, ledger): resolved.
+- Minor 2 (`--write` with explicit ROOT): resolved in spec; README sentence wording left to implementer.
+- Minor 3 (codemap stays at subdirectory): resolved (noted in spec).
+- Minor 4 (nested repos/submodules/intermediate dirs line): not resolved, harmless.
+- Minor 5 (realpath vs abspath): not addressed, harmless.
+- Minor 6 (test-count ratchet 169 vs 166): not resolved; update standards.md after the change.
+
+New findings:
+- Minor: `_git` raises RuntimeError on non-zero exit, so a non-git directory hits the most common path. Spec says "non-zero exit keeps root" but should name RuntimeError in the catch tuple `(OSError, subprocess.TimeoutExpired, RuntimeError)`, and the not-a-repo test must cover it.
+
+PLAN APPROVED
