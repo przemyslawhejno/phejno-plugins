@@ -15,7 +15,7 @@ DESC = (
     "Lead orchestrator: plans a spec into waves of tasks, assigns the cheapest "
     "capable model to each, delegates, reviews and verifies; adds hygiene passes, "
     "expert panels and UI/UX review; keeps project docs, status and backlog in "
-    "one hierarchy"
+    "one hierarchy; optional superdesign mockup provider"
 )
 
 
@@ -35,6 +35,7 @@ class PackagingTests(unittest.TestCase):
         d = load(PLUGIN / ".claude-plugin" / "plugin.json")
         self.assertEqual(d["name"], "tech-lead")
         self.assertEqual(d["description"], DESC)
+        self.assertEqual(d["version"], "0.3.0")
         self.assertEqual(d["author"]["name"], "Przemyslaw Hejno")
 
     def test_marketplace_entry_matches_plugin(self):
@@ -85,6 +86,11 @@ class PackagingTests(unittest.TestCase):
         r = (PLUGIN / "README.md").read_text(encoding="utf-8")
         for s in ("/tech-lead:run", "model-manager", "superpowers", "TECH_LEAD_STATUS", "The lenses are `security`", "`kind: hygiene`", "WCAG 2.2", '"schema": 2', "`## Codemap` section"):
             self.assertIn(s, r)
+        for s in ("superdesign", "/plugin marketplace add superdesigndev/superdesign-skill", "npx --yes @superdesign/cli@latest login", "credits"):
+            self.assertIn(s, r)
+        for s in ("not asked again", "deleting the file", "verbatim", ".superdesign/*", "the built-in builder always runs"):
+            self.assertIn(s, r)
+        self.assertNotIn("recorded before the start", r)
         root = (ROOT / "README.md").read_text(encoding="utf-8")
         self.assertIn("### tech-lead", root)
 

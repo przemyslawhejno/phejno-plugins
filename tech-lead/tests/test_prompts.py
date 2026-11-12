@@ -21,6 +21,9 @@ PLACEHOLDERS = {
 }
 
 
+NEVER_SUPERDESIGN = "Never invoke the superdesign skill or the superdesign CLI."
+
+
 def read(name):
     with open(os.path.join(DIR, name), encoding="utf-8") as f:
         return f.read()
@@ -94,6 +97,16 @@ class PromptTests(unittest.TestCase):
         for name in ["lens-review-prompt.md", "inventory-prompt.md", "batch-review-prompt.md",
                      "plan-review-prompt.md"]:
             self.assert_has(name, [".claude/codemap/"])
+
+    def test_never_invoke_superdesign(self):
+        names = sorted(n for n in os.listdir(DIR) if n.endswith("-prompt.md"))
+        self.assertEqual(names, sorted(PLACEHOLDERS))
+        for name in names:
+            self.assert_has(name, [NEVER_SUPERDESIGN])
+
+    def test_mockup_superdesign_export_mode(self):
+        self.assert_has("mockup-prompt.md", ["superdesign-export", "sd-component", "Tailwind CDN", "Lucide",
+                                             "list-components", "screen id", "mapping"])
 
     def test_absolute_paths(self):
         for name in PLACEHOLDERS:

@@ -292,7 +292,7 @@ def _string_list(x) -> bool:
     return _is_list(x) and all(isinstance(v, str) for v in x)
 
 
-def _field_errors(n: int, t: dict, lead: bool, kind) -> tuple:
+def _field_errors(n: int, t: dict, lead: bool, kind: object) -> tuple[list, list, list, list]:
     errors: list = []
     if not lead and kind not in KINDS:
         errors.append(f"task {n}: invalid kind '{kind}'")
@@ -320,7 +320,8 @@ def _field_errors(n: int, t: dict, lead: bool, kind) -> tuple:
 
 
 def _risk_lens_errors(
-    n: int, t: dict, lead: bool, kind, risks: list, known_risks: list, lenses: list, ui_enabled: bool
+    n: int, t: dict, lead: bool, kind: object, risks: list, known_risks: list, lenses: list,
+    ui_enabled: bool,
 ) -> list:
     errors: list = []
     if lead:

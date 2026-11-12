@@ -2,6 +2,8 @@
 
 Find existing work worth reusing for this area before anyone builds it.
 
+Never invoke the superdesign skill or the superdesign CLI.
+
 Area: {{AREA}}
 Spec: read {{SPEC_PATH}} for the requirements.
 

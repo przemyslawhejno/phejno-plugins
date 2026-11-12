@@ -15,3 +15,55 @@
   - The UI/UX expert still reviews the mockup (WCAG 2.2, states, accessibility).
   - In autopilot only with consent given before start.
 - Next: spec via brainstorming when the user picks this initiative.
+
+## 2026-11-12 session (start)
+
+- The user asked to execute B15 and B16 ("Wykonaj b15 i b16"). Ruling: read as advance agreement to go from plan to implementation (ledger `mode: autopilot`), with an independent review of spec and plan first; merging to master stays the user's decision — cost if wrong: the user stops the run.
+- B16 folded in as the required hygiene pass (Task 3).
+- Export syntax checked in the skill source: `get-design --draft-id <id> --json` and `get-design --output`; drafts may use `<sd-component>` templates and public asset URLs, hence the standalone check and fallback.
+- Task 1 carries risk `system-wide` (behaviour of every UI run, paid external service) with the `architecture` lens.
+- Spec, plan and ledger written.
+
+## 2026-11-12 spec and plan review, round 1 (sonnet/high)
+
+- Report: research/plan-review.md. PLAN NEEDS CHANGES: 1 Critical, 11 Important, 6 Minor; CLI claims verified against the superdesign source.
+- Accepted all: explicit never-invoke rule in every subagent brief (the skill can trigger itself), with the repository-analysis exception; full disclosure in the consent question (spec, request, project files, images as public URLs, unpinned CLI) and lead token cost; consent per user in git-ignored `.tech-lead/superdesign-consent`; autopilot without consent uses the built-in builder; allowed remote resources defined; screen ids and mapping on both paths; expert fixes split between a local builder subagent and the lead's import; `.superdesign/*` allowlist; Task 1 risk changed to `security` with the `security` lens; stronger tests; README states requirements and that the integration has not run live.
+- Minor accepted: local-only rebuild, generations counted by the lead, noise margin for timing. Kept Task 2 on sonnet low (short prose; overspend small).
+- The user confirmed the rule that subagents never invoke superdesign (asked why; explained: no user to ask, invisible credits, self-triggering skill in parallel lanes, browser login).
+
+## 2026-11-12 review round 2 (sonnet/medium, scoped)
+
+- PLAN NEEDS CHANGES: 1 Important (R1/R2 wording in the ledger), 3 Minor; all applied without a third round (last allowed): ordered-condition and init-exception assertions, never-invoke line in the every-brief sentence, Review Focus line on untested live behaviour.
+
+## 2026-11-12 gate (autopilot)
+
+- Execution starts: 4 tasks in 3 waves; sonnet 3 (Task 1 high with the security lens), lead 1.
+
+## 2026-11-12 wave 1
+Tasks done: 1, 2
+Timing: Task 1 1.0s, Task 2 1.1s, checks 0.0s
+- Lens yield: security 3 Critical/Important, 6 Minor (wave 1, Task 1); all three Important fixed and re-reviewed by the lens.
+
+## 2026-11-12 wave 2
+Tasks done: 3
+Timing: Task 3 1.0s, checks 0.0s
+Ruling: no separate inventory before Task 3 — wave 1 changed no scripts and added only document tests; the B16 list is the input — cost if wrong: a duplicate test survives to the next pass
+- Wave 2 done; suite median 1.12 s, 166 tests (6.7 ms per test, ratchet was 7.1 ms); ratchet updated. B15 and B16 closed in the backlog.
+
+## 2026-11-12 final review (opus/medium)
+
+- Ready to merge with fixes: 3 Important wording gaps in SKILL.md, deferred minors to fix now.
+- Ruling: in autopilot with no user present, step 4 always uses the built-in builder — superdesign needs the user to pick and approve the design, and the lead must not spend credits or choose a design alone — cost if wrong: autopilot runs never use superdesign; the user can run step 4 interactively. Spec updated.
+- One fix wave dispatched.
+
+## 2026-11-12 wave 3
+Tasks done: 4
+Timing: checks 0.0s
+
+## 2026-11-12 session
+
+- Done: tech-lead 0.3.0 — superdesign as optional mockup provider (consent per user and clone, bound to git user.email and git-ignored; full disclosure of credits, tokens and what is sent; the lead runs it only at step 4 with the user present; autopilot without the user uses the built-in builder; file list approved after the repository analysis; export to mockup.html with a standalone check and local rebuild; screen ids and mapping on both paths; `.superdesign/*` allowlist; never-invoke rule in every subagent brief) and the B16 hygiene leftovers.
+- 4 tasks in 3 waves on autopilot: sonnet 3 (Task 1 on high), lead 1. The security lens ran for the first time (Task 1): 3 Important findings, all fixed and re-reviewed by the lens. Final review (opus/medium): ready with fixes; one fix wave, security-focused re-review clean.
+- Suite: 166 tests at 1.12 s ratchet before the final fixes; 167 tests at the end.
+- Open: B1 (live run, now including superdesign), B17 (wording minors).
+- Next: user decides on merging the PR.
