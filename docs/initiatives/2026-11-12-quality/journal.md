@@ -55,3 +55,7 @@ Task 3: Ruling: lens-review-prompt "up to 4 tasks" conflicts with one dispatch p
 Tasks done: 5, 6
 Timing: Task 5 1.9s, Task 6 1.7s, checks 0.0s
 - Out-of-scope lines in wave 2 are the lead's integration fix (bda4c29), expected.
+
+## 2026-11-12 wave 3
+Tasks done: 7, 10
+Timing: Task 7 2.2s, Task 10 2.2s, checks 0.0s
