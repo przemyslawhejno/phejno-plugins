@@ -38,7 +38,7 @@ claude plugins install model-manager@phejno-plugins
 
 ### tech-lead
 
-Lead orchestrator: plans a spec into waves of tasks, assigns the cheapest capable model to each, delegates, reviews and verifies. It keeps project docs, status and backlog in one hierarchy.
+Lead orchestrator: plans a spec into waves of tasks, assigns the cheapest capable model to each, delegates, reviews and verifies, with hygiene passes, expert panels and UI/UX review. It keeps project docs, status and backlog in one hierarchy.
 
 ```bash
 claude plugins install tech-lead@phejno-plugins

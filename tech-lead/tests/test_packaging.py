@@ -2,15 +2,20 @@ from __future__ import annotations
 
 import json
 import re
+import sys
 import unittest
 from pathlib import Path
+
+sys.path.insert(0, str(Path(__file__).resolve().parent.parent / "scripts"))
+import ledger_core  # noqa: E402
 
 PLUGIN = Path(__file__).resolve().parent.parent
 ROOT = PLUGIN.parent
 DESC = (
     "Lead orchestrator: plans a spec into waves of tasks, assigns the cheapest "
-    "capable model to each, delegates, reviews and verifies; keeps project docs, "
-    "status and backlog in one hierarchy"
+    "capable model to each, delegates, reviews and verifies; adds hygiene passes, "
+    "expert panels and UI/UX review; keeps project docs, status and backlog in "
+    "one hierarchy"
 )
 
 
@@ -29,7 +34,7 @@ class PackagingTests(unittest.TestCase):
     def test_plugin_json(self):
         d = load(PLUGIN / ".claude-plugin" / "plugin.json")
         self.assertEqual(d["name"], "tech-lead")
-        self.assertEqual(d["version"], "0.1.0")
+        self.assertEqual(d["version"], "0.2.0")
         self.assertEqual(d["description"], DESC)
         self.assertEqual(d["author"]["name"], "Przemyslaw Hejno")
 
@@ -64,13 +69,20 @@ class PackagingTests(unittest.TestCase):
     def test_skill_references_exist(self):
         d = PLUGIN / "skills" / "tech-lead"
         text = (d / "SKILL.md").read_text(encoding="utf-8")
-        names = set(re.findall(r"[\w-]+-prompt\.md", text)) | {"layout.md"}
+        names = set(re.findall(r"[\w-]+-prompt\.md", text)) | {"layout.md", "lenses.md"}
         for n in names:
             self.assertTrue((d / n).is_file(), n)
 
+    def test_lenses_match_ledger_core(self):
+        d = PLUGIN / "skills" / "tech-lead"
+        text = (d / "lenses.md").read_text(encoding="utf-8")
+        heads = re.findall(r"(?m)^## (.+)$", text)
+        lenses = [h for h in heads if h not in ("Dispatch", "Yield")]
+        self.assertEqual(lenses, list(ledger_core.LENSES))
+
     def test_readmes(self):
         r = (PLUGIN / "README.md").read_text(encoding="utf-8")
-        for s in ("/tech-lead:run", "model-manager", "superpowers", "TECH_LEAD_STATUS"):
+        for s in ("/tech-lead:run", "model-manager", "superpowers", "TECH_LEAD_STATUS", "lenses", "hygiene", "WCAG 2.2", "schema", "codemap"):
             self.assertIn(s, r)
         root = (ROOT / "README.md").read_text(encoding="utf-8")
         self.assertIn("### tech-lead", root)
