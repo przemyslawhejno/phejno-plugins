@@ -36,7 +36,7 @@ SECTIONS = (
 BRIEF_STATES = ("in progress", "planned", "specified")
 
 
-def _core():
+def _load_core():
     import ledger_core
     return ledger_core
 
@@ -68,8 +68,8 @@ def initiative_state(folder: Path) -> dict:
     ledger_error = False
     ledger_path = folder / "ledger.json"
     if ledger_path.exists():
+        core = _load_core()
         try:
-            core = _core()
             data = core.load(str(ledger_path))
             if core.validate(data):
                 ledger_error = True
@@ -80,7 +80,6 @@ def initiative_state(folder: Path) -> dict:
 
     done_ids: set = set()
     if ledger is not None:
-        core = _core()
         tasks = ledger.get("tasks", [])
         done_ids = set(ledger.get("done", []))
         wave_of = core.waves(tasks)
@@ -173,7 +172,7 @@ def _codemap_proposal(root: Path, facts: dict):
         if n >= CODEMAP_MIN_FILES:
             return f"Codemap: none for {n} code files \u2014 propose /codemap (claude-codemap plugin)"
         return None
-    action = _core().codemap_action(facts["pending"])
+    action = _load_core().codemap_action(facts["pending"])
     if action == "rebuild" or not facts["symbols"]:
         return "Codemap: stale \u2014 propose /codemap (full rebuild)"
     if action == "update":
@@ -309,6 +308,10 @@ def main(argv: list) -> int:
         root = Path(positional[0] if positional
                     else os.environ.get("CLAUDE_PROJECT_DIR") or os.getcwd())
         root = Path(os.path.abspath(str(root)))
+        try:
+            _load_core()
+        except ImportError as e:
+            return 0 if brief else _error(f"tech-lead scripts incomplete: {e}")
         if brief:
             text = render_brief(root)
             if text:

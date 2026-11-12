@@ -21,11 +21,11 @@ class _Parser(argparse.ArgumentParser):
 
 
 def _build() -> argparse.ArgumentParser:
-    p = _Parser(prog="ledger.py")
+    p = _Parser(prog="ledger.py", allow_abbrev=False)
     sub = p.add_subparsers(dest="cmd", required=True, parser_class=_Parser)
     for name in ("check", "show", "next"):
-        sub.add_parser(name).add_argument("ledger")
-    c = sub.add_parser("checkpoint")
+        sub.add_parser(name, allow_abbrev=False).add_argument("ledger")
+    c = sub.add_parser("checkpoint", allow_abbrev=False)
     c.add_argument("ledger")
     c.add_argument("--wave", type=int, required=True)
     c.add_argument("--base", required=True)
@@ -41,7 +41,7 @@ def _repo_root() -> str:
         p = subprocess.run(["git", "rev-parse", "--show-toplevel"], capture_output=True,
                            env=env)
     except OSError:
-        raise CheckpointError("not a git repository")
+        raise CheckpointError("git is not installed")
     if p.returncode != 0:
         raise CheckpointError("not a git repository")
     return p.stdout.decode("utf-8", "replace").strip()
