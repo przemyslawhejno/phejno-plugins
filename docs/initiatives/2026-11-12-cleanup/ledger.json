@@ -1,0 +1,219 @@
+{
+  "prior_art": "skipped: internal cleanup",
+  "mode": "gated",
+  "schema": 2,
+  "checks": [],
+  "requirements": [
+    {
+      "id": "R1",
+      "text": "B12: schema int, split _schema2_errors, single risk check, ui counts for hygiene"
+    },
+    {
+      "id": "R2",
+      "text": "B10: annotations in ledger_core"
+    },
+    {
+      "id": "R3",
+      "text": "B2: missing tests for checkpoint, show, CLI and status"
+    },
+    {
+      "id": "R4",
+      "text": "B4 and B5: mark_done docstring, allow_abbrev off, missing git message"
+    },
+    {
+      "id": "R5",
+      "text": "B11: stdin test that fails without the fix"
+    },
+    {
+      "id": "R6",
+      "text": "B6: show escapes newlines in every cell"
+    },
+    {
+      "id": "R7",
+      "text": "B3 and B13: one clear status error; single instruction-line assertion"
+    },
+    {
+      "id": "R8",
+      "text": "B7, B8, B12 doc, B13 doc, B14: skill and prompt wording"
+    },
+    {
+      "id": "R9",
+      "text": "B9: packaging test checks scripts; version 0.2.1"
+    },
+    {
+      "id": "R10",
+      "text": "Hygiene pass over the changes"
+    }
+  ],
+  "done": [],
+  "tasks": [
+    {
+      "id": 1,
+      "title": "ledger_core cleanup (B10, B12)",
+      "depends_on": [],
+      "files": [
+        "tech-lead/scripts/ledger_core.py",
+        "tech-lead/tests/test_ledger_core.py"
+      ],
+      "covers": [
+        "R1",
+        "R2"
+      ],
+      "acceptance": [
+        "schema must be the integer 2",
+        "_schema2_errors split with identical messages and order",
+        "ui tasks count toward the hygiene threshold"
+      ],
+      "verify": [
+        "python3 -m unittest discover tech-lead/tests"
+      ],
+      "model": "sonnet",
+      "effort": "medium",
+      "reason": "Refactor of the validation core with byte-identical messages"
+    },
+    {
+      "id": 2,
+      "title": "Checkpoint and CLI cleanup (B2, B4, B5, B11)",
+      "depends_on": [],
+      "files": [
+        "tech-lead/scripts/ledger_checkpoint.py",
+        "tech-lead/scripts/ledger.py",
+        "tech-lead/tests/test_ledger_checkpoint.py",
+        "tech-lead/tests/test_ledger_cli.py"
+      ],
+      "covers": [
+        "R3",
+        "R4",
+        "R5"
+      ],
+      "acceptance": [
+        "Missing checkpoint and CLI tests added",
+        "allow_abbrev off, missing git reported",
+        "stdin test fails without the fix"
+      ],
+      "verify": [
+        "python3 -m unittest discover tech-lead/tests"
+      ],
+      "model": "sonnet",
+      "effort": "medium",
+      "reason": "Many new tests with git, locale and PATH setups across two modules"
+    },
+    {
+      "id": 3,
+      "title": "Show escaping and tests (B2, B6)",
+      "depends_on": [],
+      "files": [
+        "tech-lead/scripts/ledger_report.py",
+        "tech-lead/tests/test_ledger_report.py"
+      ],
+      "covers": [
+        "R3",
+        "R6"
+      ],
+      "acceptance": [
+        "Every cell escaped; list cells keep <br>",
+        "Empty ledger and rounding tested"
+      ],
+      "verify": [
+        "python3 -m unittest discover tech-lead/tests"
+      ],
+      "model": "sonnet",
+      "effort": "low",
+      "reason": "Small precise change in one module"
+    },
+    {
+      "id": 4,
+      "title": "Status import error and tests (B2, B3, B13)",
+      "depends_on": [],
+      "files": [
+        "tech-lead/scripts/status.py",
+        "tech-lead/tests/test_status.py"
+      ],
+      "covers": [
+        "R3",
+        "R7"
+      ],
+      "acceptance": [
+        "One clear error when ledger_core is missing; brief stays silent",
+        "Per-initiative waves failure isolated"
+      ],
+      "verify": [
+        "python3 -m unittest discover tech-lead/tests"
+      ],
+      "model": "sonnet",
+      "effort": "low",
+      "reason": "Precise change in one module plus tests"
+    },
+    {
+      "id": 5,
+      "title": "Skill documents, prompts and version 0.2.1",
+      "depends_on": [],
+      "files": [
+        "tech-lead/skills/tech-lead/SKILL.md",
+        "tech-lead/skills/tech-lead/layout.md",
+        "tech-lead/skills/tech-lead/lenses.md",
+        "tech-lead/skills/tech-lead/batch-review-prompt.md",
+        "tech-lead/tests/test_prompts.py",
+        "tech-lead/tests/test_packaging.py",
+        "tech-lead/.claude-plugin/plugin.json",
+        ".claude-plugin/marketplace.json"
+      ],
+      "covers": [
+        "R8",
+        "R9"
+      ],
+      "acceptance": [
+        "Spec rows B7, B8, B9, B12, B13, B14 applied",
+        "Version 0.2.1 in both manifests"
+      ],
+      "verify": [
+        "python3 -m unittest discover tech-lead/tests"
+      ],
+      "model": "sonnet",
+      "effort": "low",
+      "reason": "Small edits with exact wording decided in the spec"
+    },
+    {
+      "id": 6,
+      "title": "Hygiene pass",
+      "depends_on": [
+        1,
+        2,
+        3,
+        4,
+        5
+      ],
+      "files": [
+        "tech-lead/scripts/",
+        "tech-lead/tests/"
+      ],
+      "covers": [
+        "R10"
+      ],
+      "acceptance": [
+        "No obsolete or duplicate tests left; suite not slower per test than the ratchet"
+      ],
+      "verify": [
+        "python3 -m unittest discover tech-lead/tests"
+      ],
+      "model": "sonnet",
+      "effort": "medium",
+      "kind": "hygiene",
+      "reason": "Required by the 3+ code task rule; judgement over the suite"
+    },
+    {
+      "id": 7,
+      "title": "Lead verification",
+      "depends_on": [
+        6
+      ],
+      "files": [],
+      "covers": [],
+      "acceptance": [
+        "Backlog items closed with reasons; ratchet updated; final review clean"
+      ],
+      "model": "lead",
+      "reason": "Integration and verification belong to the lead"
+    }
+  ]
+}
