@@ -54,14 +54,14 @@ docs/
 
 `Suite time` is the ratchet. It is written when missing and updated at a finish without regression.
 
-`Lens yield`, updated at each finish, one line per lens that has run:
+`Lens yield`, updated at each finish, one line per lens that has run; Critical and Important findings count together:
 
 ```
-- security: 3 initiatives, 4 Important, 0 without Important in a row
-- performance: 3 initiatives, 0 Important, 3 without Important in a row
+- security: 3 initiatives, 4 Critical/Important, 0 without Critical/Important in a row
+- performance: 3 initiatives, 0 Critical/Important, 3 without Critical/Important in a row
 ```
 
-A lens with 3 or more consecutive initiatives without an Important finding is flagged by the plan review when chosen without a risk.
+A lens with 3 or more consecutive initiatives without any Critical or Important finding is flagged by the plan review when chosen without a risk.
 
 `UI`, when the project has a graphical interface:
 - Accessibility: WCAG 2.2 level AA, explicitly including 2.4.11 Focus Not Obscured (Minimum), 2.5.7 Dragging Movements, 2.5.8 Target Size (Minimum, 24×24 CSS px), 3.2.6 Consistent Help, 3.3.7 Redundant Entry, 3.3.8 Accessible Authentication (Minimum); 4.1.1 Parsing is obsolete. Where a WCAG 2.1 checklist (such as `design:accessibility-review`) cites 2.5.5 Target Size (44×44 px, level AAA), 2.5.8 governs at AA.
@@ -106,10 +106,10 @@ Timing: Task 3 2.1s, Task 4 0.4s, checks 14.8s
 <lines of SDD's progress.md containing "Ruling:" or starting with "Attempt:", not yet copied>
 ```
 
-When lenses ran in the wave, the lead appends one line below that entry, each lens with its Important and Minor counts:
+When lenses ran in the wave, the lead appends one line below that entry, each lens with its Critical plus Important count and its Minor count, counting every finding raised, including those fixed in the loop:
 
 ```
-Lens yield: security 1 Important, 2 Minor; data 0
+Lens yield: security 1 Critical/Important, 2 Minor; data 0
 ```
 
 Suite timing, written by the lead at the first wave and at the finish (median of 3 runs, or one run over 4 minutes):
