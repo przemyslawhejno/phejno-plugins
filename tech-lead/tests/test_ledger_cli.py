@@ -74,6 +74,16 @@ class CliTest(unittest.TestCase):
         self.assertIn("Codemap: 0 pending (inline)\n", r.stdout)
         self.assertIn(f"Wrote {pending}\n", r.stdout)
 
+    def test_codemap_sync_failure_after_mark_exits_zero(self):
+        make_repo(self.tmp)
+        path = self.write(make_ledger([make_task(1, files=["README"])]))
+        os.makedirs(os.path.join(self.tmp, ".claude", "codemap", "pending.md"))
+        r = run(["checkpoint", path, "--wave", "1", "--base", "HEAD", "--mark"], cwd=self.tmp)
+        self.assertEqual(r.returncode, 0, r.stdout + r.stderr)
+        self.assertIn("warning: codemap sync failed:", r.stderr)
+        with open(path, encoding="utf-8") as f:
+            self.assertEqual(json.load(f)["done"], [1])
+
     def test_checkpoint_failure_does_not_mark(self):
         make_repo(self.tmp)
         path = self.write(make_ledger([make_task(1, verify=["false"])]))

@@ -7,7 +7,7 @@ Plan: {{PLAN_PATH}}
 Ledger: {{LEDGER_PATH}}
 Standards: {{STANDARDS_PATH}}
 
-When `.claude/codemap/INDEX.md` exists, find code through `symbols.md` and `INDEX.md` there before Glob or Grep.
+When `.claude/codemap/INDEX.md` exists, find code through `symbols.md` and `INDEX.md` there before Glob or Grep. The index is read-only for you: never edit topic files, `symbols.md` or `pending.md`.
 
 ## Check
 

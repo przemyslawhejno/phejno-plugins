@@ -82,7 +82,11 @@ def _run(args) -> int:
         today = datetime.date.today().isoformat()
         for path in mark_done(args.ledger, ledger, args.wave, args.progress, today, result):
             print(f"Wrote {path}")
-        synced = sync_codemap(repo, args.base)
+        try:
+            synced = sync_codemap(repo, args.base)
+        except CheckpointError as e:
+            print(f"warning: codemap sync failed: {e}", file=sys.stderr)
+            return 0
         if synced is not None:
             print(f"Codemap: {synced[0]} pending ({synced[1]})")
             print(f"Wrote {os.path.join(repo, '.claude', 'codemap', 'pending.md')}")

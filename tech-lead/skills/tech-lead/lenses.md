@@ -1,6 +1,6 @@
 # Lenses
 
-A lens is a focused review of a task's diff. Each section gives the checklist and what the lens uses when installed. Use an installed skill or agent as an extra input, never as a replacement for the checklist.
+A lens is a focused review of a task's diff. Each section gives the checklist and what the lens uses when installed. Use an installed skill as an extra input to the checklist. An installed named agent replaces the generic dispatch, never adds to it (Dispatch).
 
 ## security
 
@@ -61,8 +61,8 @@ A lens is a focused review of a task's diff. Each section gives the checklist an
 
 ## ui-ux
 
-- Read the harness output under `.tech-lead/scratch/`: screenshots at mobile and desktop widths, axe JSON, Lighthouse summary.
-- Compare with the mockup: flows, hierarchy, states (empty, loading, error, success), copy.
+- Read the harness output at the path in the task entry: screenshots at mobile and desktop widths, axe JSON, Lighthouse summary.
+- When the path is `none`, say "not rendered" and review the code. Compare with the mockup: flows, hierarchy, states (empty, loading, error, success), copy.
 - Check the UI standards in `standards.md`: WCAG 2.2 AA (including 2.5.8 target size), responsive, tokens, themes.
 - Check keyboard order and focus by reading the code; axe finds only part of the issues.
 - Uses when installed: `design:design-critique`, `design:accessibility-review`, `design:ux-copy`, `design:design-system`, `modern-web-guidance`. Give these the mockup path and the harness output, and forbid questions to the user: they are interactive and otherwise ask for a Figma link or a description.
@@ -71,8 +71,8 @@ A lens is a focused review of a task's diff. Each section gives the checklist an
 
 - One dispatch per lens per wave, covering every task of the wave that lists it, in the same message as the batch reviews.
 - Pass `model` and `effort` explicitly on every call, overriding model-manager's routing: sonnet medium. Opus medium for `security` and `architecture` on tasks with a risk, and for `ui-ux` on tasks with risk `system-wide`.
-- Use a named agent from the `Uses when installed` lines only for tasks with a risk, and give it the diff path.
-- A lens finding enters the task's fix loop like a review finding; the lens that raised it re-reviews only the fix diff. Any Important finding blocks the task.
+- When a lens has a named agent in its `Uses when installed` line and a task carries a risk, that agent replaces the generic lens dispatch for the lens: same `lens-review-prompt.md` brief and report path, called with the same explicit `model` and `effort` the generic lens would get. Its findings count in the lens yield. Never dispatch both.
+- A lens finding enters the task's fix loop like a review finding; the lens that raised it re-reviews only the fix diff. Any Critical or Important finding blocks the task.
 
 ## Yield
 
