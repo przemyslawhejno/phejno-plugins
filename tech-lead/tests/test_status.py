@@ -296,20 +296,18 @@ class StatusTests(unittest.TestCase):
 
     def test_import_failure_full_errors_and_brief_is_silent(self):
         add(self.root, "2026-06-01-x", ledger=make_ledger([make_task(1)]))
-        for flags in ([], ["--write"]):
+
+        def main_without_core(*flags):
             out, err = io.StringIO(), io.StringIO()
-            with mock.patch.object(status, "_load_core", side_effect=ImportError("no ledger_core")):
-                with contextlib.redirect_stdout(out), contextlib.redirect_stderr(err):
-                    rc = status.main([self.root] + flags)
-            self.assertEqual(rc, 1)
-            self.assertEqual(out.getvalue(), "")
-            self.assertEqual(err.getvalue(),
-                             "error: tech-lead scripts incomplete: no ledger_core\n")
-        out, err = io.StringIO(), io.StringIO()
-        with mock.patch.object(status, "_load_core", side_effect=ImportError("no ledger_core")):
-            with contextlib.redirect_stdout(out), contextlib.redirect_stderr(err):
-                rc = status.main([self.root, "--brief"])
-        self.assertEqual((rc, out.getvalue(), err.getvalue()), (0, "", ""))
+            with mock.patch.object(status, "_load_core", side_effect=ImportError("no ledger_core")), \
+                    contextlib.redirect_stdout(out), contextlib.redirect_stderr(err):
+                rc = status.main([self.root, *flags])
+            return rc, out.getvalue(), err.getvalue()
+
+        for flags in ([], ["--write"]):
+            self.assertEqual(main_without_core(*flags),
+                             (1, "", "error: tech-lead scripts incomplete: no ledger_core\n"))
+        self.assertEqual(main_without_core("--brief"), (0, "", ""))
 
     def test_brief_status_path_only_when_present(self):
         add(self.root, "2026-05-01-x", spec=True)

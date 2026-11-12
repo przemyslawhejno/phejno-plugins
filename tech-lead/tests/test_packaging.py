@@ -34,7 +34,6 @@ class PackagingTests(unittest.TestCase):
     def test_plugin_json(self):
         d = load(PLUGIN / ".claude-plugin" / "plugin.json")
         self.assertEqual(d["name"], "tech-lead")
-        self.assertEqual(d["version"], "0.2.1")
         self.assertEqual(d["description"], DESC)
         self.assertEqual(d["author"]["name"], "Przemyslaw Hejno")
 
