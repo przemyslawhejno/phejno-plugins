@@ -99,6 +99,30 @@ REQUIRED_IN_LAYOUT = [
 ]
 
 
+NEVER_SUPERDESIGN = "Never invoke the superdesign skill or the superdesign CLI."
+
+REQUIRED_SUPERDESIGN_IN_SKILL = [
+    "superdesign:superdesign",
+    ".tech-lead/superdesign-consent",
+    "credits",
+    "main session",
+    "get-design --draft-id",
+    "import-design-draft --into",
+    "built-in",
+    "built-in builder",
+    "mockup-prompt.md",
+    "Mockup via superdesign",
+    "Superdesign repository analysis",
+]
+
+REQUIRED_SUPERDESIGN_IN_LAYOUT = [
+    ".superdesign/*",
+    "!.superdesign/design-system.md",
+    "Design system: .superdesign/design-system.md",
+    ".tech-lead/superdesign-consent",
+]
+
+
 def read(path: Path) -> str:
     return path.read_text(encoding="utf-8")
 
@@ -156,6 +180,57 @@ class SkillDocsTest(unittest.TestCase):
     def test_layout_paths(self):
         text = read(LAYOUT)
         missing = [item for item in REQUIRED_IN_LAYOUT if item not in text]
+        self.assertEqual(missing, [])
+
+    def test_superdesign_in_skill(self):
+        text = read(SKILL)
+        missing = [item for item in REQUIRED_SUPERDESIGN_IN_SKILL if item not in text]
+        self.assertEqual(missing, [])
+
+    def test_superdesign_conditions_in_order(self):
+        text = read(SKILL)
+        pos = text.index("## Process")
+        for item in ("superdesign:superdesign", ".tech-lead/superdesign-consent", "login", "built-in"):
+            found = text.find(item, pos)
+            self.assertNotEqual(found, -1, "%r missing after previous condition" % item)
+            pos = found
+
+    def test_superdesign_init_exception(self):
+        text = read(SKILL)
+        sentences = [s for s in text.replace("\n", " ").split(". ") if ".superdesign/init/" in s]
+        self.assertTrue(sentences)
+        self.assertTrue(any("only" in s and "never runs the CLI" in s for s in sentences), sentences)
+
+    def test_superdesign_consent_text(self):
+        text = read(SKILL) + read(LAYOUT)
+        for item in ("public URLs", "unpinned", "credits", "tokens"):
+            self.assertIn(item, text)
+
+    def test_every_brief_carries_never_invoke(self):
+        lines = read(SKILL).splitlines()
+        for marker in ("Every brief says:", "Every subagent brief"):
+            hits = [line for line in lines if marker in line]
+            self.assertTrue(hits, marker)
+            for line in hits:
+                self.assertIn(NEVER_SUPERDESIGN, line)
+
+    def test_superdesign_consent_identity_and_withdrawal(self):
+        skill, layout = read(SKILL), read(LAYOUT)
+        for item in ("user.email", "check-ignore", "consent: no"):
+            self.assertIn(item, skill)
+            self.assertIn(item, layout)
+        self.assertIn("At every start of work", skill)
+
+    def test_superdesign_context_file_guard(self):
+        skill, layout = read(SKILL), read(LAYOUT)
+        for item in (".env", "--context-file", "*.pem", "git"):
+            self.assertIn(item, skill)
+        self.assertIn(".env", layout)
+        self.assertIn("verbatim", layout)
+
+    def test_layout_superdesign(self):
+        text = read(LAYOUT)
+        missing = [item for item in REQUIRED_SUPERDESIGN_IN_LAYOUT if item not in text]
         self.assertEqual(missing, [])
 
     def test_no_model_switch(self):

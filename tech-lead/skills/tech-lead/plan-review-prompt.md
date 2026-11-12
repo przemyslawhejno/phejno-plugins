@@ -2,6 +2,8 @@
 
 Review the plan against the spec. You are read-only: edit nothing except your report.
 
+Never invoke the superdesign skill or the superdesign CLI.
+
 Spec: {{SPEC_PATH}}
 Plan: {{PLAN_PATH}}
 Ledger: {{LEDGER_PATH}}

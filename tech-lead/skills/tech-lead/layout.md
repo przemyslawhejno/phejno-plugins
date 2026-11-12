@@ -21,6 +21,8 @@ docs/
       research/                 prior-art, spike, plan-review, hygiene-candidates and lens reports
 .worktrees/                     lane worktrees (git-ignored)
 .tech-lead/scratch/             spikes, checkpoint logs, harness output and temporary files (git-ignored)
+.tech-lead/superdesign-consent  this user's superdesign consent (git-ignored, per clone and user)
+.superdesign/design-system.md   design system written by superdesign, when used (committed)
 .claude/codemap/                code index from the claude-codemap plugin, when present (committed)
 .superpowers/sdd/               SDD workspace (git-ignored, managed by SDD)
 ```
@@ -69,6 +71,25 @@ A lens with 3 or more consecutive initiatives without any Critical or Important 
 - Web platform choices (HTML, CSS, client JS) checked against `modern-web-guidance` when installed; native and desktop apps follow current platform guidelines (Apple Human Interface Guidelines, Material Design 3, Fluent 2) and expose controls through the platform accessibility API.
 - Responsive from the smallest supported viewport; light and dark themes when the product has both; empty, loading, error and success states designed.
 - A design system or component library from prior art before custom components; design tokens instead of hard-coded values (`design:design-system` when installed).
+- When superdesign creates or updates `.superdesign/design-system.md`, this section holds the line `Design system: .superdesign/design-system.md` instead of repeating tokens. The accessibility and performance rules above stay here and are authoritative.
+
+## Superdesign consent
+
+`.tech-lead/superdesign-consent` is git-ignored because credits and uploads belong to the user's own superdesign account:
+
+```
+consent: yes
+user: <git config user.email>
+date: 2026-11-12
+```
+
+Consent is valid only while the file is git-ignored (`git check-ignore -q .tech-lead/superdesign-consent` succeeds) and `user:` equals the current `git config user.email`; otherwise ask again, or in autopilot with no user present use the built-in builder. `consent: no` is not asked again. Consent covers every initiative in this clone. The user withdraws it by setting `consent: no` or deleting the file. Ask while the user is present, and state:
+
+- Generation credits on the user's superdesign account: on an existing codebase at least one reproduction draft of the current screen plus each requested variant.
+- Lead tokens: the superdesign skill (about 900 lines) and, the first time, its repository analysis.
+- Sent to superdesign's servers: the written spec as the design brief, the user's request, selected project files as design context, and uploaded images, which become public URLs. The lead lists the exact files and images and gets a yes before the first generation; it never selects `.env*`, `*.pem`, `*.key`, `*.p12`, `id_*`, `credentials*`, `secrets*`, files ignored by git, or screenshots containing real user data.
+- Stored by superdesign: the request verbatim, to improve generation; drafts, uploaded assets and context stay on the user's superdesign account until deleted there.
+- The CLI runs unpinned from npm (`@latest`) on each run.
 
 ## State
 
@@ -111,6 +132,15 @@ When lenses ran in the wave, the lead appends one line below that entry, each le
 ```
 Lens yield: security 1 Critical/Important, 2 Minor; data 0
 ```
+
+Superdesign mockup, written by the lead at step 4 (generations counted by the lead):
+
+```
+## 2026-11-12 superdesign mockup
+CLI: <version from the preflight>. Project: <project id>. Draft: <draft id>. Canvas: <link>. Preview: <link>. Generations used: 3
+```
+
+When the built-in builder runs although the plugin is installed, write `Ruling: built-in mockup builder — <reason>` (no consent, not logged in, headless).
 
 Suite timing, written by the lead at the first wave and at the finish (median of 3 runs, or one run over 4 minutes); each measurement is an event, the ratchet stays in `standards.md`:
 
@@ -169,6 +199,15 @@ Add these entries to the project's `.gitignore` when missing:
 .worktrees/
 .tech-lead/
 ```
+
+When superdesign is used, also:
+
+```
+.superdesign/*
+!.superdesign/design-system.md
+```
+
+Add them before the repository analysis or the first CLI call. Everything else there (`init/`, `resume.json` with per-account ids, `tmp/`, `replica_html_template/`, `website/`) stays local; a fresh clone pays the repository analysis again, which `journal.md` notes.
 
 `.superpowers/sdd/` ignores itself; SDD manages it.
 
