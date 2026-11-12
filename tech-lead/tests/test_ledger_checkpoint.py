@@ -207,3 +207,58 @@ class CheckpointTests(unittest.TestCase):
 
 if __name__ == "__main__":
     unittest.main()
+
+
+class CodemapSyncTests(unittest.TestCase):
+    @classmethod
+    def setUpClass(cls):
+        cls.tmp = os.path.realpath(tempfile.mkdtemp())
+        cls.repo = os.path.join(cls.tmp, "repo")
+        os.makedirs(cls.repo)
+        git(cls.repo, "init", "-q")
+        git(cls.repo, "config", "user.email", "t@example.com")
+        git(cls.repo, "config", "user.name", "T")
+        git(cls.repo, "config", "commit.gpgsign", "false")
+        for p in ("keep.py", "gone.py"):
+            with open(os.path.join(cls.repo, p), "w") as f:
+                f.write("x\n")
+        git(cls.repo, "add", "-A")
+        git(cls.repo, "commit", "-q", "-m", "init")
+        cls.base = git(cls.repo, "rev-parse", "HEAD")
+        for p in (".worktrees/lane/a.py", ".claude/codemap/INDEX.md", "src/new.py"):
+            os.makedirs(os.path.join(cls.repo, os.path.dirname(p)), exist_ok=True)
+            with open(os.path.join(cls.repo, p), "w") as f:
+                f.write("y\n")
+        os.remove(os.path.join(cls.repo, "gone.py"))
+        git(cls.repo, "add", "-A", "-f")
+        git(cls.repo, "commit", "-q", "-m", "work")
+        cls.pending = os.path.join(cls.repo, ".claude", "codemap", "pending.md")
+
+    @classmethod
+    def tearDownClass(cls):
+        shutil.rmtree(cls.tmp, True)
+
+    def setUp(self):
+        shutil.rmtree(os.path.dirname(self.pending), True)
+
+    def test_none_without_codemap_directory(self):
+        self.assertIsNone(cp.sync_codemap(self.repo, self.base))
+        self.assertFalse(os.path.exists(os.path.dirname(self.pending)))
+
+    def test_merges_filters_and_deduplicates(self):
+        os.makedirs(os.path.dirname(self.pending))
+        with open(self.pending, "w") as f:
+            f.write("src/new.py\nold.py\n.worktrees/x/b.py\n\n")
+        self.assertEqual(cp.sync_codemap(self.repo, self.base), (3, "inline"))
+        with open(self.pending, encoding="utf-8") as f:
+            self.assertEqual(f.read().splitlines(),
+                             ["src/new.py", "old.py", "gone.py"])
+
+    def test_git_failure_raises(self):
+        os.makedirs(os.path.dirname(self.pending))
+        with self.assertRaises(cp.CheckpointError):
+            cp.sync_codemap(self.repo, "nope")
+
+    def test_action_boundaries(self):
+        self.assertEqual([cp.codemap_action(n) for n in (15, 16, 50, 51)],
+                         ["inline", "update", "update", "rebuild"])

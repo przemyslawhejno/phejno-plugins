@@ -83,6 +83,17 @@ class CliTest(unittest.TestCase):
         with open(path, encoding="utf-8") as f:
             self.assertEqual(json.load(f)["done"], [1])
 
+    def test_checkpoint_mark_reports_codemap_only_when_present(self):
+        make_repo(self.tmp)
+        path = self.write(make_ledger([make_task(1, files=["README"])]))
+        args = ["checkpoint", path, "--wave", "1", "--base", "HEAD", "--mark"]
+        self.assertNotIn("Codemap:", run(args, cwd=self.tmp).stdout)
+        pending = os.path.join(self.tmp, ".claude", "codemap", "pending.md")
+        os.makedirs(os.path.dirname(pending))
+        r = run(args, cwd=self.tmp)
+        self.assertIn("Codemap: 0 pending (inline)\n", r.stdout)
+        self.assertIn(f"Wrote {pending}\n", r.stdout)
+
     def test_checkpoint_prints_durations(self):
         make_repo(self.tmp)
         path = self.write(make_ledger([make_task(1, files=["README"])]))
