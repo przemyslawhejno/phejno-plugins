@@ -1,0 +1,347 @@
+{
+  "prior_art": "done",
+  "mode": "autopilot",
+  "schema": 2,
+  "checks": [],
+  "requirements": [
+    {
+      "id": "R1",
+      "text": "docs/standards.md Hygiene, Suite, Lens yield (and UI for UI projects) sections"
+    },
+    {
+      "id": "R2",
+      "text": "Ledger schema 2 fields: ui, kind, risk, experts, replaces"
+    },
+    {
+      "id": "R3",
+      "text": "Risk-to-lens rules, routine tasks take no experts, at most 4 lenses"
+    },
+    {
+      "id": "R4",
+      "text": "Hygiene task required by the 3-task / 2-task-with-replaces rule and depending on every code task"
+    },
+    {
+      "id": "R5",
+      "text": "UI tasks need top-level ui and risk ux unless on haiku"
+    },
+    {
+      "id": "R6",
+      "text": "lenses.md with checklists, installed-skill use, dispatch and yield rules"
+    },
+    {
+      "id": "R7",
+      "text": "Lens review and inventory prompts"
+    },
+    {
+      "id": "R8",
+      "text": "Batch and plan review prompts check hygiene, candidates, risks and lenses"
+    },
+    {
+      "id": "R9",
+      "text": "Mockup prompt carries current UI standards and the UI/UX review loop"
+    },
+    {
+      "id": "R10",
+      "text": "Skill covers suite ratchet, inventory, hygiene pass, expert stages, escalation cause unknown, UI/UX and render harness"
+    },
+    {
+      "id": "R11",
+      "text": "Checkpoint prints durations and journals timing"
+    },
+    {
+      "id": "R12",
+      "text": "show prints risk, experts and lens dispatches"
+    },
+    {
+      "id": "R13",
+      "text": "Version 0.2.0 and README"
+    },
+    {
+      "id": "R14",
+      "text": "Hygiene pass over the plugin itself"
+    },
+    {
+      "id": "R15",
+      "text": "Lead and every brief navigate through the codemap index when it exists"
+    },
+    {
+      "id": "R16",
+      "text": "Checkpoint syncs lane changes into codemap pending.md and reports the action"
+    },
+    {
+      "id": "R17",
+      "text": "Status and session brief report codemap health and propose mapping"
+    }
+  ],
+  "done": [
+    1,
+    2,
+    3,
+    4,
+    5,
+    6,
+    7,
+    10,
+    8,
+    9
+  ],
+  "tasks": [
+    {
+      "id": 1,
+      "title": "Project standards for this repository",
+      "depends_on": [],
+      "files": [],
+      "covers": [
+        "R1"
+      ],
+      "acceptance": [
+        "docs/standards.md has Hygiene, Suite (baseline 1.58s, 91 tests) and Lens yield sections"
+      ],
+      "model": "lead",
+      "reason": "Project documents belong to the lead"
+    },
+    {
+      "id": 2,
+      "title": "Ledger schema 2 validation",
+      "depends_on": [],
+      "files": [
+        "tech-lead/scripts/ledger_core.py",
+        "tech-lead/tests/helpers.py",
+        "tech-lead/tests/test_ledger_core.py"
+      ],
+      "covers": [
+        "R2",
+        "R3",
+        "R4",
+        "R5"
+      ],
+      "acceptance": [
+        "Every schema 2 rule produces its message",
+        "0.1.0 ledgers, including the finished initiative, stay valid"
+      ],
+      "verify": [
+        "python3 -m unittest discover tech-lead/tests"
+      ],
+      "model": "sonnet",
+      "effort": "medium",
+      "reason": "Many interacting rules with backward compatibility; every script depends on validation"
+    },
+    {
+      "id": 3,
+      "title": "Lenses and prompts",
+      "depends_on": [],
+      "files": [
+        "tech-lead/skills/tech-lead/lenses.md",
+        "tech-lead/skills/tech-lead/lens-review-prompt.md",
+        "tech-lead/skills/tech-lead/inventory-prompt.md",
+        "tech-lead/skills/tech-lead/batch-review-prompt.md",
+        "tech-lead/skills/tech-lead/plan-review-prompt.md",
+        "tech-lead/skills/tech-lead/mockup-prompt.md",
+        "tech-lead/tests/test_prompts.py"
+      ],
+      "covers": [
+        "R6",
+        "R7",
+        "R8",
+        "R9",
+        "R15"
+      ],
+      "acceptance": [
+        "Each lens has a checklist and its installed-skill line",
+        "New prompts have their placeholders; updated prompts carry hygiene, risk and UI checks"
+      ],
+      "verify": [
+        "python3 -m unittest discover tech-lead/tests"
+      ],
+      "model": "sonnet",
+      "effort": "medium",
+      "reason": "Six instruction documents whose content needs judgement to stay concise and unambiguous"
+    },
+    {
+      "id": 4,
+      "title": "Skill and layout for 0.2.0",
+      "depends_on": [],
+      "files": [
+        "tech-lead/skills/tech-lead/SKILL.md",
+        "tech-lead/skills/tech-lead/layout.md",
+        "tech-lead/tests/test_skill_docs.py"
+      ],
+      "covers": [
+        "R1",
+        "R4",
+        "R6",
+        "R7",
+        "R8",
+        "R9",
+        "R10",
+        "R15",
+        "R16",
+        "R17"
+      ],
+      "acceptance": [
+        "SKILL.md covers hygiene, suite ratchet, inventory, experts, escalation cause unknown, UI/UX and schema 2 in under 300 lines",
+        "layout.md defines the new standards sections, backlog tag and journal lines"
+      ],
+      "verify": [
+        "python3 -m unittest discover tech-lead/tests"
+      ],
+      "model": "opus",
+      "effort": "medium",
+      "reason": "Risk: core behaviour of every future run; many interacting rules where ambiguity propagates system-wide"
+    },
+    {
+      "id": 5,
+      "title": "Checkpoint timings",
+      "depends_on": [
+        2
+      ],
+      "files": [
+        "tech-lead/scripts/ledger_checkpoint.py",
+        "tech-lead/scripts/ledger.py",
+        "tech-lead/tests/test_ledger_checkpoint.py",
+        "tech-lead/tests/test_ledger_cli.py"
+      ],
+      "covers": [
+        "R11"
+      ],
+      "acceptance": [
+        "Durations printed with one decimal and kept pass/fail prefixes",
+        "Timing line in the wave journal entry"
+      ],
+      "verify": [
+        "python3 -m unittest discover tech-lead/tests"
+      ],
+      "model": "sonnet",
+      "effort": "low",
+      "reason": "Precise spec, small change across two modules and their tests"
+    },
+    {
+      "id": 6,
+      "title": "Report columns for risk and experts",
+      "depends_on": [
+        2
+      ],
+      "files": [
+        "tech-lead/scripts/ledger_report.py",
+        "tech-lead/tests/test_ledger_report.py"
+      ],
+      "covers": [
+        "R12"
+      ],
+      "acceptance": [
+        "Risk and Experts columns, kind suffix, distinct lens dispatches per wave"
+      ],
+      "verify": [
+        "python3 -m unittest discover tech-lead/tests"
+      ],
+      "model": "sonnet",
+      "effort": "low",
+      "reason": "Formatting from a precise spec, two files"
+    },
+    {
+      "id": 10,
+      "title": "Codemap in status and checkpoint",
+      "depends_on": [
+        5
+      ],
+      "files": [
+        "tech-lead/scripts/status.py",
+        "tech-lead/scripts/ledger_checkpoint.py",
+        "tech-lead/scripts/ledger.py",
+        "tech-lead/tests/test_status.py",
+        "tech-lead/tests/test_ledger_checkpoint.py",
+        "tech-lead/tests/test_ledger_cli.py"
+      ],
+      "covers": [
+        "R16",
+        "R17"
+      ],
+      "acceptance": [
+        "Checkpoint --mark syncs pending.md and prints the Codemap line only when the index exists",
+        "Status and brief report codemap health per the spec table, never raising"
+      ],
+      "verify": [
+        "python3 -m unittest discover tech-lead/tests"
+      ],
+      "model": "sonnet",
+      "effort": "medium",
+      "reason": "Git-backed logic across status and checkpoint, runs in the session-start hook"
+    },
+    {
+      "id": 7,
+      "title": "Version 0.2.0 and docs",
+      "depends_on": [
+        2,
+        3,
+        4,
+        5,
+        6
+      ],
+      "files": [
+        "tech-lead/.claude-plugin/plugin.json",
+        "tech-lead/README.md",
+        "tech-lead/tests/test_packaging.py",
+        ".claude-plugin/marketplace.json",
+        "README.md"
+      ],
+      "covers": [
+        "R13"
+      ],
+      "acceptance": [
+        "Version 0.2.0 everywhere",
+        "README describes the new features and optional skills"
+      ],
+      "verify": [
+        "python3 -m unittest discover tech-lead/tests"
+      ],
+      "model": "sonnet",
+      "effort": "low",
+      "reason": "Fixed values plus short prose"
+    },
+    {
+      "id": 8,
+      "title": "Hygiene pass over the plugin",
+      "depends_on": [
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        10
+      ],
+      "files": [
+        "tech-lead/scripts/",
+        "tech-lead/tests/"
+      ],
+      "covers": [
+        "R14"
+      ],
+      "acceptance": [
+        "No dead code, duplicate or obsolete tests, or noise comments; every removed test mapped to its replacement",
+        "Suite green and not slower per test than the baseline by the 20% and 2 s rule"
+      ],
+      "verify": [
+        "python3 -m unittest discover tech-lead/tests"
+      ],
+      "model": "sonnet",
+      "effort": "medium",
+      "kind": "hygiene",
+      "reason": "Judgement over the whole suite with the inventory as input"
+    },
+    {
+      "id": 9,
+      "title": "Lead verification",
+      "depends_on": [
+        8
+      ],
+      "files": [],
+      "covers": [],
+      "acceptance": [
+        "All checks pass; Suite time ratchet updated"
+      ],
+      "model": "lead",
+      "reason": "Integration and verification belong to the lead"
+    }
+  ]
+}

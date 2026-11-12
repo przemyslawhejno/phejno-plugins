@@ -1,0 +1,273 @@
+# tech-lead plugin: design
+
+Date: 2026-11-11
+
+## Goal
+
+A plugin that turns the main session into a lead orchestrator for a project. The lead keeps the project's documents in one hierarchy, looks for existing solutions, specifies with a mockup when the work is visual, breaks the spec into small tasks, picks the cheapest capable model for each, shows the breakdown for one approval, delegates, and keeps coordination, integration, review dispatch and final verification for itself. Each new session starts from the project's status and proposes next steps.
+
+Success means: the spec is completed at full quality and nothing in it is lost; the code follows the project's standards; a later session knows what happened, what is in progress and what is planned; as little work as possible runs on the expensive models or is built from scratch when a usable solution exists.
+
+## Decisions made with the user
+
+- Name: `tech-lead` (plugin and skill). Command: `/tech-lead:run`.
+- Four subagent tiers: haiku, sonnet, opus, fable.
+- The lead runs on whatever model the session uses. The plugin never switches it and never suggests another model for it.
+- Activation: the command, plus the skill triggering on requests to lead, plan or orchestrate work. A SessionStart hook shows the project status (see Session start); it is silent in projects that do not use tech-lead.
+- `model-manager` stays the source of truth for the dispatch table, the Agent hook, named-agent routing, lanes and the cost report. Its code does not change.
+- An independent fable review of the first draft was accepted in full; this version incorporates it.
+- Prior-art search is a standard step.
+- Every plan is reviewed by an independent agent and corrected before the user sees it; the lead then recommends implementing it. In autopilot, agreed beforehand, the lead goes from plan to goal without the gate.
+- Quality foundation: project standards, shared checks, ADRs.
+- An HTML mockup is part of the spec whenever the work has a UI, a user flow or behaviour easier shown than described. The lead makes it without asking; the user can decline it.
+- Every artifact lives inside the project directory, in the hierarchy below, unless the user says otherwise.
+- Whenever an artifact is created or updated, its full absolute path is given to the user, so it can be opened straight from the console. This applies to the lead's messages, to what subagents report back, and to the scripts' output.
+
+## Relationship to other plugins
+
+- **model-manager** (required). The lead loads `model-manager:model-manager` before dispatching and follows its table, lane rule, long-job rule and cleanup rule. Its escalation ladder is merged with the SDD fix loop as described under Escalation.
+- **superpowers** (required). The lead drives `brainstorming`, `writing-plans`, `subagent-driven-development` (SDD), `test-driven-development`, `requesting-code-review`, `verification-before-completion` and `finishing-a-development-branch`. Both `brainstorming` and `writing-plans` let a user preference override where they save; tech-lead's hierarchy is that preference. SDD's implementer prompt, report files and `progress.md` are used as they are.
+- **Optional skills**, used when installed: `engineering:architecture` for ADRs, `security-review` for security-sensitive work, `modern-web-guidance` for mockups and web UI.
+
+## Project document hierarchy
+
+```
+docs/
+  STATUS.md                     generated: in progress, planned, backlog head, recently done
+  backlog.md                    unplanned tasks, follow-ups, parked findings
+  standards.md                  project conventions and shared checks
+  adr/
+    NNNN-<title>.md             architecture decisions
+  initiatives/
+    YYYY-MM-DD-<topic>/         one folder per piece of work
+      spec.md
+      mockup.html               when the work is visual
+      plan.md
+      ledger.json
+      journal.md                sessions, rulings, escalations, wave results, closure
+      research/                 prior-art and spike reports
+.worktrees/                     lane worktrees (git-ignored)
+.tech-lead/scratch/             spikes and temporary files (git-ignored)
+.superpowers/sdd/               SDD workspace (git-ignored, managed by SDD)
+```
+
+Rules:
+
+- One initiative is one folder. Everything about it is found there, never under `docs/superpowers/`.
+- An initiative's state is derived from its files, so it cannot drift: `proposed` (folder with `journal.md` only), `specified` (`spec.md`), `planned` (`ledger.json`, no task done), `in progress` (some tasks done), `done` (all tasks done), `closed` (a `Closed: <abandoned|superseded> — <reason>` line in `journal.md`).
+- Work discovered along the way (out-of-scope findings, follow-ups, parked review findings, user ideas) goes into `backlog.md` as `- [ ] B<n> <title> — from <initiative or session> — <date>`. Planning a backlog item into an initiative replaces its checkbox with a link to that initiative.
+- `docs/STATUS.md` is generated by `status.py` and never edited by hand.
+- The lead adds `.worktrees/` and `.tech-lead/` to `.gitignore` when missing.
+- Paths shown to the user are absolute (for example `/home/me/app/docs/initiatives/2026-11-11-orders/mockup.html`), one per line, never shortened or relative. Every subagent brief asks for absolute paths of the files it created or changed in its report. Gate messages, wave summaries, the finish report and the session-start status list the absolute paths of the artifacts they mention (spec, mockup, plan, ledger, journal, status, ADRs, research reports, logs).
+- A project with documents under `docs/superpowers/` is not migrated silently. The lead offers once to move them with `git mv` (a haiku task) and records the answer in `backlog.md`.
+
+## Journal
+
+`journal.md` is the initiative's memory for later sessions. Entries are short and dated, newest last:
+
+- `## <date> session`: what was done, what is open, what comes next. Written before a turn ends with work stopped.
+- Wave results, rulings and escalations, copied by `ledger.py checkpoint` from SDD's `progress.md` (lines containing `Ruling:`, which covers SDD's `Task N: Ruling:` and parked-finding forms, and lines starting `Attempt:`), so they survive the git-ignored SDD workspace.
+- Gate approvals and re-gates, with what changed.
+- `Closed:` when the initiative ends without completion.
+
+## Session start
+
+A SessionStart hook (`startup`, `clear`, `compact`) runs `status.py --brief`. When `docs/initiatives/` does not exist it prints nothing. Otherwise it injects at most about 25 lines: initiatives in progress with their next wave, planned and specified initiatives, the first backlog items, and an instruction to propose next steps to the user as a short list and wait for their choice before starting work, followed by the absolute path of `docs/STATUS.md` when that file exists. Any error in the hook prints nothing; a hook failure never blocks a session. `TECH_LEAD_STATUS=0` turns it off.
+
+## Lead process (SKILL.md)
+
+1. **Orient.** Read `docs/STATUS.md` (or run `status.py`) and, for an initiative being resumed, its `journal.md`. Create the initiative folder with `journal.md` for new work.
+2. **Standards.** If `docs/standards.md` is missing: in an existing codebase, Explore on haiku records the conventions in force (layout, naming, formatter, linter, type checker, test runner, CI) without inventing new ones; in a new project, the plan's first wave sets them up, with tool choices going through prior art. `standards.md` ends with a `Checks` list of commands, copied into the ledger's `checks`.
+3. **Spec.** Read all of it. If it is missing, or a requirement can be read two ways, run `superpowers:brainstorming`, saving to the initiative folder.
+4. **Mockup.** When the work has a UI, a user flow or behaviour easier shown than described, a sonnet medium subagent builds `mockup.html` from the written spec: one self-contained file, as static screens, a clickable prototype with fake data, or a runnable simulation, whichever the goal needs. The lead checks both directions: every screen and behaviour in the mockup has a requirement in the spec, and every UI requirement appears in the mockup. The user reviews spec and mockup together in brainstorming's spec review. Revisions resume the same subagent.
+5. **Prior art.** Unless the spec is small or entirely project-specific glue, name 1 to 4 areas where building from scratch is costly. Dispatch one scout per area in parallel (sonnet low, read-only, brief in `scout-prompt.md`). Search order: this repository and the user's other repositories, package registries, GitHub, the web. Each scout writes its report to `research/` and returns at most 3 candidates with name, URL, pinned version or SHA, license, last release, maintenance state, fit, and a mode: `dependency`, `copy` (with attribution), `pattern` or `reject`. The lead decides per area. When the network blocks the search, the lead records `skipped: no network` and continues.
+6. **Spikes.** A task whose approach is unknown gets a spike before planning: sonnet medium, working in `.tech-lead/scratch/`, returning an answer recorded in `research/`, not code to keep.
+7. **Plan and ledger.** Run `superpowers:writing-plans`, saving `plan.md` in the initiative folder. Write `ledger.json` with one entry per plan task, copying each task's run commands into `verify`. Requirements may point at mockup sections. Assign models by assessing complexity, reasoning need, risk and scope, taking the lowest row of the tier table that fits, with one sentence of reason. Run `ledger.py check` until it passes.
+8. **Plan review.** As soon as the plan and ledger pass `ledger.py check`, the lead dispatches an independent reviewer without asking (`plan-review-prompt.md`, read-only): spec coverage, task size and boundaries, interfaces between tasks, dependencies and waves, model and effort per task (too high wastes cost, too low risks failure), `verify` commands that really prove acceptance, Review Focus, and risks the plan ignores. Model: sonnet medium; opus medium when the spec is large, system-wide or risky; never the lead reviewing its own plan. The reviewer writes its report to `research/plan-review.md`. The lead applies the findings it accepts, records rejected ones with a reason, runs `ledger.py check` again, and repeats the review once more only when blocking findings changed the plan, at most 2 rounds. The outcome goes into `journal.md`.
+9. **Gate.** One message holds the plan path, a short plan-review summary (rounds, what changed, what was rejected and why), the `ledger.py show` output unchanged, and a recommendation to implement with the execution question writing-plans would ask. This replaces writing-plans' separate plan review. Nothing that edits project code is dispatched before approval; standards discovery, mockups, scouts, Explore, spikes and the plan review may run before it. The approval goes into `journal.md`.
+   - **Autopilot.** When the user said beforehand that the work should go from plan to goal without stopping (in words, or `/tech-lead:run --auto`), the ledger's `mode` is `autopilot` and the gate is skipped once the plan review is clean: the lead posts the same gate message as a status note and goes straight to execution. Autopilot still stops for SDD's four stop reasons (an irreversible or destructive operation, a security-sensitive action, a side effect outside the worktree such as a merge, push to a shared branch or publish, and a plan so broken that every path is a guess) and for a change that adds requirements beyond the spec. Other re-gate thresholds become rulings, recorded in the journal and listed in the finish report.
+10. **Execute by waves.** `ledger.py next` names the current wave. For each wave:
+   1. Reset the lane worktrees to the integration branch head (see Lanes).
+   2. Dispatch each task's implementer with the ledger's model and effort, using SDD's implementer prompt plus the paths of `standards.md` and, for UI tasks, `mockup.html`.
+   3. Review: one reviewer dispatch per lane batch of up to 4 tasks, with a verdict per task (`batch-review-prompt.md`), checking spec compliance, `standards.md`, and the mockup for UI tasks. The reviewer's model follows SDD's rule, scaled to the diff, with sonnet medium as the floor; a risky task raises it one effort level.
+   4. Fix loop per task, following Escalation.
+   5. Merge the lane branches into the integration branch.
+   6. Run `ledger.py checkpoint --mark`. A failure goes back to the fix loop of the failing task. On success it records the wave's tasks as done in the ledger and appends to the journal; the lead runs `status.py --write` and commits ledger, journal and status together.
+11. **Rulings.** Decisions during execution follow SDD's "Rulings, not stalls". The user is asked again only when a requirement or the scope changes, or when new opus or fable work is added; the question shows the ledger change as `git diff`. A decision that shapes the system beyond this initiative becomes an ADR. Found work outside the scope goes to `backlog.md`.
+12. **Finish.** Final whole-branch review on opus medium, one effort level up for risky work, plus `security-review` when the work is security-sensitive and the skill is available. Walk the requirement list against the result, run `superpowers:verification-before-completion` and `superpowers:finishing-a-development-branch`. The report lists what was done, rulings, escalations with their cause, what was reused and from where, new backlog items, and points to `/model-manager:mm-report` for cost by model. Then propose next steps from `STATUS.md`.
+
+Resume: `/tech-lead:run <initiative folder>` reads its journal, plan and ledger and continues at `ledger.py next`; inside a wave it also reads SDD's `progress.md` when present.
+
+## Tier table
+
+Rows for haiku, sonnet and opus are the model-manager table. tech-lead adds:
+
+| Work | Model | Effort |
+|---|---|---|
+| Decisions, plans, integration, verification; no project code edits | lead (main session) | - |
+| Standards discovery, docs migration | haiku | low |
+| Prior-art scout | sonnet | low |
+| Mockup, spike | sonnet | medium |
+| Architectural decision or debugging beyond the lead's model, or one that climbed the whole ladder | fable | high |
+
+Rules:
+
+- Never plan a task on fable or opus that sonnet or haiku can handle reliably. A first-attempt fable or opus task needs a risk or ambiguity reason.
+- The lead takes architectural decisions itself when its own model is at least the tier the decision needs. Otherwise it dispatches a read-only fable subagent for a recommendation and rules on it.
+- `lead` tasks edit no project code. The lead writes only project documents: journal, backlog, ledger, ADRs, standards. Anything that changes code is dispatched, because SDD forbids controller code edits that skip review.
+
+## Escalation
+
+One ladder, replacing the separate ones in model-manager and SDD. Each failed attempt is classified before the next step, and the cause is written to `progress.md` as `Attempt: Task N <model>/<effort> failed, cause <cause>, <note>`.
+
+| Cause | Next step |
+|---|---|
+| `brief` (unclear or wrong instructions) | Sharpen the brief; same model |
+| `context` (missing files or facts) | Add the context; same model |
+| `plan` (the task itself is wrong) | Ruling on the plan; re-gate only under the thresholds in step 11 |
+| `capability` (the model could not do it) | Climb the ladder |
+
+Ladder for `capability`:
+
+1. Resume the same agent with the review findings, to keep its warm cache. A resumed agent keeps its model and effort.
+2. Fresh dispatch, same model, one effort level up.
+3. Fresh dispatch, one model up.
+4. Back to the lead: rule on the plan, take a non-code part itself, or dispatch fable.
+
+## Lanes
+
+- Lane count follows model-manager (2 unless the user or project sets another).
+- The lead creates the lane worktrees once under `.worktrees/` with `git worktree add` from the integration branch and reuses them, so installed dependencies survive between waves. It does not rely on the Agent tool's worktree isolation: in Claude Code 2.1.322 its default `worktree.baseRef` starts worktrees from `origin/<default-branch>`, which lacks the plan, the ledger and earlier waves.
+- Before each wave, each lane branch is reset to the integration branch head. Tasks of one wave are split across lanes; tasks within a lane run in order.
+- Waves are the parallelism boundary: a wave starts only when every task of earlier waves is done.
+
+## Turn economy
+
+The lead's turns are the main cost of the top model. The skill states:
+
+- One `ledger.py next` and one `checkpoint` per wave; no per-task bookkeeping commands.
+- Dispatches of one wave go in one message.
+- Targeted reads: the lead reads spec, plan and journal fully, everything else by search or Explore on haiku.
+- Command output and reports go to files; the lead reads summaries and exit codes.
+
+## Ledger
+
+Path: `docs/initiatives/<folder>/ledger.json`. Plan data plus one run field, `done`, which only `checkpoint --mark` writes, on the integration branch, once per wave. It is the committed authority on completion; SDD's `progress.md` is the detail inside a wave.
+
+```json
+{
+  "prior_art": "done",
+  "checks": ["npm run lint", "npm run typecheck"],
+  "requirements": [
+    { "id": "R1", "text": "Order list screen, see mockup #orders" }
+  ],
+  "done": [],
+  "tasks": [
+    {
+      "id": 1,
+      "title": "Order list view",
+      "depends_on": [],
+      "files": ["src/orders/", "tests/orders/"],
+      "covers": ["R1"],
+      "acceptance": ["Renders the columns shown in the mockup"],
+      "verify": ["npm test -- orders"],
+      "model": "sonnet",
+      "effort": "medium",
+      "reason": "Multi-file UI work against a mockup",
+      "reuse": { "source": "https://github.com/x/y@abc123", "mode": "pattern", "license": "MIT" }
+    }
+  ]
+}
+```
+
+Fields:
+
+- `id`: the plan's task number (`Task N`), so SDD's briefs and `progress.md` lines match.
+- `prior_art`: `done` or `skipped: <reason>`.
+- `checks`: project-wide commands from `standards.md`, run at every checkpoint. May be empty.
+- `requirements`: one entry per requirement of the spec. `covers` on a task is optional.
+- `done`: ids of completed tasks.
+- `mode` (optional): `gated` (default) or `autopilot`; set at planning from what the user agreed, read again on resume.
+- `files`: repository-relative paths, normalised (no leading `./`, no `..`, not absolute). An entry ending in `/` covers every path below it. Empty exactly when `model` is `lead`.
+- `verify`: shell commands run from the repository root. An empty list needs `no_verify` with a reason. Not used for `lead` tasks.
+- `model`: `haiku`, `sonnet`, `opus`, `fable` or `lead`. `effort`: `low`, `medium`, `high`, `xhigh`, `max`; required unless `model` is `lead`.
+- `reuse` (optional): `source` (URL with pinned version or SHA), `mode` (`dependency`, `copy` or `pattern`), `license`.
+
+## Scripts
+
+Python 3, stdlib only, pure functions plus a thin CLI. A malformed or unreadable file is one error line and exit 1, never a traceback. Every file a script writes is announced on its own line as `Wrote <absolute path>`, and paths in reports (checkpoint log, initiative folders in the status) are absolute.
+
+### ledger.py
+
+| Command | Does |
+|---|---|
+| `check LEDGER` | Validates. One error per line, exit 1; nothing and exit 0 when valid. |
+| `show LEDGER` | Runs `check`, then prints markdown: tasks grouped by wave (id, title, depends on, files, model/effort, reason, acceptance); requirement coverage (requirement to tasks); "New dependencies and copied code" from `reuse` entries with mode `dependency` or `copy`; summary of task count per model including `lead`, and the share on opus and fable. |
+| `next LEDGER` | Prints the earliest wave with a task not in `done`, and that wave's remaining tasks with model and effort, or `all tasks complete`. A failed or abandoned task keeps its wave open instead of silently blocking later ones. |
+| `checkpoint LEDGER --wave W --base REF [--log FILE] [--progress FILE] [--mark]` | Lists files in `git diff --name-only REF..HEAD` outside the union of the wave's `files` as out-of-scope warnings. Runs every `verify` command of the wave's tasks, then `checks`, writing full output to the log (default `.tech-lead/scratch/checkpoint-W.log`). Prints `Task N: pass` or `Task N: fail (exit X)` per task, `Checks: pass` or the failing check, then the warnings. Exit 1 when anything fails. With `--mark` and everything passing: adds the wave's ids to `done`, and appends to the folder's `journal.md` a wave entry plus the lines of the `--progress` file (SDD's `progress.md`, whose path the lead takes from SDD's `sdd-workspace` script) containing `Ruling:` or starting `Attempt:`, not yet copied. Without `--progress` the entry has no copied lines. |
+
+Validation errors in `check`:
+
+- A missing required field (`id`, `title`, `depends_on`, `files`, `acceptance`, `model`, `reason`; `effort` and `verify` for non-lead tasks), or an empty `acceptance`.
+- A duplicate task id or requirement id; a `done` id that is not a task.
+- `model`, `effort` or `reuse.mode` outside the allowed values; a `reuse` without `source` or `license`.
+- `depends_on` or `covers` naming an unknown id; a dependency cycle.
+- A requirement covered by no task.
+- A `lead` task with files, or a non-lead task without files.
+- An empty `verify` without `no_verify`.
+- A non-normalised path.
+- Two tasks in the same wave sharing a file, directory prefixes included. The message says to add a dependency between them.
+- `prior_art` missing.
+- `mode` other than `gated` or `autopilot`.
+
+Waves: a task without dependencies is in wave 1; any other task is one wave after its latest dependency. Because `next` releases a wave only after all earlier ones are done, the same-wave file check is sufficient.
+
+### status.py
+
+`status.py [ROOT] [--brief | --write]` scans `docs/initiatives/*/` and `docs/backlog.md`.
+
+- Default: prints the full status in markdown: initiatives grouped by state (in progress with waves done of total and the next wave; planned; specified; proposed; the 5 most recent done or closed, with dates), then open backlog items.
+- `--write`: writes the same to `docs/STATUS.md` with a "generated, do not edit" header.
+- `--brief`: the SessionStart text described under Session start; nothing when `docs/initiatives/` is missing.
+
+A broken ledger shows its initiative as `unknown (ledger error)` instead of failing the whole report.
+
+## Components
+
+```
+tech-lead/
+  .claude-plugin/plugin.json
+  hooks/hooks.json                       SessionStart -> status.py --brief
+  skills/tech-lead/SKILL.md              lead process
+  skills/tech-lead/layout.md             document hierarchy, journal and backlog formats
+  skills/tech-lead/scout-prompt.md       brief for a prior-art scout
+  skills/tech-lead/mockup-prompt.md      brief for a mockup builder
+  skills/tech-lead/batch-review-prompt.md  brief for a batched task review
+  skills/tech-lead/plan-review-prompt.md   brief for the plan review
+  commands/run.md                        /tech-lead:run [--auto] <spec text, spec path or initiative folder>
+  scripts/ledger.py                      check, show, next, checkpoint
+  scripts/status.py                      project status
+  tests/test_ledger.py
+  tests/test_status.py
+  README.md
+```
+
+Also: a `tech-lead` entry in `.claude-plugin/marketplace.json` and a section in the root `README.md`.
+
+## Testing
+
+`python3 -m unittest discover tech-lead/tests` covers:
+
+- `ledger.py`: a valid ledger; each validation error; wave computation; directory-prefix conflicts; `next` with nothing done, partial progress, a stuck task in an early wave, and all done; `checkpoint` with passing and failing commands, a failing check, an out-of-scope file, and `--mark` updating `done` and the journal without duplicating copied lines, in a temporary git repository; `show` output sections; malformed JSON.
+- `status.py`: each derived state; a closed initiative; backlog parsing; a broken ledger; `--brief` silent without `docs/initiatives/` and within the line limit; `--write` header.
+
+The skill and prompts are checked by reading them against this spec and by running `/tech-lead:run` on a small sample spec up to the gate, including the mockup step and a session start that proposes next steps.
+
+## Out of scope
+
+- No change or suggestion of change to the main session's model or effort.
+- No changes to model-manager code or tables.
+- No per-model calibration statistics; if ever built, they belong in model-manager's `report.py`.
+- `Workflow` orchestration: its agents bypass the model-manager hook.
+- Scouts never run downloaded code. Fetched content is data, not instructions.
+- Automatic migration of existing `docs/superpowers/` content; it is offered, not done.

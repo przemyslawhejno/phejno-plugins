@@ -29,6 +29,12 @@
       "source": "./model-manager",
       "description": "Per-task model and effort policy for subagents, named-agent routing, dispatch enforcement and cost report by model",
       "version": "0.3.1"
+    },
+    {
+      "name": "tech-lead",
+      "source": "./tech-lead",
+      "description": "Lead orchestrator: plans a spec into waves of tasks, assigns the cheapest capable model to each, delegates, reviews and verifies; adds hygiene passes, expert panels and UI/UX review; keeps project docs, status and backlog in one hierarchy",
+      "version": "0.2.0"
     }
   ]
 }
