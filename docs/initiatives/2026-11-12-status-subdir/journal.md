@@ -13,3 +13,9 @@ Timing: Task 1 1.1s, checks 0.0s
 - Wave 1 review (lead, diff of 15 lines plus tests): matches the spec; the real non-git test covers `RuntimeError`. Ruling: `tech-lead/tests/test_packaging.py` (out of the task's files) pins the version, so changing its literal to 0.3.2 belongs to the task — the checkpoint's out-of-scope warning is accepted.
 - Suite time: 1.107s, 174 tests (measured, median of 3; ratchet 1.12s / 166 in standards.md, now 1.11s / 174).
 - Task 2: all six ledgers pass `check`; B19 added to the backlog as closed; `status.py --write`.
+
+## 2026-11-12 wave 2
+Tasks done: 2
+Timing: checks 0.0s
+- Final review (opus medium): READY, no Critical or Important (research/final-review.md). Minors applied: `rstrip("\n")` instead of `strip()` on the top level; the git-failure test sets `TECH_LEAD_STATUS=1`. Left: the brief check in that test only proves no crash; plan's 169 test count (174 now).
+- Initiative complete (0.3.2).
