@@ -173,7 +173,7 @@ The `claude-codemap` plugin keeps `.claude/codemap/` (`INDEX.md`, `symbols.md`, 
 
 ### Keeping it fresh
 
-- Edits made in lane worktrees reach `pending.md` with wrong paths, because the hook resolves paths against the session's directory. So `ledger.py checkpoint --mark`, when `.claude/codemap/` exists, appends the paths from `git diff --name-only REF..HEAD` to `pending.md`, drops entries under `.worktrees/`, de-duplicates, and prints `Codemap: <n> pending (<action>)` where the action is `inline`, `update` or `rebuild` by the thresholds above.
+- Edits made in lane worktrees reach `pending.md` with wrong paths, because the hook resolves paths against the session's directory. So `ledger.py checkpoint --mark`, when `.claude/codemap/` exists, appends the paths from `git diff --name-only REF..HEAD` to `pending.md`, drops entries under `.worktrees/` and `.claude/codemap/` (as the hook does), keeps deleted paths (the update procedure drops unmapped ones), de-duplicates, and prints `Codemap: <n> pending (<action>)` where the action is `inline`, `update` or `rebuild` by the thresholds above.
 - After each wave checkpoint, when the action is `update`, the lead runs the `/codemap update` procedure (haiku writers, cheap); `inline` is left to the next navigation (the `codemap-usage` skill handles it); `rebuild` waits for the finish.
 - At the finish, the lead brings the index up to date: `update` when pending, a full rebuild when the action is `rebuild` or the initiative moved or renamed modules. In autopilot it runs it; otherwise it proposes it in the finish report. The index is committed with the initiative.
 
@@ -185,11 +185,11 @@ The `claude-codemap` plugin keeps `.claude/codemap/` (`INDEX.md`, `symbols.md`, 
 |---|---|
 | No `.claude/codemap/`, 30 or more tracked code files | `Codemap: none for <n> code files — propose /codemap (claude-codemap plugin)` |
 | `pending.md` 16-50 unique paths | `Codemap: <n> pending — propose /codemap update` |
-| `pending.md` over 50, or `symbols.md` missing | `Codemap: stale — propose /codemap rebuild` |
-| `INDEX.md` `Generated:` older than 30 days with 20 or more commits since | `Codemap: <days> days old, <commits> commits since — propose /codemap update` |
+| `pending.md` over 50, or `symbols.md` missing | `Codemap: stale — propose /codemap (full rebuild)` |
+| `INDEX.md` `Generated:` older than 30 days with 20 or more commits since | `Codemap: <days> days old, <commits> commits since — propose /codemap (full rebuild)` |
 | otherwise | nothing |
 
-Code files are `git ls-files` entries outside `docs/`, `.claude/` and dot directories; any git failure skips the line. The full status gains a `## Codemap` section with the same facts.
+Code files are `git ls-files` entries outside `docs/`, `.claude/` and dot directories; any git failure skips the line. The brief shows the codemap line only when it is otherwise non-empty (initiatives exist). `/codemap update` only processes `pending.md`; a full rebuild is plain `/codemap`. The full status gains a `## Codemap` section with the same facts.
 
 ## Changes by file
 

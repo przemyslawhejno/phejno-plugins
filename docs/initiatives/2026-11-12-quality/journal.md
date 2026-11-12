@@ -28,3 +28,11 @@
 - Suite baseline: median 1.58 s, 91 tests (3 runs).
 - Added on request mid-planning: Part 4, codemap integration (navigation through the index, pending sync across lanes at checkpoint, session-start proposals for /codemap, finish update or rebuild). Found while reading claude-codemap 0.5.0: its PostToolUse hook records lane-worktree edits with wrong paths, hence the checkpoint sync. New Task 10.
 - Plan and ledger written; plan review next.
+
+## 2026-11-12 plan review, round 1 (opus/medium)
+
+- Report: research/plan-review.md. Verdict: PLAN NEEDS CHANGES, 2 blocking, 10 minor; all accepted.
+- B1: Task 3 tests lenses against a literal list; the cross-check with `ledger_core.LENSES` moves to Task 7. B2: corrected codemap commands (a full rebuild is plain `/codemap`; `/codemap update` only processes `pending.md`) in spec, Task 4 and Task 10.
+- Minor: exact test edits named in Tasks 5 and 6; haiku tasks cannot carry a risk; Task 4 told the placeholders Task 3 writes; inventory before the hygiene wave; hygiene timing fallback to a `[hygiene]` backlog item and three timings in the report; `sync_codemap` drops `.claude/codemap/` and keeps deleted paths; codemap brief line only in a non-empty brief; full-suite verify for Tasks 3, 4, 6; Task 7 moved to wave 3.
+- Ruling: the hygiene pass covers scripts and tests only; skill and prompt documents were reviewed by their own tasks — cost if wrong: noise in documents survives until the next pass.
+- Ruling: Task 1 (`docs/standards.md`) is committed before the wave 1 base is taken, so the checkpoint does not flag it out of scope — cost if wrong: none.

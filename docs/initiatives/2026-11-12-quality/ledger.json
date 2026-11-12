@@ -140,7 +140,7 @@
         "New prompts have their placeholders; updated prompts carry hygiene, risk and UI checks"
       ],
       "verify": [
-        "python3 -m unittest discover tech-lead/tests -p 'test_prompts.py'"
+        "python3 -m unittest discover tech-lead/tests"
       ],
       "model": "sonnet",
       "effort": "medium",
@@ -172,7 +172,7 @@
         "layout.md defines the new standards sections, backlog tag and journal lines"
       ],
       "verify": [
-        "python3 -m unittest discover tech-lead/tests -p 'test_skill_docs.py'"
+        "python3 -m unittest discover tech-lead/tests"
       ],
       "model": "opus",
       "effort": "medium",
@@ -221,7 +221,7 @@
         "Risk and Experts columns, kind suffix, distinct lens dispatches per wave"
       ],
       "verify": [
-        "python3 -m unittest discover tech-lead/tests -p 'test_ledger_report.py'"
+        "python3 -m unittest discover tech-lead/tests"
       ],
       "model": "sonnet",
       "effort": "low",
@@ -264,8 +264,7 @@
         3,
         4,
         5,
-        6,
-        10
+        6
       ],
       "files": [
         "tech-lead/.claude-plugin/plugin.json",

@@ -17,7 +17,7 @@
 - Spec: `docs/initiatives/2026-11-12-quality/spec.md`. A task that names spec parts reads them there. The 0.1.0 spec is `docs/initiatives/2026-11-11-tech-lead/spec.md`.
 - Python 3.9+ compatible: `from __future__ import annotations` in every module; no `match`, no runtime `X | Y` unions, no parenthesised multi-item `with`, no `zip(strict=...)`. Stdlib only.
 - UTF-8 for every read and write; JSON with `indent=2`, `ensure_ascii=False`, trailing newline. Errors are one `error: <message>` line on stderr and exit 1, never a traceback. Every written file is announced as `Wrote <absolute path>`.
-- Backward compatibility: every new ledger rule applies only when the ledger has `"schema": 2`. A ledger without `schema` validates exactly as in 0.1.0; existing tests that use 0.1.0-shaped ledgers keep passing unchanged.
+- Backward compatibility: every new ledger rule applies only when the ledger has `"schema": 2`. A ledger without `schema` gives exactly the 0.1.0 validation results. Output formats do change (Tasks 5, 6, 10), and those tasks update the existing assertions they name.
 - Hygiene (this repository's `docs/standards.md`, written by Task 1): comments only where the code cannot say it (why, a non-obvious constraint); no change history, no commented-out code, no restating code, no TODO without a backlog id. Remove what a change makes obsolete, in the same task. One behaviour, one test: extend or replace an existing test instead of adding a near-duplicate.
 - No `model` or `effort` key in any skill or command frontmatter; nothing switches or suggests the main session's model.
 - Plugin version `0.2.0` in `tech-lead/.claude-plugin/plugin.json` and the marketplace entry.
@@ -62,7 +62,7 @@ tech-lead/.claude-plugin/plugin.json, README.md, tests/test_packaging.py, .claud
 tech-lead/scripts/, tech-lead/tests/                Task 8 (hygiene pass)
 ```
 
-Waves: 1 = Tasks 1, 2, 3, 4; 2 = Tasks 5, 6; 3 = Task 10; 4 = Task 7; 5 = Task 8; 6 = Task 9.
+Waves: 1 = Tasks 1, 2, 3, 4; 2 = Tasks 5, 6; 3 = Tasks 7, 10; 4 = Task 8; 5 = Task 9.
 
 ---
 
@@ -98,10 +98,11 @@ Rules for schema 2 (messages are asserted by tests; `N` is the task id):
 | lenses on a haiku task, or a sonnet/low task with no risk | `task N: routine task takes no experts` |
 | `kind: ui` while top-level `ui` is not `true` | `task N: kind 'ui' needs top-level ui: true` |
 | `kind: ui` not on haiku without risk `ux` | `task N: ui task not on haiku needs risk 'ux'` |
+| any risk on a haiku task (lens rules are then skipped for it) | `task N: haiku task cannot carry risk '<r>'` |
 | hygiene task missing when 3+ `code`/`ui` tasks, or 2+ such tasks and any has non-empty `replaces` | `missing hygiene task` |
 | hygiene task not depending on a `code`/`ui` task | `task N: hygiene task must depend on task M` (one per missing M) |
 
-`kind` defaults to `code`; `risk`, `experts`, `replaces` default to `[]`; `lead` tasks ignore `kind`.
+`kind` defaults to `code`; `risk`, `experts`, `replaces` default to `[]`; `lead` tasks ignore `kind`. The hygiene task must depend directly on every `code`/`ui` task.
 
 - [ ] **Step 1: Write the failing tests** in `test_ledger_core.py`, one per rule above (`test_schema2_<rule>`), plus `test_schema_absent_keeps_v1_rules` (a 4-task ledger without hygiene and with an unknown lens is valid without `schema`), `test_invalid_schema`, `test_case_sensitive_lens_and_risk` (`"Security"` rejected in both), `test_system_wide_matches_ui_ux_on_ui_task`, `test_valid_schema2_ledger` (3 code tasks, a hygiene task depending on all, risks with matching lenses: `[]` errors), and `test_finished_v1_initiative_ledger_valid` (loads `docs/initiatives/2026-11-11-tech-lead/ledger.json` relative to the repository root and expects `[]`).
 - [ ] **Step 2: Run** `python3 -m unittest discover tech-lead/tests -p 'test_ledger_core.py'` — expected FAIL on the new tests.
@@ -127,10 +128,10 @@ Content (source: spec Parts 1-3):
 - `lens-review-prompt.md`, `inventory-prompt.md`, `batch-review-prompt.md`, `plan-review-prompt.md`: one line each — when `.claude/codemap/INDEX.md` exists, find code through `symbols.md` and `INDEX.md` before Glob or Grep (spec Part 4).
 - `mockup-prompt.md`: the UI standards of spec Part 3 (WCAG 2.2 AA with the six criteria named, 2.5.8 over 2.5.5, states, responsive, tokens, `modern-web-guidance` when installed); after the UI/UX expert's review it is resumed to fix the findings.
 
-- [ ] **Step 1: Write the failing tests** in `test_prompts.py`: `test_lenses_cover_all` (each name in `ledger_core.LENSES` is a heading in `lenses.md`), `test_lens_review_placeholders`, `test_inventory_placeholders_and_read_only` (contains `change nothing`), `test_batch_review_hygiene` (contains `{{CANDIDATES_PATH}}`, `obsolete`, `duplicat`, `ui-ux`), `test_plan_review_risk_and_hygiene` (contains `replaces`, `risk`, `hygiene`, `Lens yield`), `test_mockup_standards` (contains `WCAG 2.2`, `2.5.8`, `modern-web-guidance`), `test_codemap_navigation` (the four prompts named above contain `.claude/codemap/`). Keep the existing tests.
+- [ ] **Step 1: Write the failing tests** in `test_prompts.py`: `test_lenses_cover_all` (each of `security`, `data`, `api`, `architecture`, `performance`, `errors`, `tests`, `ui-ux` is a heading in `lenses.md`; a literal list, because Task 2 adds `ledger_core.LENSES` in parallel), `test_lens_review_placeholders`, `test_inventory_placeholders_and_read_only` (contains `change nothing`), `test_batch_review_hygiene` (contains `{{CANDIDATES_PATH}}`, `obsolete`, `duplicat`, `ui-ux`), `test_plan_review_risk_and_hygiene` (contains `replaces`, `risk`, `hygiene`, `Lens yield`), `test_mockup_standards` (contains `WCAG 2.2`, `2.5.8`, `modern-web-guidance`), `test_codemap_navigation` (the four prompts named above contain `.claude/codemap/`). Keep the existing tests.
 - [ ] **Step 2: Run** `python3 -m unittest discover tech-lead/tests -p 'test_prompts.py'` — expected FAIL.
 - [ ] **Step 3: Write** the files.
-- [ ] **Step 4: Run** the same command, then the full suite — expected PASS.
+- [ ] **Step 4: Run** the full suite — expected PASS.
 - [ ] **Step 5: Commit** `tech-lead: lenses, inventory and lens review prompts; hygiene and UI checks in prompts`.
 
 ---
@@ -141,12 +142,12 @@ Content (source: spec Parts 1-3):
 - Modify: `tech-lead/skills/tech-lead/SKILL.md`, `tech-lead/skills/tech-lead/layout.md`
 - Test: `tech-lead/tests/test_skill_docs.py`
 
-Source: spec Parts 1-3 and "Changes by file". `SKILL.md` gains: the `Hygiene`, `Suite`, `Lens yield` and `UI` sections of `standards.md` in step 2; suite timing and the ratchet (first wave, finish, median of 3, the 20% per test and 2 s rule, 4-minute rule); the inventory step (when, haiku low, `inventory-prompt.md`, `research/hygiene-candidates-<wave>.md`); the hygiene pass rule; expert stages (architectural proposals, hard bugs with escalation cause `unknown`, lenses via `lenses.md` and `lens-review-prompt.md`, yield); UI/UX stages, the render harness and risk `ux`; codemap use and freshness (spec Part 4: navigation in the lead and in every brief, the `Codemap:` checkpoint line and the after-wave `/codemap update`, the finish update or rebuild, the session-start proposals); the schema 2 ledger fields in the ledger format block, with `"schema": 2` in the example. `layout.md` gains the four `standards.md` sections, the `[hygiene]` backlog tag, and journal lines `Suite time:`, `Timing:` and `Lens yield:`. Keep `SKILL.md` under 300 lines; point to `lenses.md` instead of repeating it. Ledger rule names and messages are Task 2's; command output formats are Task 5's (`Task N: pass (2.1s)`) and Task 10's (`Codemap: <n> pending (<action>)`, brief lines of spec Part 4).
+Source: spec Parts 1-3 and "Changes by file". `SKILL.md` gains: the `Hygiene`, `Suite`, `Lens yield` and `UI` sections of `standards.md` in step 2; suite timing and the ratchet (first wave, finish, median of 3, the 20% per test and 2 s rule, 4-minute rule); the inventory step (when, haiku low, `inventory-prompt.md`, `research/hygiene-candidates-<wave>.md`); the hygiene pass rule; expert stages (architectural proposals, hard bugs with escalation cause `unknown`, lenses via `lenses.md` and `lens-review-prompt.md`, yield); UI/UX stages, the render harness and risk `ux`; codemap use and freshness (spec Part 4: navigation in the lead and in every brief, the `Codemap:` checkpoint line and the after-wave `/codemap update`, the finish update or rebuild, the session-start proposals); the schema 2 ledger fields in the ledger format block, with `"schema": 2` in the example. Prompt placeholders written in parallel by Task 3: `inventory-prompt.md` takes `{{CHANGES}}`, `{{TEST_ROOTS}}`, `{{CODE_ROOTS}}`, `{{REPORT_PATH}}`; `batch-review-prompt.md` gains `{{CANDIDATES_PATH}}`; `lens-review-prompt.md` takes `{{LENS}}`, `{{TASKS}}`, `{{SPEC_PATH}}`, `{{STANDARDS_PATH}}`, `{{LENSES_PATH}}`, `{{CANDIDATES_PATH}}`, `{{REPORT_PATH}}`. A full codemap rebuild is plain `/codemap`; `/codemap update` only processes `pending.md`. `layout.md` gains the four `standards.md` sections, the `[hygiene]` backlog tag, and journal lines `Suite time:`, `Timing:` and `Lens yield:`. Keep `SKILL.md` under 300 lines; point to `lenses.md` instead of repeating it. Ledger rule names and messages are Task 2's; command output formats are Task 5's (`Task N: pass (2.1s)`) and Task 10's (`Codemap: <n> pending (<action>)`, brief lines of spec Part 4).
 
-- [ ] **Step 1: Extend `test_skill_docs.py`**: `SKILL.md` mentions `lenses.md`, `lens-review-prompt.md`, `inventory-prompt.md`, `"schema": 2`, `replaces`, `risk`, `experts`, `hygiene`, `ui-ux`, `unknown`, `Suite time`, `WCAG 2.2`, `systematic-debugging`, `.claude/codemap/`, `/codemap update`, `pending.md`; `layout.md` mentions `[hygiene]`, `Suite time:`, `Lens yield`, `Timing:`; line limit still 300.
+- [ ] **Step 1: Extend `test_skill_docs.py`**: `SKILL.md` mentions `lenses.md`, `lens-review-prompt.md`, `inventory-prompt.md`, `"schema": 2`, `replaces`, `risk`, `experts`, `hygiene`, `ui-ux`, `unknown`, `Suite time`, `WCAG 2.2`, `systematic-debugging`, `.claude/codemap/`, `/codemap update`, `pending.md`, `engineering:tech-debt`, `simplify`, `Lens yield`, `{{CANDIDATES_PATH}}`; `layout.md` mentions `[hygiene]`, `Suite time:`, `Lens yield`, `Timing:`; line limit still 300.
 - [ ] **Step 2: Run** `python3 -m unittest discover tech-lead/tests -p 'test_skill_docs.py'` — expected FAIL.
 - [ ] **Step 3: Edit** the two files.
-- [ ] **Step 4: Run** the same command, then the full suite — expected PASS.
+- [ ] **Step 4: Run** the full suite — expected PASS.
 - [ ] **Step 5: Commit** `tech-lead: skill and layout for hygiene, experts and UI/UX`.
 
 ---
@@ -159,10 +160,10 @@ Source: spec Parts 1-3 and "Changes by file". `SKILL.md` gains: the `Hygiene`, `
 
 **Interfaces:**
 - `CheckpointResult.tasks: list[tuple[int, int, float]]` (id, worst exit, total seconds of its verify commands); `checks: list[tuple[str, int, float]]`. `passed` unchanged.
-- `format_result`: `Task N: pass (2.1s)`, `Task N: fail (exit X, 2.1s)`, `Checks: pass (14.8s)` (sum), `Check failed: <command> (exit X, 1.2s)`; one decimal; `time.monotonic`.
+- `format_result`: `Task N: pass (2.1s)`, `Task N: fail (exit X, 2.1s)`, `Checks: pass (14.8s)` (sum; `Checks: pass (0.0s)` when `checks` is empty), `Check failed: <command> (exit X, 1.2s)`; one decimal; `time.monotonic`.
 - `mark_done(ledger_path, ledger, wave, progress_path, today, result=None)`: when `result` is given, the wave entry gains `Timing: Task 1 2.1s, Task 2 0.4s, checks 14.8s` after `Tasks done:`. `ledger.py checkpoint --mark` passes the result.
 
-- [ ] **Step 1: Update and add tests**: existing assertions on `Task 1: pass` and `Task 1: fail (exit 3` keep matching by prefix; new `test_durations_formatted` (a `sleep 0.2` verify reports between 0.1 and 2.0 seconds), `test_timing_line_in_journal`, CLI `test_checkpoint_prints_durations`.
+- [ ] **Step 1: Update and add tests**: change `test_failing_verify` to assert the prefix `Task 1: fail (exit 3` and `test_failing_check` the prefix `Check failed: exit 2 (exit 2`; other assertions on `Task 1: pass` keep matching; new `test_durations_formatted` (a `sleep 0.2` verify reports between 0.1 and 2.0 seconds), `test_timing_line_in_journal`, CLI `test_checkpoint_prints_durations`.
 - [ ] **Step 2: Run** the two test files — expected FAIL on the new tests.
 - [ ] **Step 3: Implement.**
 - [ ] **Step 4: Run** them, then the full suite — expected PASS.
@@ -178,10 +179,10 @@ Source: spec Parts 1-3 and "Changes by file". `SKILL.md` gains: the `Hygiene`, `
 
 `render_show`: wave table columns become `| Task | Title | Depends on | Files | Model | Risk | Experts | Reason | Acceptance |`; Model cell appends ` (hygiene)` or ` (ui)` for those kinds; empty lists render `-`. Summary adds `Lens dispatches: wave 1: 2, wave 2: 0 (total 2)` counting distinct lenses per wave, or `Lens dispatches: none` when no task has experts.
 
-- [ ] **Step 1: Write tests**: `test_risk_and_experts_columns`, `test_kind_suffix`, `test_lens_dispatch_counts_distinct_per_wave` (two tasks in wave 1 both with `security` count 1), `test_v1_ledger_renders_dashes_and_none`.
+- [ ] **Step 1: Write tests**: update `test_wave_tables` to the new header; add `test_risk_and_experts_columns`, `test_kind_suffix`, `test_lens_dispatch_counts_distinct_per_wave` (two tasks in wave 1 both with `security` count 1), `test_v1_ledger_renders_dashes_and_none`.
 - [ ] **Step 2: Run** `python3 -m unittest discover tech-lead/tests -p 'test_ledger_report.py'` — expected FAIL.
 - [ ] **Step 3: Implement.**
-- [ ] **Step 4: Run** it, then the full suite — expected PASS.
+- [ ] **Step 4: Run** the full suite (`test_ledger_cli` also exercises `show`) — expected PASS.
 - [ ] **Step 5: Commit** `tech-lead: show risk, experts and lens dispatches`.
 
 ---
@@ -194,9 +195,9 @@ Source: spec Parts 1-3 and "Changes by file". `SKILL.md` gains: the `Hygiene`, `
 
 **Interfaces** (source: spec Part 4):
 - `ledger_checkpoint.codemap_action(count: int) -> str`: `inline` (≤ 15), `update` (16-50), `rebuild` (> 50).
-- `ledger_checkpoint.sync_codemap(repo: str, base: str) -> tuple[int, str] | None`: `None` when `<repo>/.claude/codemap/` does not exist; otherwise appends `git diff --name-only <base>..HEAD` paths (quotepath off, as in `run_checkpoint`) to `pending.md`, drops lines under `.worktrees/`, de-duplicates keeping first order, rewrites the file, and returns (unique count, action). A git failure raises `CheckpointError`.
+- `ledger_checkpoint.sync_codemap(repo: str, base: str) -> tuple[int, str] | None`: `None` when `<repo>/.claude/codemap/` does not exist; otherwise appends `git diff --name-only <base>..HEAD` paths (quotepath off, as in `run_checkpoint`) to `pending.md`, drops lines under `.worktrees/` and `.claude/codemap/`, keeps deleted paths, de-duplicates keeping first order, rewrites the file, and returns (unique count, action). A git failure raises `CheckpointError`.
 - `ledger.py checkpoint --mark`, after a passing mark: calls `sync_codemap(repo, base)` and, when not `None`, prints `Codemap: <n> pending (<action>)` and `Wrote <absolute path of pending.md>`.
-- `status.codemap_lines(root: Path) -> list[str]`: the brief lines of spec Part 4's table (at most one line), never raising (any error returns `[]`); `render_brief` places it before the instruction line, counted in the 25-line cap; `render_full` adds `## Codemap` with: index present or not, `Generated:` date, pending count, `symbols.md` present, and the proposed action or `up to date`.
+- `status.codemap_lines(root: Path) -> list[str]`: the brief lines of spec Part 4's table (at most one line), never raising (any error returns `[]`); `render_brief` places it before the instruction line, counted in the 25-line cap, only when the brief is otherwise non-empty (initiatives exist; `test_brief_silent_without_initiatives` stays as it is); `render_full` adds `## Codemap` with: index present or not, `Generated:` date, pending count, `symbols.md` present, and the proposed action or `up to date`.
 
 - [ ] **Step 1: Write the failing tests**: `codemap_action` boundaries 15/16/50/51; `sync_codemap` returns `None` without the directory, merges diff paths, drops `.worktrees/` lines, de-duplicates; CLI `--mark` prints the `Codemap:` line only when the directory exists; `codemap_lines` for each table row (no index with 30 tracked code files in a temporary git repo; 20 pending; 60 pending; missing `symbols.md`; old index with 20 commits since, using commit dates set by `GIT_COMMITTER_DATE`; up to date → `[]`; not a git repo → `[]`); brief contains the line before `Propose next steps`; full status has `## Codemap`.
 - [ ] **Step 2: Run** the three test files — expected FAIL.
@@ -212,7 +213,7 @@ Source: spec Parts 1-3 and "Changes by file". `SKILL.md` gains: the `Hygiene`, `
 - Modify: `tech-lead/.claude-plugin/plugin.json`, `.claude-plugin/marketplace.json` (version `0.2.0`, description mentions hygiene, expert panels and UI/UX), `tech-lead/README.md` (sections for hygiene, expert panels, UI/UX, codemap integration with `claude-codemap`, and the optional skills `engineering:*`, `design:*`, `modern-web-guidance`, `simplify`, `security-review`), root `README.md` (one updated sentence)
 - Test: `tech-lead/tests/test_packaging.py`
 
-- [ ] **Step 1: Extend tests**: version `0.2.0` in both and equal; `lenses.md` exists next to `SKILL.md` and is mentioned there; README mentions `lenses`, `hygiene`, `WCAG 2.2`, `schema`, `codemap`.
+- [ ] **Step 1: Extend tests**: version `0.2.0` in both and equal; `lenses.md` exists next to `SKILL.md` and is mentioned there; its headings equal `ledger_core.LENSES` (`test_lenses_match_ledger_core`); README mentions `lenses`, `hygiene`, `WCAG 2.2`, `schema`, `codemap`.
 - [ ] **Step 2: Run** `python3 -m unittest discover tech-lead/tests -p 'test_packaging.py'` — expected FAIL.
 - [ ] **Step 3: Edit.**
 - [ ] **Step 4: Run** the full suite — expected PASS.
@@ -224,7 +225,7 @@ Source: spec Parts 1-3 and "Changes by file". `SKILL.md` gains: the `Hygiene`, `
 
 **Files:** `tech-lead/scripts/`, `tech-lead/tests/`
 
-Input: `research/hygiene-candidates-4.md` from the lead's inventory dispatch. Remove dead code; merge duplicate tests and delete obsolete ones (keeping one test per behaviour, including the Review Focus tests); remove noise comments; no behaviour change. Acceptance: full suite green; median of 3 suite runs per test not more than 20% above the baseline of 1.58 s / 91 tests unless the total grew by 2 s or less; the report lists every removed or merged test with the test that now covers its behaviour.
+Input: `research/hygiene-candidates-4.md`, from the inventory (haiku low) the lead dispatches over all of the initiative's changes before this task's wave. Scope: scripts and tests only; the skill and prompt documents were reviewed by their own tasks (lead ruling). Remove dead code; merge duplicate tests and delete obsolete ones (keeping one test per behaviour, including the Review Focus tests); remove noise comments; no behaviour change. Acceptance: full suite green; median of 3 suite runs per test not more than 20% above the baseline of 1.58 s / 91 tests unless the total grew by 2 s or less — if new tests from Task 10 make that unreachable, the report says why and the lead records a `[hygiene]` backlog item with both numbers; the report lists the three timings before and after and every removed or merged test with the test that now covers its behaviour.
 
 - [ ] **Step 1: Run** the full suite three times and record the median and the test count.
 - [ ] **Step 2: Apply** the cleanups, one commit per kind (dead code, tests, comments).
