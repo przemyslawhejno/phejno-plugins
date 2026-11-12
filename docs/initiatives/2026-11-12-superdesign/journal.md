@@ -30,3 +30,11 @@
 - Accepted all: explicit never-invoke rule in every subagent brief (the skill can trigger itself), with the repository-analysis exception; full disclosure in the consent question (spec, request, project files, images as public URLs, unpinned CLI) and lead token cost; consent per user in git-ignored `.tech-lead/superdesign-consent`; autopilot without consent uses the built-in builder; allowed remote resources defined; screen ids and mapping on both paths; expert fixes split between a local builder subagent and the lead's import; `.superdesign/*` allowlist; Task 1 risk changed to `security` with the `security` lens; stronger tests; README states requirements and that the integration has not run live.
 - Minor accepted: local-only rebuild, generations counted by the lead, noise margin for timing. Kept Task 2 on sonnet low (short prose; overspend small).
 - The user confirmed the rule that subagents never invoke superdesign (asked why; explained: no user to ask, invisible credits, self-triggering skill in parallel lanes, browser login).
+
+## 2026-11-12 review round 2 (sonnet/medium, scoped)
+
+- PLAN NEEDS CHANGES: 1 Important (R1/R2 wording in the ledger), 3 Minor; all applied without a third round (last allowed): ordered-condition and init-exception assertions, never-invoke line in the every-brief sentence, Review Focus line on untested live behaviour.
+
+## 2026-11-12 gate (autopilot)
+
+- Execution starts: 4 tasks in 3 waves; sonnet 3 (Task 1 high with the security lens), lead 1.

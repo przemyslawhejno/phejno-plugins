@@ -42,3 +42,18 @@ Reviewed: spec.md, plan.md, ledger.json (`ledger.py check` passes), standards.md
 Dependencies, waves, file ownership, requirement coverage (R1-R7) and the hygiene task are consistent. Hygiene is not strictly required (2 code tasks, no `replaces`), so Task 3 is justified only as the B16 carrier. That is fine.
 
 PLAN NEEDS CHANGES
+
+## Round 2
+
+Round-1 findings: 1 resolved (never-invoke line in every `*-prompt.md` and the implementer rule, with a presence test). 2 resolved (consent lists spec, request, files, public-URL images, credits, unpinned CLI). 3 resolved (`.tech-lead/superdesign-consent`, already git-ignored). 4 resolved (lead tokens, init delegation, planned generation count). 5 resolved (allowed remote resources defined). 6 resolved (ids and mapping on both paths). 7 resolved (local builder edits, lead imports). 8 resolved (autopilot without consent uses built-in). 9 resolved (allowlist). 10 resolved (Review Focus 3-4, 6 added). 11 resolved (risk and lens `security`). 12 partially: tests are token-presence; the ordered conditions (plugin, consent, auth) and the fallback sentence are still not asserted, and the plan does not say live behaviour is untested outside the README. Minors resolved or accepted.
+
+New findings:
+
+- Important: `ledger.json` R1 says consent is "recorded in standards.md" and R2 says "asked once per project"; the spec now says git-ignored per-user `.tech-lead/superdesign-consent`. Reviewers check against the ledger, so they would flag the correct implementation. Fix: reword R1/R2 (per user, `.tech-lead/superdesign-consent`, full disclosure, autopilot rule); R4/R5 can mention the allowlist.
+- Minor: the repository-analysis brief is not a `*-prompt.md` file, so no test covers it; it should say "writes only `.superdesign/init/`, never calls the CLI". Add one assertion in SKILL.md tests.
+- Minor: add to Task 1 tests an ordered-condition check for step 4 (plugin, consent, auth, then fallback sentence) and a line in Review Focus that live behaviour is untested (B1).
+- Minor: SDD's own implementer/reviewer prompts (superpowers) are outside the plugin's files and do not carry the never-invoke line; the SKILL.md rule "every brief says" covers them only if step 48's brief list names it. Confirm the rule sits in that sentence.
+
+No wave-1 file overlap (Task 1: skill docs and two test files; Task 2: README, manifests, `test_packaging.py`). No test is unwritable as specified.
+
+PLAN NEEDS CHANGES

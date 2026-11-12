@@ -6,11 +6,11 @@
   "requirements": [
     {
       "id": "R1",
-      "text": "Superdesign used only when the plugin is available, consent is recorded in standards.md and the CLI is authenticated"
+      "text": "Superdesign used only when the plugin is available, the current user's consent is recorded in git-ignored .tech-lead/superdesign-consent and the CLI is authenticated; otherwise the built-in builder"
     },
     {
       "id": "R2",
-      "text": "Consent asked once per project stating credits and code upload"
+      "text": "Consent asked once per user and clone, stating credits, lead tokens, everything sent to superdesign and the unpinned CLI"
     },
     {
       "id": "R3",

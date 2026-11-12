@@ -26,6 +26,7 @@
 5. A non-standalone export falls back to a local rebuild; screen ids and the screen-to-requirement mapping exist on both paths (Task 1).
 6. `.gitignore` allowlist: only `.superdesign/design-system.md` is committed (Task 1).
 7. Hygiene changes keep every message and exit code (Task 3).
+8. Live behaviour with a real superdesign account is untested in this initiative (backlog B1); tests cover the documents only.
 
 ---
 
@@ -35,7 +36,7 @@ Waves: 1 = Tasks 1, 2 (lane 1: Task 1; lane 2: Task 2); 2 = Task 3; 3 = Task 4.
 
 **Files:** `tech-lead/skills/tech-lead/SKILL.md`, `layout.md`, `mockup-prompt.md`, `scout-prompt.md`, `lens-review-prompt.md`, `batch-review-prompt.md`, `inventory-prompt.md`, `plan-review-prompt.md` (all in `tech-lead/skills/tech-lead/`), `tech-lead/tests/test_skill_docs.py`, `tech-lead/tests/test_prompts.py`
 
-- [ ] Tests first: every `*-prompt.md` and SKILL.md's implementer-brief rule contain `Never invoke the superdesign skill or the superdesign CLI.`; SKILL.md mentions `superdesign:superdesign`, `.tech-lead/superdesign-consent`, `credits`, `main session`, `get-design --draft-id`, `import-design-draft --into`, `built-in` and still names the built-in builder with `mockup-prompt.md` (built-in path unchanged); the consent text in SKILL.md or layout.md names `public URLs` and `unpinned`; layout.md mentions `.superdesign/*`, `!.superdesign/design-system.md`, `Design system: .superdesign/design-system.md`; `mockup-prompt.md` describes the superdesign-export mode with `sd-component`, the allowed remote resources (Tailwind CDN, Lucide) and adding screen ids and the mapping.
+- [ ] Tests first: every `*-prompt.md` and SKILL.md's implementer-brief rule contain `Never invoke the superdesign skill or the superdesign CLI.`; SKILL.md mentions `superdesign:superdesign`, `.tech-lead/superdesign-consent`, `credits`, `main session`, `get-design --draft-id`, `import-design-draft --into`, `built-in` and still names the built-in builder with `mockup-prompt.md` (built-in path unchanged); the consent text in SKILL.md or layout.md names `public URLs` and `unpinned`; layout.md mentions `.superdesign/*`, `!.superdesign/design-system.md`, `Design system: .superdesign/design-system.md`; `mockup-prompt.md` describes the superdesign-export mode with `sd-component`, the allowed remote resources (Tailwind CDN, Lucide) and adding screen ids and the mapping. In SKILL.md, assert the step-4 conditions appear in this order: `superdesign:superdesign`, then `.tech-lead/superdesign-consent`, then `login`, then the built-in fallback; assert the repository-analysis exception says it writes only `.superdesign/init/` and never runs the CLI; assert the sentence listing what every subagent brief carries includes the never-invoke line (it reaches SDD's own implementer and reviewer briefs that way).
 - [ ] Edit SKILL.md step 4 per spec Part 1 (requirements, conditions incl. autopilot, consent, lead-only with the init exception, flow steps 1-7 — a few lines, details to layout.md and mockup-prompt.md), the implementer-brief rule, the tier rows and the finish report line; layout.md and mockup-prompt.md per the spec; add the never-invoke line to every `*-prompt.md`.
 - [ ] Full suite passes; commit `tech-lead: superdesign as optional mockup provider (docs)`.
 
