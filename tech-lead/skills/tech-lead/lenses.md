@@ -71,7 +71,7 @@ A lens is a focused review of a task's diff. Each section gives the checklist an
 
 - One dispatch per lens per wave, covering every task of the wave that lists it, in the same message as the batch reviews.
 - Pass `model` and `effort` explicitly on every call, overriding model-manager's routing: sonnet medium. Opus medium for `security` and `architecture` on tasks with a risk, and for `ui-ux` on tasks with risk `system-wide`.
-- Use a named agent from the tables above only for tasks with a risk, and give it the diff path.
+- Use a named agent from the `Uses when installed` lines only for tasks with a risk, and give it the diff path.
 - A lens finding enters the task's fix loop like a review finding; the lens that raised it re-reviews only the fix diff. Any Important finding blocks the task.
 
 ## Yield

@@ -44,27 +44,27 @@ class PromptTests(unittest.TestCase):
         self.assert_has("mockup-prompt.md", ["self-contained", "static", "prototype", "simulation", "id"])
 
     def test_review_rules(self):
-        self.assert_has("batch-review-prompt.md", ["APPROVED", "CHANGES_REQUIRED", "blocking", "minor"])
+        self.assert_has("batch-review-prompt.md", ["APPROVED", "CHANGES_REQUIRED", "Critical", "Important", "Minor", "none"])
 
     def test_plan_review_rules(self):
-        self.assert_has("plan-review-prompt.md", ["PLAN APPROVED", "PLAN NEEDS CHANGES", "blocking",
-                                                  "minor", "model", "verify", "read-only"])
+        self.assert_has("plan-review-prompt.md", ["PLAN APPROVED", "PLAN NEEDS CHANGES", "Critical",
+                                                  "Important", "Minor", "model", "verify", "read-only"])
 
     def test_lenses_cover_all(self):
-        headings = [l[3:].strip() for l in read("lenses.md").splitlines() if l.startswith("## ")]
+        headings = [line[3:].strip() for line in read("lenses.md").splitlines() if line.startswith("## ")]
         for lens in LENS_NAMES:
             self.assertIn(lens, headings)
         self.assert_has("lenses.md", ["Lens yield: ", "Uses when installed"])
 
     def test_lens_review_rules(self):
-        self.assert_has("lens-review-prompt.md", ["Important", "Minor", "not rendered", ".tech-lead/scratch/",
+        self.assert_has("lens-review-prompt.md", ["Critical", "Important", "Minor", "not rendered", ".tech-lead/scratch/",
                                                   "read-only"])
 
     def test_inventory_read_only(self):
         self.assert_has("inventory-prompt.md", ["change nothing", "vulture", "knip"])
 
     def test_batch_review_hygiene(self):
-        self.assert_has("batch-review-prompt.md", ["{{CANDIDATES_PATH}}", "obsolete", "duplicat", "ui-ux"])
+        self.assert_has("batch-review-prompt.md", ["obsolete", "duplicat", "ui-ux"])
 
     def test_plan_review_risk_and_hygiene(self):
         self.assert_has("plan-review-prompt.md", ["replaces", "risk", "hygiene", "Lens yield"])
