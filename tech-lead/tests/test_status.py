@@ -317,5 +317,71 @@ class StatusTests(unittest.TestCase):
         self.assertTrue(out.splitlines()[-1].endswith(f" Full status: {p}"))
 
 
+class ResolveRootTests(unittest.TestCase):
+    @classmethod
+    def setUpClass(cls):
+        cls._tmp = tempfile.TemporaryDirectory()
+        base = os.path.realpath(cls._tmp.name)
+        cls.top = os.path.join(base, "top")
+        cls.bare = os.path.join(base, "bare")
+        for repo in (cls.top, cls.bare):
+            init_repo(repo)
+            os.makedirs(os.path.join(repo, "sub"))
+        add(cls.top, "2026-01-01-top", spec=True)
+        add(os.path.join(cls.top, "own"), "2026-01-02-own", spec=True)
+        cls.sub = os.path.join(cls.top, "sub")
+        cls.outside = os.path.join(base, "outside")
+        os.makedirs(cls.outside)
+        cls.ceiling = {"GIT_CEILING_DIRECTORIES": base}
+
+    @classmethod
+    def tearDownClass(cls):
+        cls._tmp.cleanup()
+
+    def resolve(self, path):
+        with mock.patch.dict(os.environ, self.ceiling):
+            return os.path.realpath(status.resolve_root(Path(path)))
+
+    def brief(self, path):
+        env = {k: v for k, v in os.environ.items() if k != "TECH_LEAD_STATUS"}
+        env.update(self.ceiling, CLAUDE_PROJECT_DIR=path)
+        return subprocess.run([sys.executable, SCRIPT, "--brief"], env=env,
+                              capture_output=True, cwd=self.outside)
+
+    def test_subdirectory_resolves_to_top_level(self):
+        self.assertEqual(self.resolve(self.sub), self.top)
+        r = self.brief(self.sub)
+        self.assertEqual(r.returncode, 0)
+        self.assertIn(os.path.join(self.top, "docs", "initiatives", "2026-01-01-top"),
+                      r.stdout.decode("utf-8"))
+
+    def test_own_initiatives_win_over_top_level(self):
+        own = os.path.join(self.top, "own")
+        self.assertEqual(self.resolve(own), own)
+
+    def test_top_level_without_initiatives_unchanged(self):
+        sub = os.path.join(self.bare, "sub")
+        self.assertEqual(self.resolve(sub), sub)
+
+    def test_not_a_git_repository_unchanged_and_brief_silent(self):
+        with self.assertRaises(subprocess.CalledProcessError):
+            subprocess.run(["git", "-C", self.outside, "rev-parse"], check=True,
+                           capture_output=True, env=dict(clean_env(), **self.ceiling))
+        self.assertEqual(self.resolve(self.outside), self.outside)
+        r = self.brief(self.outside)
+        self.assertEqual((r.returncode, r.stdout), (0, b""))
+
+    def test_git_failure_keeps_root_and_brief_silent(self):
+        for exc in (FileNotFoundError("git"), subprocess.TimeoutExpired("git", 5)):
+            with self.subTest(exc=type(exc).__name__):
+                with mock.patch.object(status, "_git", side_effect=exc):
+                    self.assertEqual(status.resolve_root(Path(self.sub)), Path(self.sub))
+                    buf = io.StringIO()
+                    with mock.patch.dict(os.environ, {"CLAUDE_PROJECT_DIR": self.sub}):
+                        with contextlib.redirect_stdout(buf):
+                            rc = status.main(["--brief"])
+                self.assertEqual((rc, buf.getvalue()), (0, ""))
+
+
 if __name__ == "__main__":
     unittest.main()

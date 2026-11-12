@@ -35,7 +35,7 @@ class PackagingTests(unittest.TestCase):
         d = load(PLUGIN / ".claude-plugin" / "plugin.json")
         self.assertEqual(d["name"], "tech-lead")
         self.assertEqual(d["description"], DESC)
-        self.assertEqual(d["version"], "0.3.1")
+        self.assertEqual(d["version"], "0.3.2")
         self.assertEqual(d["author"]["name"], "Przemyslaw Hejno")
 
     def test_marketplace_entry_matches_plugin(self):

@@ -138,13 +138,23 @@ def _backlog(root: Path) -> list:
     return read_backlog(Path(root) / "docs" / "backlog.md")
 
 
-def _git(root: Path, *args: str) -> str:
+def _git(root: Path, *args: str, timeout: int = 10) -> str:
     env = {k: v for k, v in os.environ.items() if k not in ("GIT_DIR", "GIT_WORK_TREE")}
     p = subprocess.run(["git", "-c", "core.quotepath=false", *args], cwd=str(root),
-                       capture_output=True, env=env, timeout=10)
+                       capture_output=True, env=env, timeout=timeout)
     if p.returncode != 0:
         raise RuntimeError("git failed")
     return p.stdout.decode("utf-8", "replace")
+
+
+def resolve_root(root: Path) -> Path:
+    if (root / "docs" / "initiatives").is_dir():
+        return root
+    try:
+        top = Path(_git(root, "rev-parse", "--show-toplevel", timeout=5).strip())
+    except (OSError, subprocess.TimeoutExpired, RuntimeError):
+        return root
+    return top if (top / "docs" / "initiatives").is_dir() else root
 
 
 def _is_code_file(path: str) -> bool:
@@ -312,6 +322,7 @@ def main(argv: list) -> int:
             _load_core()
         except ImportError as e:
             return 0 if brief else _error(f"tech-lead scripts incomplete: {e}")
+        root = resolve_root(root)
         if brief:
             text = render_brief(root)
             if text:
