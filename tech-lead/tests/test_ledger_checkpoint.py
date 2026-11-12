@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import json
 import os
+import re
 import shutil
 import subprocess
 import tempfile
@@ -72,12 +73,19 @@ class CheckpointTests(unittest.TestCase):
     def test_failing_verify(self):
         r = self.run_cp(verify=["exit 3"])
         self.assertFalse(r.passed)
-        self.assertIn("Task 1: fail (exit 3)", cp.format_result(r))
+        self.assertIn("Task 1: fail (exit 3", cp.format_result(r))
 
     def test_failing_check(self):
         r = self.run_cp(checks=["exit 2"])
         self.assertFalse(r.passed)
-        self.assertIn("Check failed: exit 2 (exit 2)", cp.format_result(r))
+        self.assertIn("Check failed: exit 2 (exit 2", cp.format_result(r))
+
+    def test_durations_formatted(self):
+        r = self.run_cp(verify=["sleep 0.2"], checks=["true"])
+        m = re.search(r"Task 1: pass \((\d+\.\d)s\)", cp.format_result(r))
+        self.assertTrue(0.1 <= float(m.group(1)) <= 2.0)
+        self.assertRegex(cp.format_result(r), r"Checks: pass \(\d+\.\ds\)")
+        self.assertIn("Checks: pass (0.0s)", cp.format_result(self.run_cp()))
 
     def test_output_goes_to_log_only(self):
         r = self.run_cp(verify=["echo hello"])
@@ -155,6 +163,13 @@ class CheckpointTests(unittest.TestCase):
                   "Attempt: Task 1 sonnet/low failed, cause brief, x"):
             self.assertIn(s, j)
         self.assertNotIn("Task 1: complete", j)
+
+    def test_timing_line_in_journal(self):
+        ledger, _ = self._marked(None)
+        result = cp.CheckpointResult(tasks=[(1, 0, 2.14), (2, 0, 0.4)], checks=[("c", 0, 14.8)])
+        cp.mark_done(self.ledger_path, ledger, 1, None, "2026-11-11", result)
+        self.assertIn("Tasks done: 1\nTiming: Task 1 2.1s, Task 2 0.4s, checks 14.8s\n",
+                      self.journal())
 
     def test_mark_done_does_not_duplicate_copied_lines(self):
         ledger, pp = self._marked()

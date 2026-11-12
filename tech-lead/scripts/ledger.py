@@ -80,7 +80,7 @@ def _run(args) -> int:
         return 1
     if args.mark:
         today = datetime.date.today().isoformat()
-        for path in mark_done(args.ledger, ledger, args.wave, args.progress, today):
+        for path in mark_done(args.ledger, ledger, args.wave, args.progress, today, result):
             print(f"Wrote {path}")
     return 0
 
