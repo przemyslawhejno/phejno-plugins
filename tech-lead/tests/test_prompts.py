@@ -105,8 +105,10 @@ class PromptTests(unittest.TestCase):
             self.assert_has(name, [NEVER_SUPERDESIGN])
 
     def test_mockup_superdesign_export_mode(self):
-        self.assert_has("mockup-prompt.md", ["superdesign-export", "sd-component", "Tailwind CDN", "Lucide",
+        self.assert_has("mockup-prompt.md", ["superdesign-export", "sd-component", "Tailwind", "Lucide",
                                              "list-components", "screen id", "mapping"])
+        self.assert_has("mockup-prompt.md", ["fetch", "XMLHttpRequest", "WebSocket", "<iframe>", "x.y.z",
+                                             "tailwindcss", "rebuild", "locally"])
 
     def test_absolute_paths(self):
         for name in PLACEHOLDERS:

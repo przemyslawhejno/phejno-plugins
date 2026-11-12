@@ -23,9 +23,9 @@ Kind: {{KIND}} (`superdesign-export` has its own section below)
 
 Kind `superdesign-export`: {{MOCKUP_PATH}} already holds a draft exported from superdesign. Work on that local file only, never fetch anything, and keep its design.
 
-- Standalone check, which fails on: any `<sd-component` tag; relative or `file://` paths; any remote resource other than public `https://` images from superdesign, the Tailwind CDN script and the Lucide icon CDN.
+- Standalone check, which fails on: any `<sd-component` tag; relative or `file://` paths; any remote resource other than public `https://` images returned by superdesign uploads and scripts or styles whose URL names the package `tailwindcss` or `lucide` (or whose host is `cdn.tailwindcss.com`) and contains a full version `x.y.z` (for example `tailwindcss@3.4.1`). Also fails: an unpinned Tailwind or Lucide URL, any other `<script src>`, a `<link>` to another script or style host, an `<iframe>`, and inline `fetch`, `XMLHttpRequest` or `WebSocket` code.
 - Check passed: add one element with an `id="<name>"` attribute to each screen or state (screen id), and the mapping list from each screen id to the spec requirements it shows (see Deliverable).
-- Check failed: rebuild the file from the export, keeping the design: replace each `<sd-component` with plain HTML and CSS, using the `list-components` output the lead gives you for unresolved templates; replace relative or `file://` assets with inline data URIs or plain CSS, and drop what cannot be resolved and say so in your reply; then add the screen ids and the mapping.
+- Check failed: rebuild the file locally from the export without those resources (inline CSS and SVG), keeping the design: replace each `<sd-component` with plain HTML and CSS, using the `list-components` output the lead gives you for unresolved templates; replace relative or `file://` assets with inline data URIs or plain CSS, and drop what cannot be resolved and say so in your reply; then add the screen ids and the mapping.
 - The UI standards below apply to what you add or rebuild.
 
 ## UI standards

@@ -52,9 +52,9 @@ With the `superdesign` plugin installed, the lead can make the step 4 mockup on 
 
 - Requirements: shell access, Node.js (`npx`) and a browser for login. Headless and cloud sessions use the built-in builder.
 - Install: `/plugin marketplace add superdesigndev/superdesign-skill`, then `/plugin install superdesign@superdesign`. Log in once with `npx --yes @superdesign/cli@latest login`.
-- Consent is per user, stored in git-ignored `.tech-lead/superdesign-consent`. The lead asks once and says what it costs and sends: generation credits on your superdesign account, lead tokens for the superdesign skill, and, to superdesign's servers, the written spec, your request, selected project files and uploaded images (which become public URLs). The CLI runs unpinned from npm.
+- Consent is per user, stored in git-ignored `.tech-lead/superdesign-consent`. The lead asks once and says what it costs and sends: generation credits on your superdesign account, lead tokens for the superdesign skill, and, to superdesign's servers, the written spec, your request, selected project files, uploaded images, fonts and logos (which become public URLs) and component templates converted from project source. The CLI runs unpinned from npm.
 - A "no" is stored and not asked again; withdraw consent by setting `consent: no` or deleting the file. The request is stored verbatim by superdesign and drafts stay on your account until deleted there. The lead adds a `.superdesign/*` allowlist (keeping `design-system.md`) and `.tech-lead/` to `.gitignore` before the first CLI call.
-- Only the lead runs superdesign, never subagents. In autopilot with no user present, the built-in builder always runs, whatever consent is recorded; superdesign needs you there to pick and approve the draft.
+- Only the lead runs superdesign, never subagents. In an `--auto` run where you are not answering in the conversation at step 4, the built-in builder always runs, whatever consent is recorded; superdesign needs you there to pick and approve the draft.
 - Without the plugin, login or consent, the built-in mockup builder runs as before.
 - The integration has not yet been run live (backlog B1).
 
