@@ -1,0 +1,110 @@
+{
+  "prior_art": "skipped: internal polish",
+  "mode": "autopilot",
+  "schema": 2,
+  "checks": [],
+  "requirements": [
+    {
+      "id": "R1",
+      "text": "Wording fixes: upload or generation, no user present, registry latest, ids only in the journal, cwd docstring"
+    },
+    {
+      "id": "R2",
+      "text": "Safety: full consent channels, strict standalone check, init subagent change check"
+    },
+    {
+      "id": "R3",
+      "text": "README assertions and version 0.3.1"
+    },
+    {
+      "id": "R4",
+      "text": "B18: the lead adds a ## Project docs section to CLAUDE.md so sessions without tech-lead find the hierarchy"
+    }
+  ],
+  "done": [
+    1,
+    3,
+    2
+  ],
+  "tasks": [
+    {
+      "id": 1,
+      "title": "Superdesign polish and 0.3.1",
+      "depends_on": [],
+      "files": [
+        "tech-lead/skills/tech-lead/SKILL.md",
+        "tech-lead/skills/tech-lead/layout.md",
+        "tech-lead/skills/tech-lead/mockup-prompt.md",
+        "tech-lead/README.md",
+        "tech-lead/scripts/ledger.py",
+        "tech-lead/tests/test_skill_docs.py",
+        "tech-lead/tests/test_prompts.py",
+        "tech-lead/tests/test_packaging.py",
+        "tech-lead/.claude-plugin/plugin.json",
+        ".claude-plugin/marketplace.json"
+      ],
+      "covers": [
+        "R1",
+        "R2",
+        "R3"
+      ],
+      "acceptance": [
+        "Spec decisions 1-9 applied with their wording",
+        "Version 0.3.1"
+      ],
+      "verify": [
+        "python3 -m unittest discover tech-lead/tests"
+      ],
+      "model": "sonnet",
+      "effort": "medium",
+      "risk": [
+        "security"
+      ],
+      "experts": [
+        "security"
+      ],
+      "reason": "Consent wording and the standalone check guard what leaves the machine and what runs in the mockup"
+    },
+    {
+      "id": 3,
+      "title": "Project docs pointer in CLAUDE.md (B18)",
+      "depends_on": [
+        1
+      ],
+      "files": [
+        "tech-lead/skills/tech-lead/SKILL.md",
+        "tech-lead/skills/tech-lead/layout.md",
+        "tech-lead/tests/test_skill_docs.py",
+        "tech-lead/skills/tech-lead/mockup-prompt.md",
+        "tech-lead/tests/test_prompts.py"
+      ],
+      "covers": [
+        "R4"
+      ],
+      "acceptance": [
+        "Start of work adds the section when missing and keeps an existing one",
+        "layout.md lists CLAUDE.md with the exact section text"
+      ],
+      "verify": [
+        "python3 -m unittest discover tech-lead/tests"
+      ],
+      "model": "sonnet",
+      "effort": "low",
+      "reason": "Small precise wording with the exact text fixed in the spec"
+    },
+    {
+      "id": 2,
+      "title": "Lead verification",
+      "depends_on": [
+        3
+      ],
+      "files": [],
+      "covers": [],
+      "acceptance": [
+        "B17 closed; review clean"
+      ],
+      "model": "lead",
+      "reason": "Verification belongs to the lead"
+    }
+  ]
+}

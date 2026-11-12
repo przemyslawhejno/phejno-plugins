@@ -174,6 +174,19 @@ class SkillDocsTest(unittest.TestCase):
             positions.append(matches[0])
         self.assertEqual(positions, sorted(positions))
 
+    def test_project_docs_pointer(self):
+        skill = SKILL.read_text()
+        start = skill.split("## Start of work", 1)[1].split("## Process", 1)[0]
+        self.assertIn("CLAUDE.md", start)
+        self.assertIn("## Project docs", start)
+        self.assertIn("anywhere in the file", start)
+        self.assertIn("uncommitted changes", start)
+        layout = LAYOUT.read_text()
+        self.assertIn("CLAUDE.md", layout)
+        self.assertIn("## Project docs\nWork is tracked in docs/initiatives/<date>-<topic>/ (spec, plan, ledger, journal);\n"
+                      "status in docs/STATUS.md, open work in docs/backlog.md.\n"
+                      "Save superpowers specs and plans into the initiative folder, not docs/superpowers/.", layout)
+
     def test_length(self):
         self.assertLess(len(read(SKILL).splitlines()), 300)
 
@@ -243,6 +256,28 @@ class SkillDocsTest(unittest.TestCase):
         for item in ("an empty or unset email never matches", "npm view @superdesign/cli version", "before the first superdesign CLI call"):
             self.assertIn(item, layout)
         self.assertLess(len(skill.splitlines()), 300)
+
+    def test_superdesign_polish(self):
+        skill, layout = read(SKILL), read(LAYOUT)
+        both = skill + layout
+        self.assertIn("before the first upload or generation", skill)
+        self.assertNotIn("before the first generation", both)
+        for item in ("not answering", "registry latest", "create-component", "fonts and logos",
+                     "git status --porcelain --ignored", "baseline", "never reverted automatically"):
+            self.assertIn(item, both)
+        self.assertIn("never reverted automatically", skill)
+        self.assertIn("never reverted automatically", layout)
+        for text in (skill, layout):
+            self.assertIn("outside `.superdesign/init/`", text)
+            self.assertNotIn("outside `.superdesign/` ", text)
+        step6 = [l for l in skill.splitlines() if "(6) Record" in l]
+        self.assertTrue(step6)
+        self.assertIn("ids only", step6[0])
+        self.assertNotIn("canvas and preview links", step6[0])
+        journal = layout[layout.index("## 2026-11-12 superdesign mockup"):]
+        journal = journal[:journal.index("```", 10)]
+        self.assertNotIn("Canvas", journal)
+        self.assertNotIn("Preview", journal)
 
     def test_layout_superdesign(self):
         text = read(LAYOUT)

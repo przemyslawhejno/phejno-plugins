@@ -2,6 +2,7 @@
 # Project status
 
 ## Recently done
+- 2026-11-12-superdesign-polish (done, waves 3/3): /home/user/phejno-plugins/docs/initiatives/2026-11-12-superdesign-polish
 - 2026-11-12-superdesign (done, waves 3/3): /home/user/phejno-plugins/docs/initiatives/2026-11-12-superdesign
 - 2026-11-12-quality (done, waves 5/5): /home/user/phejno-plugins/docs/initiatives/2026-11-12-quality
 - 2026-11-12-cleanup (done, waves 3/3): /home/user/phejno-plugins/docs/initiatives/2026-11-12-cleanup
@@ -16,4 +17,4 @@
 
 ## Backlog
 - B1 Interactive dry run: `/tech-lead:run` on a sample spec with a UI in a new session, up to the gate (mockup, plan review, `ledger.py show`) — from 2026-11-11-tech-lead — 2026-11-12
-- B17 [hygiene] superdesign wording: say "before the first upload or generation"; define "no user present" for --auto runs; npm view reports the registry's latest version, not necessarily the one npx ran; other minors in .superpowers review-final-superdesign (copied to docs/initiatives/2026-11-12-superdesign/research/) — from 2026-11-12-superdesign — 2026-11-12
+- B20 [hygiene] superdesign mockup safety leftovers (security lens on 0.3.1): image allowance has no host to check against (list upload URLs); CDN scripts carry no integrity hash; init-check limit sentence incomplete; inline script can still beacon or navigate within CSP limits; allowed URL shapes do not exclude `..` segments; `blob:` blocked by default-src 'none' — from 2026-11-12-superdesign-polish — 2026-11-12

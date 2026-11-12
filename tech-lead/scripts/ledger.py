@@ -97,6 +97,8 @@ def _run(args, cwd: str | None = None) -> int:
 
 
 def main(argv: list, cwd: str | None = None) -> int:
+    """Run the CLI. `cwd` exists for tests: it sets where git runs and where a
+    relative `--log` resolves; the ledger path and `--progress` are resolved by the caller."""
     for s in (sys.stdout, sys.stderr):
         try:
             s.reconfigure(encoding="utf-8")
