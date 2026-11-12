@@ -28,7 +28,7 @@ docs/
 .superpowers/sdd/               SDD workspace (git-ignored, managed by SDD)
 ```
 
-- `CLAUDE.md`: gains this section when no `## Project docs` section exists (an existing one is left as it is), committed with the initiative:
+- `CLAUDE.md`: gains this section unless the file already routes specs and plans to `docs/initiatives/` anywhere (any section, any wording naming it; then it is left unchanged), committed with the initiative. With uncommitted changes in `CLAUDE.md`, show the user the section and ask first:
 
 ```
 ## Project docs
@@ -92,7 +92,7 @@ user: <git config user.email>
 date: 2026-11-12
 ```
 
-Consent is valid only while the file is git-ignored (`git check-ignore -q .tech-lead/superdesign-consent` succeeds) and `user:` equals the current `git config user.email` (an empty or unset email never matches: ask again each time, store no consent); otherwise ask again. In an `--auto` run where the user is not answering in this conversation at step 4 the built-in builder always runs; if the user is still in the conversation, ask as usual. A `consent: no` whose `user:` matches is not asked again. Consent covers every initiative in this clone. The user withdraws it by setting `consent: no` or deleting the file. Ask while the user is present, and state:
+Consent is valid only while the file is git-ignored (`git check-ignore -q .tech-lead/superdesign-consent` succeeds) and `user:` equals the current `git config user.email` (an empty or unset email never matches: ask again each time, store no consent); otherwise ask again. In an autopilot run (`--auto` is one way to agree to it) where the user is not answering in this conversation at step 4 the built-in builder always runs; if the user is still in the conversation, ask as usual. A `consent: no` whose `user:` matches is not asked again. Consent covers every initiative in this clone. The user withdraws it by setting `consent: no` or deleting the file. Ask while the user is present, and state:
 
 - Generation credits on the user's superdesign account: on an existing codebase at least one reproduction draft of the current screen plus each requested variant.
 - Lead tokens: the superdesign skill (about 900 lines) and, the first time, its repository analysis.
