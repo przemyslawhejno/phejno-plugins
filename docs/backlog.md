@@ -1,0 +1,12 @@
+# Backlog
+
+- [ ] B1 Interactive dry run: `/tech-lead:run` on a sample spec with a UI in a new session, up to the gate (mockup, plan review, `ledger.py show`) — from 2026-11-11-tech-lead — 2026-11-12
+- [ ] B2 tech-lead tests: cover log truncation, lead-task verify skip, first failing exit code and multi-wave selection in checkpoint; rounding and empty ledger in show; missing argument, bad `--wave`, relative `--log`, unknown wave and non-UTF-8 locale in the CLI; status.py per-initiative `waves` failure — from 2026-11-11-tech-lead — 2026-11-12
+- [ ] B3 status.py: a failed `ledger_core` import shows every initiative as `unknown (ledger error)`; report one clear error instead (status.py:82-90) — from 2026-11-11-tech-lead — 2026-11-12
+- [ ] B4 ledger_checkpoint.py: lead tasks' files are not part of `allowed` for the scope check; document that `mark_done` mutates the ledger it receives — from 2026-11-11-tech-lead — 2026-11-12
+- [ ] B5 ledger.py: `-h` prints multi-line help and exits 0; set `allow_abbrev=False`; a missing git binary is reported as "not a git repository" — from 2026-11-11-tech-lead — 2026-11-12
+- [ ] B6 ledger_report.py: escape newlines in list cells consistently — from 2026-11-11-tech-lead — 2026-11-12
+- [ ] B7 SKILL.md polish: define "integration branch"; give the ledger format block its own heading; remove the absolute-path bullets duplicated in layout.md; state when model-manager is loaded in flows that dispatch before step 7 — from 2026-11-11-tech-lead — 2026-11-12
+- [ ] B8 Prompts: say what `{{MOCKUP_PATH}}` holds for batches without UI tasks; stronger `id` assertion in test_prompts — from 2026-11-11-tech-lead — 2026-11-12
+- [ ] B9 tech-lead README: list the optional skills (`engineering:architecture`, `security-review`, `modern-web-guidance`); packaging test also checks the scripts the skill names — from 2026-11-11-tech-lead — 2026-11-12
+- [ ] B10 ledger_core.py: tighten type annotations; remaining test gaps from the Task 1 review — from 2026-11-11-tech-lead — 2026-11-12
