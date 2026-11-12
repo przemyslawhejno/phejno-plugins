@@ -1,0 +1,63 @@
+{
+  "prior_art": "skipped: internal fix",
+  "mode": "autopilot",
+  "schema": 2,
+  "checks": [],
+  "requirements": [
+    {
+      "id": "R1",
+      "text": "status.py resolves the repository top level when the session root has no docs/initiatives/"
+    },
+    {
+      "id": "R2",
+      "text": "README sentence and version 0.3.2"
+    }
+  ],
+  "done": [
+    1,
+    2
+  ],
+  "tasks": [
+    {
+      "id": 1,
+      "title": "resolve_root and 0.3.2",
+      "depends_on": [],
+      "files": [
+        "tech-lead/scripts/status.py",
+        "tech-lead/tests/test_status.py",
+        "tech-lead/skills/tech-lead/SKILL.md",
+        "tech-lead/README.md",
+        "tech-lead/.claude-plugin/plugin.json",
+        ".claude-plugin/marketplace.json"
+      ],
+      "covers": [
+        "R1",
+        "R2"
+      ],
+      "acceptance": [
+        "A subdirectory session finds the top-level docs/initiatives/",
+        "--brief never raises; a subdirectory with its own docs/initiatives/ keeps priority"
+      ],
+      "verify": [
+        "python3 -m unittest discover tech-lead/tests"
+      ],
+      "model": "sonnet",
+      "effort": "medium",
+      "reason": "Runs in every session's hook; git-backed logic with edge cases"
+    },
+    {
+      "id": 2,
+      "title": "Lead verification",
+      "depends_on": [
+        1
+      ],
+      "files": [],
+      "covers": [],
+      "acceptance": [
+        "B19 closed; review clean"
+      ],
+      "model": "lead",
+      "reason": "Verification belongs to the lead"
+    }
+  ]
+}
