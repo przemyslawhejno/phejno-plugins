@@ -49,3 +49,9 @@ Tasks done: 3
 Timing: Task 3 1.0s, checks 0.0s
 Ruling: no separate inventory before Task 3 — wave 1 changed no scripts and added only document tests; the B16 list is the input — cost if wrong: a duplicate test survives to the next pass
 - Wave 2 done; suite median 1.12 s, 166 tests (6.7 ms per test, ratchet was 7.1 ms); ratchet updated. B15 and B16 closed in the backlog.
+
+## 2026-11-12 final review (opus/medium)
+
+- Ready to merge with fixes: 3 Important wording gaps in SKILL.md, deferred minors to fix now.
+- Ruling: in autopilot with no user present, step 4 always uses the built-in builder — superdesign needs the user to pick and approve the design, and the lead must not spend credits or choose a design alone — cost if wrong: autopilot runs never use superdesign; the user can run step 4 interactively. Spec updated.
+- One fix wave dispatched.

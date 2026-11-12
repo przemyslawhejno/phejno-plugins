@@ -28,7 +28,7 @@ All of these hold, checked by the lead at step 4:
   - the CLI runs unpinned from npm.
   A "no" is stored as `consent: no` and not asked again.
 - The CLI preflight (`npx --yes @superdesign/cli@latest`) reports an authenticated session. Otherwise the lead asks the user to run `npx --yes @superdesign/cli@latest login` once; if that does not happen, the built-in builder runs and the journal says why.
-- In autopilot runs that start from an existing spec (no user present at step 4), superdesign runs only with consent already recorded; without it the built-in builder runs without asking.
+- In autopilot runs with no user present at step 4, the built-in builder always runs: superdesign needs the user to pick a draft and approve the design (final review ruling).
 
 Otherwise the built-in mockup builder (sonnet medium, `mockup-prompt.md`) runs as in 0.2.0.
 
