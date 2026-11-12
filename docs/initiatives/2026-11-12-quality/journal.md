@@ -59,3 +59,10 @@ Timing: Task 5 1.9s, Task 6 1.7s, checks 0.0s
 ## 2026-11-12 wave 3
 Tasks done: 7, 10
 Timing: Task 7 2.2s, Task 10 2.2s, checks 0.0s
+
+## 2026-11-12 wave 4
+Tasks done: 8
+Timing: Task 8 1.4s, checks 0.0s
+
+- Suite timed after the hygiene pass: median 1.45 s, 136 tests (10.7 ms per test, baseline 17.4 ms); ratchet in docs/standards.md updated.
+- Lens yield: no lenses this initiative (no task carried a risk).
