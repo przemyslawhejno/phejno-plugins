@@ -22,3 +22,7 @@
 - Fixed without a further round: Task 6 asserts `backlog.md`, `research/plan-review.md`, `docs/superpowers/` and the backticked failure causes; the dry-run sample lives in a scratch git repository.
 - Not changed: patching `status.render_brief` works because `main` resolves the module global at call time.
 - Next: gate.
+
+## 2026-11-12 gate
+
+- Approved by the user: subagent-driven execution in two lanes, autopilot to the end (ledger `mode: autopilot`).

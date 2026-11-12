@@ -303,5 +303,5 @@
       "reason": "Integration and verification belong to the lead"
     }
   ],
-  "mode": "gated"
+  "mode": "autopilot"
 }
