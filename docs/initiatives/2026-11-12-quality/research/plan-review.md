@@ -31,3 +31,29 @@ Everything else in Part 4 matches the plugin: the thresholds (≤15 inline, 16-5
 10. **Task 7 waits longer than it needs to.** It needs Task 10 only for README prose, which is in the spec. With `depends_on [2,3,4,5,6]` it runs in wave 3 alongside Task 10 and saves one wave.
 
 PLAN NEEDS CHANGES
+
+## Round 2
+
+Scope: the round-1 fixes in commit 9dd66e5 against spec.md, plan.md, ledger.json (`ledger.py show`: 5 waves) and the existing tests.
+
+### Round-1 findings
+- B1: resolved. Task 3 tests a literal list of eight lenses; the cross-check with `ledger_core.LENSES` is `test_lenses_match_ledger_core` in Task 7, which depends on 2 and 3.
+- B2: resolved. Spec Part 4 rows and Task 4 text use `/codemap (full rebuild)`; `/codemap update` is described as processing only `pending.md`.
+- Minor 1: resolved. The constraint is limited to validation results; Tasks 5 and 6 name the edits to `test_failing_verify`, `test_failing_check` (prefix `Check failed: exit 2 (exit 2` matches the existing command) and `test_wave_tables`; the empty-checks line is stated.
+- Minor 2: resolved (haiku rule and direct hygiene dependency added).
+- Minor 3: resolved (placeholders and extra required terms in Task 4).
+- Minor 4: resolved (inventory dispatched before wave 4; `hygiene-candidates-4.md` now matches Task 8's wave).
+- Minor 5: resolved (`[hygiene]` fallback, three timings, scope ruling in the journal).
+- Minor 6: resolved in spec and Task 10.
+- Minor 7: resolved (brief line only when initiatives exist).
+- Minor 8: resolved (full-suite verify for Tasks 3, 4, 6).
+- Minor 9: resolved (the journal says it is committed before the wave base; commit a4d7284 exists).
+- Minor 10: resolved (Task 7 moved to wave 3 with Task 10; their files do not overlap).
+
+### New problems
+- minor: Task 4 asserts `{{CANDIDATES_PATH}}` appears in SKILL.md, which couples a test to a Task 3 placeholder that Task 4 only names in prose. It passes if the brief is followed. Fix: leave it, or drop the term from the test.
+- minor: Task 10's `ledger_checkpoint.py` / `ledger.py` edits follow Task 5's (dependency 5), so there is no conflict. Task 10 does not depend on Task 2, and it does not need to.
+
+No contradictions between spec, plan and ledger found; no test that cannot pass as written.
+
+PLAN APPROVED

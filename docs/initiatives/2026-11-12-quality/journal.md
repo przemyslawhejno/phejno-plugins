@@ -36,3 +36,11 @@
 - Minor: exact test edits named in Tasks 5 and 6; haiku tasks cannot carry a risk; Task 4 told the placeholders Task 3 writes; inventory before the hygiene wave; hygiene timing fallback to a `[hygiene]` backlog item and three timings in the report; `sync_codemap` drops `.claude/codemap/` and keeps deleted paths; codemap brief line only in a non-empty brief; full-suite verify for Tasks 3, 4, 6; Task 7 moved to wave 3.
 - Ruling: the hygiene pass covers scripts and tests only; skill and prompt documents were reviewed by their own tasks — cost if wrong: noise in documents survives until the next pass.
 - Ruling: Task 1 (`docs/standards.md`) is committed before the wave 1 base is taken, so the checkpoint does not flag it out of scope — cost if wrong: none.
+
+## 2026-11-12 plan review, round 2 (sonnet/medium, scoped)
+
+- PLAN APPROVED; one minor finding left as is (Task 4's test term is written by Task 3 per its brief).
+
+## 2026-11-12 gate (autopilot)
+
+- Status note posted; execution starts. 10 tasks in 5 waves: sonnet 7, opus 1, lead 2.
