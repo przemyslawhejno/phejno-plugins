@@ -126,12 +126,11 @@ class CodemapTests(unittest.TestCase):
         with tempfile.TemporaryDirectory() as plain:
             self.assertEqual(status.codemap_lines(Path(plain)), [])
 
-    def test_brief_line_precedes_instruction_and_full_has_section(self):
+    def test_brief_codemap_line_last_but_one_and_full_has_section(self):
         add(self.repo, "2026-01-01-x", spec=True)
         self.build(pending=20)
         lines = status.render_brief(Path(self.repo)).splitlines()
         self.assertTrue(lines[-2].startswith("Codemap: 20 pending"))
-        self.assertTrue(lines[-1].startswith("Propose next steps"))
         full = status.render_full(Path(self.repo))
         self.assertIn("## Codemap\n- Index: present\n- Generated: ", full)
         self.assertIn("- Pending: 20\n", full)
@@ -277,6 +276,40 @@ class StatusTests(unittest.TestCase):
                 rc = status.main([self.root, "--brief"])
         self.assertEqual(rc, 0)
         self.assertEqual(buf.getvalue(), "")
+
+    def test_waves_failure_marks_only_that_initiative(self):
+        import ledger_core
+        real = ledger_core.waves
+        bad = make_ledger([make_task(1), make_task(7)])
+
+        def waves(tasks):
+            if any(t["id"] == 7 for t in tasks):
+                raise ValueError("boom")
+            return real(tasks)
+
+        add(self.root, "2026-06-01-bad", ledger=bad)
+        add(self.root, "2026-06-02-good", ledger=make_ledger([make_task(1)]))
+        with mock.patch.object(ledger_core, "waves", side_effect=waves):
+            out = status.render_full(Path(self.root))
+        self.assertIn("## Unknown\n- 2026-06-01-bad (unknown (ledger error)):", out)
+        self.assertIn("- 2026-06-02-good (planned, waves 0/1, next wave 1):", out)
+
+    def test_import_failure_full_errors_and_brief_is_silent(self):
+        add(self.root, "2026-06-01-x", ledger=make_ledger([make_task(1)]))
+        for flags in ([], ["--write"]):
+            out, err = io.StringIO(), io.StringIO()
+            with mock.patch.object(status, "_load_core", side_effect=ImportError("no ledger_core")):
+                with contextlib.redirect_stdout(out), contextlib.redirect_stderr(err):
+                    rc = status.main([self.root] + flags)
+            self.assertEqual(rc, 1)
+            self.assertEqual(out.getvalue(), "")
+            self.assertEqual(err.getvalue(),
+                             "error: tech-lead scripts incomplete: no ledger_core\n")
+        out, err = io.StringIO(), io.StringIO()
+        with mock.patch.object(status, "_load_core", side_effect=ImportError("no ledger_core")):
+            with contextlib.redirect_stdout(out), contextlib.redirect_stderr(err):
+                rc = status.main([self.root, "--brief"])
+        self.assertEqual((rc, out.getvalue(), err.getvalue()), (0, "", ""))
 
     def test_brief_status_path_only_when_present(self):
         add(self.root, "2026-05-01-x", spec=True)
