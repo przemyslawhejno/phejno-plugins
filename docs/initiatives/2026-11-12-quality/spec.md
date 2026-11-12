@@ -1,4 +1,4 @@
-# tech-lead 0.2.0: code hygiene, expert panels and UI/UX — design (after design review, awaiting approval)
+# tech-lead 0.2.0: code hygiene, expert panels and UI/UX — design (approved 2026-11-12)
 
 Date: 2026-11-12
 
@@ -9,6 +9,7 @@ Three additions to the `tech-lead` plugin (0.1.0 spec: `docs/initiatives/2026-11
 1. **Hygiene.** After many iterations a project keeps no obsolete code, no obsolete or duplicated tests and no noise comments, and its test suite gets faster rather than slower.
 2. **Expert panels.** Each task gets the parallel experts its risk justifies, decidable from ledger data, and the lead learns from their yield which experts pay off.
 3. **UI/UX.** Every project with a graphical interface gets a UI/UX expert at spec, review and finish, and follows current standards.
+4. **Codemap.** tech-lead navigates through the `claude-codemap` index when present, keeps it fresh across lanes, and proposes mapping when it would pay off.
 
 All three reference existing skills instead of copying them, and work without them. The standing goal holds: maximum quality at the lowest token, time and cost; no stronger model or extra agent where it adds nothing.
 
@@ -27,6 +28,7 @@ Gaps none of them covers: comment policy; removing what a behaviour change made 
 
 | Field | Where | Values | Default |
 |---|---|---|---|
+| `schema` | top level | `2`; the rules below apply only to ledgers with `schema: 2`, so 0.1.0 ledgers stay valid | absent (0.1.0 rules) |
 | `ui` | top level | boolean | `false` |
 | `kind` | task | `code`, `ui`, `hygiene` | `code` (`lead` tasks: ignored) |
 | `risk` | task | list of `security`, `data`, `irreversible`, `system-wide`, `ux` | `[]` |
@@ -160,12 +162,42 @@ Applies to every project with a graphical interface (web, desktop, mobile): the 
 - Briefs for experts that use `design:design-critique`, `design:accessibility-review`, `design:ux-copy` or `design:design-system` give them the mockup path and the harness output, and forbid questions to the user: these are interactive commands that otherwise ask for a Figma link or a description.
 - `ledger.py check`: a `kind: ui` task not on haiku without risk `ux`; `kind: ui` in a ledger without `"ui": true`.
 
+## Part 4: Codemap
+
+The `claude-codemap` plugin keeps `.claude/codemap/` (`INDEX.md`, `symbols.md`, topic files) and tracks edited files in `pending.md` through a PostToolUse hook. Its thresholds: up to 15 pending files are updated inline (`codemap-usage` skill), 16-50 by `/codemap update` (haiku writers), more than 50 by a full `/codemap` rebuild (sonnet planner plus haiku writers). tech-lead uses it when the index exists and proposes it when it would pay off; without the plugin nothing changes.
+
+### Using the index
+
+- When `.claude/codemap/INDEX.md` exists, the lead and every subagent brief navigate through it before Glob or Grep: `symbols.md` for a named symbol, `INDEX.md` then 1-2 topic files for a concept (the `codemap-usage` skill). This applies to orientation, standards discovery, prior-art scouting of the own repository, spikes, planning (task `files` taken from topic files), implementer briefs, reviews, lenses and the inventory step.
+- Briefs carry one line with the absolute paths of `INDEX.md` and `symbols.md`; they do not paste index content.
+
+### Keeping it fresh
+
+- Edits made in lane worktrees reach `pending.md` with wrong paths, because the hook resolves paths against the session's directory. So `ledger.py checkpoint --mark`, when `.claude/codemap/` exists, appends the paths from `git diff --name-only REF..HEAD` to `pending.md`, drops entries under `.worktrees/`, de-duplicates, and prints `Codemap: <n> pending (<action>)` where the action is `inline`, `update` or `rebuild` by the thresholds above.
+- After each wave checkpoint, when the action is `update`, the lead runs the `/codemap update` procedure (haiku writers, cheap); `inline` is left to the next navigation (the `codemap-usage` skill handles it); `rebuild` waits for the finish.
+- At the finish, the lead brings the index up to date: `update` when pending, a full rebuild when the action is `rebuild` or the initiative moved or renamed modules. In autopilot it runs it; otherwise it proposes it in the finish report. The index is committed with the initiative.
+
+### Proposing cyclic mapping
+
+`status.py` reports codemap health, and the session-start brief turns it into a proposed next step:
+
+| State | Brief line |
+|---|---|
+| No `.claude/codemap/`, 30 or more tracked code files | `Codemap: none for <n> code files — propose /codemap (claude-codemap plugin)` |
+| `pending.md` 16-50 unique paths | `Codemap: <n> pending — propose /codemap update` |
+| `pending.md` over 50, or `symbols.md` missing | `Codemap: stale — propose /codemap rebuild` |
+| `INDEX.md` `Generated:` older than 30 days with 20 or more commits since | `Codemap: <days> days old, <commits> commits since — propose /codemap update` |
+| otherwise | nothing |
+
+Code files are `git ls-files` entries outside `docs/`, `.claude/` and dot directories; any git failure skips the line. The full status gains a `## Codemap` section with the same facts.
+
 ## Changes by file
 
 - `skills/tech-lead/SKILL.md`: standards sections; suite timing and ratchet; inventory step; hygiene pass rule; expert stages, lens choice, dispatch and yield; escalation cause `unknown`; UI/UX stages and render harness.
 - `skills/tech-lead/layout.md`: `standards.md` Hygiene, Suite, Lens yield and UI sections; `[hygiene]` backlog tag; journal lines for suite time and lens yield.
 - New `skills/tech-lead/lenses.md`, `lens-review-prompt.md`, `inventory-prompt.md`.
 - `batch-review-prompt.md`, `plan-review-prompt.md`, `mockup-prompt.md`: hygiene, candidates, risk/expert checks, UI standards, the UI/UX review loop, harness output paths.
+- `scripts/status.py`: codemap health in the full status and the brief. `ledger_checkpoint.py`, `ledger.py`: codemap pending sync on `--mark`.
 - `scripts/ledger_core.py`: new fields and rules. `ledger_checkpoint.py`, `ledger.py`: timings. `ledger_report.py`: Risk and Experts columns, lens totals.
 - Tests, README, plugin and marketplace version `0.2.0`.
 - Finish: a hygiene pass over the plugin itself.

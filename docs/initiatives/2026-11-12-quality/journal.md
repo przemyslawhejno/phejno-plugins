@@ -20,3 +20,11 @@
 - R2-B2: a render harness task in the first UI wave (Playwright, axe-core, Lighthouse CI via prior art, shown at the gate); `verify` writes screenshots, axe JSON and Lighthouse summary to scratch; reviewers only read them; "not rendered" fallback.
 - Minor 1-11 applied: hygiene trigger needs 2+ tasks with `replaces`; inventory also on added test files; lens yield persisted in standards.md; first timing seeds the ratchet only when absent; WCAG 2.2 criteria named (2.5.8 over 2.5.5); Core Web Vitals as field target with Lighthouse lab budgets; Fluent 2 and platform accessibility APIs; opus for ui-ux keyed on risk `system-wide`; design skills briefed with mockup and harness output, no questions to the user, `design-handoff` dropped, `design-system` added; keyboard and focus read in code; finish UI pass on sonnet medium.
 - Next: user approval of the design.
+
+## 2026-11-12 spec approved, planning
+
+- User approved the spec; autopilot carries on from the earlier agreement (ledger `mode: autopilot`).
+- Ruling: schema 2 gates every new ledger rule, so the finished 0.1.0 ledger stays valid — without it status.py would show the done initiative as a ledger error — cost if wrong: one extra field per new ledger.
+- Suite baseline: median 1.58 s, 91 tests (3 runs).
+- Added on request mid-planning: Part 4, codemap integration (navigation through the index, pending sync across lanes at checkpoint, session-start proposals for /codemap, finish update or rebuild). Found while reading claude-codemap 0.5.0: its PostToolUse hook records lane-worktree edits with wrong paths, hence the checkpoint sync. New Task 10.
+- Plan and ledger written; plan review next.
