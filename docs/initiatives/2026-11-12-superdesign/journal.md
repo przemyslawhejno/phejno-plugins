@@ -38,3 +38,8 @@
 ## 2026-11-12 gate (autopilot)
 
 - Execution starts: 4 tasks in 3 waves; sonnet 3 (Task 1 high with the security lens), lead 1.
+
+## 2026-11-12 wave 1
+Tasks done: 1, 2
+Timing: Task 1 1.0s, Task 2 1.1s, checks 0.0s
+- Lens yield: security 3 Critical/Important, 6 Minor (wave 1, Task 1); all three Important fixed and re-reviewed by the lens.

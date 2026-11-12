@@ -33,7 +33,10 @@
       "text": "B16 hygiene leftovers"
     }
   ],
-  "done": [],
+  "done": [
+    1,
+    2
+  ],
   "tasks": [
     {
       "id": 1,
