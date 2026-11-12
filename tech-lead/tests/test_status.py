@@ -377,7 +377,7 @@ class ResolveRootTests(unittest.TestCase):
                 with mock.patch.object(status, "_git", side_effect=exc):
                     self.assertEqual(status.resolve_root(Path(self.sub)), Path(self.sub))
                     buf = io.StringIO()
-                    with mock.patch.dict(os.environ, {"CLAUDE_PROJECT_DIR": self.sub}):
+                    with mock.patch.dict(os.environ, {"CLAUDE_PROJECT_DIR": self.sub, "TECH_LEAD_STATUS": "1"}):
                         with contextlib.redirect_stdout(buf):
                             rc = status.main(["--brief"])
                 self.assertEqual((rc, buf.getvalue()), (0, ""))

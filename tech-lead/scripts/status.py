@@ -151,7 +151,7 @@ def resolve_root(root: Path) -> Path:
     if (root / "docs" / "initiatives").is_dir():
         return root
     try:
-        top = Path(_git(root, "rev-parse", "--show-toplevel", timeout=5).strip())
+        top = Path(_git(root, "rev-parse", "--show-toplevel", timeout=5).rstrip("\n"))
     except (OSError, subprocess.TimeoutExpired, RuntimeError):
         return root
     return top if (top / "docs" / "initiatives").is_dir() else root
