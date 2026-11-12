@@ -14,7 +14,7 @@ Kind: {{KIND}}
 
 - One self-contained HTML file: inline CSS and JS, no network requests (no CDN, fonts, images or fetches), so it opens straight from the file system.
 - Use fake data only.
-- Give one element with an `id` to each screen or state, so requirements can point at `#id`.
+- Give one element with an `id="<name>"` attribute to each screen or state, so requirements can point at `#id`.
 - Do not touch any other file.
 
 ## UI standards
