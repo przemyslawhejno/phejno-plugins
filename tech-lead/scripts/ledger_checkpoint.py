@@ -47,6 +47,32 @@ def _changed_files(base: str, repo: str) -> list:
     return [l for l in p.stdout.decode("utf-8", "replace").split("\0") if l]
 
 
+CODEMAP_INLINE_MAX = 15
+CODEMAP_UPDATE_MAX = 50
+CODEMAP_IGNORED = (".worktrees/", ".claude/codemap/")
+
+
+def codemap_action(count: int) -> str:
+    if count <= CODEMAP_INLINE_MAX:
+        return "inline"
+    return "update" if count <= CODEMAP_UPDATE_MAX else "rebuild"
+
+
+def sync_codemap(repo: str, base: str):
+    pending = os.path.join(repo, ".claude", "codemap", "pending.md")
+    if not os.path.isdir(os.path.dirname(pending)):
+        return None
+    lines = [l.strip() for l in _read(pending).splitlines()] + _changed_files(base, repo)
+    unique = list(dict.fromkeys(
+        l for l in lines if l and not l.startswith(CODEMAP_IGNORED)))
+    try:
+        with open(pending, "w", encoding="utf-8", newline="\n") as f:
+            f.write("".join(l + "\n" for l in unique))
+    except OSError as e:
+        raise CheckpointError(f"cannot write {pending} ({e.strerror or e})")
+    return len(unique), codemap_action(len(unique))
+
+
 def _run(command: str, repo: str, log) -> tuple:
     start = time.monotonic()
     p = subprocess.run(command, shell=True, cwd=repo, stdin=subprocess.DEVNULL, stdout=subprocess.PIPE,

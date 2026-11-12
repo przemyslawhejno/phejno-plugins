@@ -1,9 +1,11 @@
 from __future__ import annotations
 
 import contextlib
+import datetime
 import io
 import json
 import os
+import shutil
 import subprocess
 import sys
 import tempfile
@@ -43,6 +45,89 @@ def three_tasks(done):
     return make_ledger(
         [make_task(1), make_task(2, depends_on=[1]), make_task(3, depends_on=[2])],
         done=done)
+
+
+def _git(repo, *args, date=None):
+    env = {k: v for k, v in os.environ.items() if k not in ("GIT_DIR", "GIT_WORK_TREE")}
+    if date:
+        env["GIT_COMMITTER_DATE"] = env["GIT_AUTHOR_DATE"] = date
+    subprocess.run(["git", "-C", repo, *args], check=True, capture_output=True, env=env)
+
+
+class CodemapTests(unittest.TestCase):
+    @classmethod
+    def setUpClass(cls):
+        cls._tmp = tempfile.TemporaryDirectory()
+        cls.repo = os.path.realpath(cls._tmp.name)
+        _git(cls.repo, "init", "-q")
+        _git(cls.repo, "config", "user.email", "t@example.com")
+        _git(cls.repo, "config", "user.name", "T")
+        _git(cls.repo, "config", "commit.gpgsign", "false")
+        for n in range(30):
+            Path(cls.repo, f"m{n}.py").write_text("x\n", encoding="utf-8")
+        _git(cls.repo, "add", "-A")
+        stamp = (datetime.date.today() - datetime.timedelta(days=10)).isoformat() + "T12:00:00"
+        _git(cls.repo, "commit", "-q", "-m", "init", date=stamp)
+        for n in range(19):
+            _git(cls.repo, "commit", "-q", "--allow-empty", "-m", f"c{n}", date=stamp)
+        cls.codemap = Path(cls.repo, ".claude", "codemap")
+
+    @classmethod
+    def tearDownClass(cls):
+        cls._tmp.cleanup()
+
+    def setUp(self):
+        shutil.rmtree(self.codemap, ignore_errors=True)
+        shutil.rmtree(Path(self.repo, "docs"), ignore_errors=True)
+
+    def build(self, generated=None, pending=0, symbols=True):
+        shutil.rmtree(self.codemap, ignore_errors=True)
+        self.codemap.mkdir(parents=True)
+        generated = generated or datetime.date.today().isoformat()
+        (self.codemap / "INDEX.md").write_text(f"# Codemap\nGenerated: {generated}\n", encoding="utf-8")
+        (self.codemap / "pending.md").write_text(
+            "".join(f"p{n}.py\n" for n in range(pending)), encoding="utf-8")
+        if symbols:
+            (self.codemap / "symbols.md").write_text("s\n", encoding="utf-8")
+
+    def lines(self):
+        return status.codemap_lines(Path(self.repo))
+
+    def test_no_index_with_thirty_code_files(self):
+        self.assertEqual(self.lines(), [
+            "Codemap: none for 30 code files \u2014 propose /codemap (claude-codemap plugin)"])
+
+    def test_pending_update_and_rebuild_and_missing_symbols(self):
+        self.build(pending=20)
+        self.assertEqual(self.lines(), ["Codemap: 20 pending \u2014 propose /codemap update"])
+        stale = ["Codemap: stale \u2014 propose /codemap (full rebuild)"]
+        self.build(pending=60)
+        self.assertEqual(self.lines(), stale)
+        self.build(symbols=False)
+        self.assertEqual(self.lines(), stale)
+
+    def test_old_index_with_many_commits(self):
+        old = (datetime.date.today() - datetime.timedelta(days=45)).isoformat()
+        self.build(generated=old)
+        self.assertEqual(self.lines(), [
+            "Codemap: 45 days old, 20 commits since \u2014 propose /codemap (full rebuild)"])
+
+    def test_up_to_date_and_not_a_git_repo(self):
+        self.build(pending=15)
+        self.assertEqual(self.lines(), [])
+        with tempfile.TemporaryDirectory() as plain:
+            self.assertEqual(status.codemap_lines(Path(plain)), [])
+
+    def test_brief_line_precedes_instruction_and_full_has_section(self):
+        add(self.repo, "2026-01-01-x", spec=True)
+        self.build(pending=20)
+        lines = status.render_brief(Path(self.repo)).splitlines()
+        self.assertTrue(lines[-2].startswith("Codemap: 20 pending"))
+        self.assertTrue(lines[-1].startswith("Propose next steps"))
+        full = status.render_full(Path(self.repo))
+        self.assertIn("## Codemap\n- Index: present\n- Generated: ", full)
+        self.assertIn("- Pending: 20\n", full)
+        self.assertIn("- Proposed: 20 pending", full)
 
 
 class StatusTests(unittest.TestCase):
@@ -96,7 +181,7 @@ class StatusTests(unittest.TestCase):
         self.assertIn("(planned, waves 0/1, next wave 1)", out)
         self.assertIn("(done, waves 1/1):", out)
         heads = [l for l in out.splitlines() if l.startswith("## ")]
-        self.assertEqual(heads, ["## In progress", "## Planned", "## Recently done", "## Backlog"])
+        self.assertEqual(heads, ["## In progress", "## Planned", "## Recently done", "## Codemap", "## Backlog"])
         self.assertIn("- B1 first", out)
 
     def test_recently_done_limited_to_five_newest(self):

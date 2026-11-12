@@ -4,8 +4,10 @@ Run from a SessionStart hook with --brief, so --brief must never raise or break 
 """
 from __future__ import annotations
 
+import datetime
 import os
 import re
+import subprocess
 import sys
 from pathlib import Path
 
@@ -19,6 +21,11 @@ BRIEF_MAX_LINES = 25
 BRIEF_BACKLOG = 5
 RECENT = 5
 OPEN_PREFIX = "- [ ] "
+CODEMAP_MIN_FILES = 30
+CODEMAP_UPDATE_MIN = 16
+CODEMAP_REBUILD_MIN = 51
+CODEMAP_STALE_DAYS = 30
+CODEMAP_STALE_COMMITS = 20
 
 # (state, section heading) in display order
 SECTIONS = (
@@ -134,6 +141,81 @@ def _backlog(root: Path) -> list:
     return read_backlog(Path(root) / "docs" / "backlog.md")
 
 
+def _git(root: Path, *args: str) -> str:
+    env = {k: v for k, v in os.environ.items() if k not in ("GIT_DIR", "GIT_WORK_TREE")}
+    p = subprocess.run(["git", "-c", "core.quotepath=false", *args], cwd=str(root),
+                       capture_output=True, env=env, timeout=10)
+    if p.returncode != 0:
+        raise RuntimeError("git failed")
+    return p.stdout.decode("utf-8", "replace")
+
+
+def _is_code_file(path: str) -> bool:
+    return not (path.startswith(("docs/", ".claude/"))
+                or any(part.startswith(".") for part in path.split("/")))
+
+
+def _codemap_facts(root: Path) -> dict:
+    base = Path(root) / ".claude" / "codemap"
+    index = _read_text(base / "INDEX.md")
+    m = re.search(r"^Generated:\s*(\d{4}-\d{2}-\d{2})", index, re.M)
+    pending = {l.strip() for l in _read_text(base / "pending.md").splitlines() if l.strip()}
+    return {
+        "index": (base / "INDEX.md").is_file(),
+        "generated": m.group(1) if m else "",
+        "pending": len(pending),
+        "symbols": (base / "symbols.md").is_file(),
+    }
+
+
+def _codemap_proposal(root: Path, facts: dict):
+    if not facts["index"]:
+        files = [p for p in _git(root, "ls-files", "-z").split("\0") if p]
+        n = sum(1 for p in files if _is_code_file(p))
+        if n >= CODEMAP_MIN_FILES:
+            return f"Codemap: none for {n} code files \u2014 propose /codemap (claude-codemap plugin)"
+        return None
+    if facts["pending"] >= CODEMAP_REBUILD_MIN or not facts["symbols"]:
+        return "Codemap: stale \u2014 propose /codemap (full rebuild)"
+    if facts["pending"] >= CODEMAP_UPDATE_MIN:
+        return f"Codemap: {facts['pending']} pending \u2014 propose /codemap update"
+    if facts["generated"]:
+        since = datetime.date.fromisoformat(facts["generated"])
+        days = (datetime.date.today() - since).days
+        if days > CODEMAP_STALE_DAYS:
+            commits = int(_git(root, "rev-list", "--count", f"--since={since}T00:00:00",
+                               "HEAD").strip())
+            if commits >= CODEMAP_STALE_COMMITS:
+                return (f"Codemap: {days} days old, {commits} commits since "
+                        "\u2014 propose /codemap (full rebuild)")
+    return None
+
+
+def codemap_lines(root: Path) -> list:
+    try:
+        line = _codemap_proposal(root, _codemap_facts(root))
+    except Exception:
+        return []
+    return [line] if line else []
+
+
+def _codemap_section(root: Path) -> list:
+    facts = _codemap_facts(root)
+    try:
+        proposal = _codemap_proposal(root, facts)
+    except Exception:
+        proposal = None
+    return [
+        "## Codemap",
+        f"- Index: {'present' if facts['index'] else 'none'}",
+        f"- Generated: {facts['generated'] or 'unknown'}",
+        f"- Pending: {facts['pending']}",
+        f"- symbols.md: {'present' if facts['symbols'] else 'missing'}",
+        f"- Proposed: {proposal[len('Codemap: '):] if proposal else 'up to date'}",
+        "",
+    ]
+
+
 def render_full(root: Path) -> str:
     root = Path(root)
     initiatives = _initiatives(root)
@@ -153,6 +235,7 @@ def render_full(root: Path) -> str:
             out.append("## Recently done")
             out += [_line(i) for i in finished[:RECENT]]
             out.append("")
+    out += _codemap_section(root)
     out.append("## Backlog")
     items = _backlog(root)
     out += [f"- {b}" for b in items] if items else ["No open items."]
@@ -181,6 +264,7 @@ def render_brief(root: Path) -> str:
     if backlog:
         tail.append("Open backlog:")
         tail += [f"- {b}" for b in backlog]
+    tail += codemap_lines(root)
     instruction = INSTRUCTION
     status = _status_path(root)
     if status.exists():

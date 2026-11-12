@@ -9,7 +9,7 @@ import sys
 
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 
-from ledger_checkpoint import CheckpointError, format_result, mark_done, run_checkpoint  # noqa: E402
+from ledger_checkpoint import CheckpointError, format_result, mark_done, run_checkpoint, sync_codemap  # noqa: E402
 from ledger_core import LedgerError, load, next_wave, validate  # noqa: E402
 from ledger_report import render_show  # noqa: E402
 
@@ -82,6 +82,10 @@ def _run(args) -> int:
         today = datetime.date.today().isoformat()
         for path in mark_done(args.ledger, ledger, args.wave, args.progress, today, result):
             print(f"Wrote {path}")
+        synced = sync_codemap(repo, args.base)
+        if synced is not None:
+            print(f"Codemap: {synced[0]} pending ({synced[1]})")
+            print(f"Wrote {os.path.join(repo, '.claude', 'codemap', 'pending.md')}")
     return 0
 
 
