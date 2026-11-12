@@ -83,6 +83,13 @@ class CliTest(unittest.TestCase):
         with open(path, encoding="utf-8") as f:
             self.assertEqual(json.load(f)["done"], [1])
 
+    def test_checkpoint_prints_durations(self):
+        make_repo(self.tmp)
+        path = self.write(make_ledger([make_task(1, files=["README"])]))
+        r = run(["checkpoint", path, "--wave", "1", "--base", "HEAD"], cwd=self.tmp)
+        self.assertRegex(r.stdout, r"Task 1: pass \(\d+\.\ds\)")
+        self.assertRegex(r.stdout, r"Checks: pass \(\d+\.\ds\)")
+
     def test_checkpoint_failure_does_not_mark(self):
         make_repo(self.tmp)
         path = self.write(make_ledger([make_task(1, verify=["false"])]))
