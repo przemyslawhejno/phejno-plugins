@@ -119,7 +119,7 @@ Add these entries to the project's `.gitignore` when missing:
 
 ## Existing docs/superpowers/
 
-A project with documents under `docs/superpowers/` is not migrated silently. Offer once to move them into this hierarchy with `git mv` (a haiku low task: each spec and plan into its own `docs/initiatives/YYYY-MM-DD-<topic>/`). Record the answer in `docs/backlog.md` as a closed item, `- [x] B<n> Migrate docs/superpowers/ — moved|declined — <date>`, so the offer is not repeated. When the user wants it later, record an open item instead.
+A project with documents under `docs/superpowers/` is not migrated silently. Offer once to move them into this hierarchy with `git mv` (a haiku low task): one initiative folder `docs/initiatives/YYYY-MM-DD-<topic>/` per spec and plan pair, taking date and topic from the original file names; the spec renamed to `spec.md`, the plan to `plan.md`; and a new `journal.md` whose first entry is `## <date> session` noting the migration and the original paths. A plan moved without a ledger leaves the folder `specified` until a ledger is written. Record the answer in `docs/backlog.md` as a closed item, `- [x] B<n> Migrate docs/superpowers/ — moved|declined — <date>`, so the offer is not repeated. When the user wants it later, record an open item instead.
 
 ## Absolute paths
 
