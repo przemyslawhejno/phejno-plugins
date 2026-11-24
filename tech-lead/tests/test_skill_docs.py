@@ -62,6 +62,11 @@ REQUIRED_IN_SKILL = [
     "simplify",
     "Lens yield",
     "{{CANDIDATES_PATH}}",
+    "Settling round",
+    "One decision in force",
+    "key decision",
+    "## Open questions",
+    "recommended one first",
 ]
 
 SECTIONS = [
@@ -70,6 +75,7 @@ SECTIONS = [
     "Process",
     "Tiers",
     "Escalation",
+    "Owner decisions",
     "Lanes",
     "Turn economy",
     "Paths",

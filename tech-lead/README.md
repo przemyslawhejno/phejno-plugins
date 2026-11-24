@@ -60,6 +60,10 @@ With the `superdesign` plugin installed, the lead can make the step 4 mockup on 
 - Without the plugin, login or consent, the built-in mockup builder runs as before.
 - The integration has not yet been run live (backlog B1).
 
+## Owner decisions
+
+Questions for the user do not stop independent work. With "act on your recommendation" the lead takes the recommended option and records it as a ruling; a key decision (substance of the work, costly to undo, the user's money, effects outside the repository) waits while other tasks go on. Open questions live in one queue and come back from time to time as a numbered list with a state summary. On request the lead settles them one by one: explanation, question, 2 to 4 proposed answers with the recommended one first, a discussion when none fits. A new decision marks the earlier ones as superseded.
+
 ## Ledger schema
 
 New ledgers carry `"schema": 2`, which enables the hygiene, lens and UI rules. Ledgers without `schema` keep the 0.1.0 validation unchanged.
