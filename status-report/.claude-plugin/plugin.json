@@ -1,0 +1,8 @@
+{
+  "name": "status-report",
+  "description": "Periodic and per-release owner status report in five sections (released, in progress with %, next, milestones with %, questions waiting on the owner), built from git tags and GitHub issue checklists",
+  "version": "0.1.0",
+  "author": {
+    "name": "Przemyslaw Hejno"
+  }
+}

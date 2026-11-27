@@ -35,6 +35,12 @@
       "source": "./tech-lead",
       "description": "Lead orchestrator: plans a spec into waves of tasks, assigns the cheapest capable model to each, delegates, reviews and verifies; adds hygiene passes, expert panels and UI/UX review; keeps project docs, status and backlog in one hierarchy; optional superdesign mockup provider",
       "version": "0.3.3"
+    },
+    {
+      "name": "status-report",
+      "source": "./status-report",
+      "description": "Periodic and per-release owner status report in five sections (released, in progress with %, next, milestones with %, questions waiting on the owner), built from git tags and GitHub issue checklists",
+      "version": "0.1.0"
     }
   ]
 }

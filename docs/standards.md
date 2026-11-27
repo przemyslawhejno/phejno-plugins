@@ -19,7 +19,7 @@ Conventions for this repository (Claude Code plugin marketplace: Markdown skills
 
 ## Suite
 
-- Suite: `python3 -m unittest discover tech-lead/tests`
+- Suite: `python3 -m unittest discover tech-lead/tests` and `python3 -m unittest discover status-report/tests`
 - Suite time: 1.11s (2026-11-12, 174 tests)
 
 ## Checks
