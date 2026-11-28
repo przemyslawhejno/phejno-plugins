@@ -1,6 +1,6 @@
 ---
 name: status-report
-description: Use when the owner should hear where the work stands — on a schedule (every few hours of an autonomous session), right after a release or a closed stage, or when asked "status", "podsumowanie", "what's going on". Builds a five-section report from facts: released since last time, in progress with %, next, milestones with %, and the questions waiting on the owner.
+description: Use when the owner should hear where the work stands — on a schedule (every few hours of an autonomous session), right after a release or a closed stage, or when asked "status", "podsumowanie", "what's going on". Builds a five-section report from facts: released since last time, in progress with %, next, milestones with %, and the questions waiting on the owner. Then asks the open decisions with AskUserQuestion, recommended option first.
 ---
 
 # Status report
@@ -41,6 +41,17 @@ Use the owner's language (the config's `language`, else the conversation's). The
    - Never list a question the owner has already answered: check the conversation and the issue comments.
 
 End with one line saying whether you keep working on your own.
+
+## Ask the open questions
+
+After the report, ask the section 5 decisions that are needed now or when convenient with the AskUserQuestion tool. The table is only the record; the owner answers by clicking.
+
+- Ask at most 4 questions per call. Ask the ones that block work first; the rest wait for the next report.
+- Make each question stand on its own. Name the item with its code and human name, say what you found, and end with a question mark. The owner may see only the dialog.
+- Give 2–4 options. Put the recommended answer first and add " (Recommended)" to its label. Each description says what happens if the owner picks it.
+- Skip rows that need the owner to see something first ("after the demo"). Show the thing, then ask.
+- Read the answers exactly. An "Other" answer may change the question or say "I need to see it". Then act on that answer; do not take your recommendation instead.
+- Record each answer where the project keeps decisions, such as an issue comment or decision log, with the date. Never record an unanswered question as a decision.
 
 ## Rules
 

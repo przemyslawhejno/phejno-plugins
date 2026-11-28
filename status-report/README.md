@@ -4,6 +4,8 @@ Owner status report for long, autonomous Claude Code sessions. Sent periodically
 
 Five sections: ✅ released since the last report · 🔄 in progress with % · ⏭️ next · milestones with % · ⚠️ waiting on the owner.
 
+After the report, the decisions waiting on the owner are asked with the AskUserQuestion dialog (recommended option first); answers are recorded with their date.
+
 ## Project config
 
 `.claude/status-report.json` in the project root (all fields optional):

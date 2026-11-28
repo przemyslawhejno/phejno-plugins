@@ -40,7 +40,7 @@
       "name": "status-report",
       "source": "./status-report",
       "description": "Periodic and per-release owner status report in five sections (released, in progress with %, next, milestones with %, questions waiting on the owner), built from git tags and GitHub issue checklists",
-      "version": "0.1.0"
+      "version": "0.2.0"
     }
   ]
 }
