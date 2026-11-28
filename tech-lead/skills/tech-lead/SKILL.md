@@ -162,8 +162,34 @@ Questions for the user never stop work that does not depend on them.
 - **"Act on your recommendation".** When the user has said to act on recommendations (in any wording, for the session or for the project), take the recommended option for every open question, record it in `journal.md` as a ruling with the alternatives, and list it in the next summary so the user can reverse it. The exception is a key decision: one that changes the substance of the work (its goal, scope or architecture), is costly to undo, spends the user's money, or acts outside the repository. A key decision waits for the user; work on what does not depend on it. SDD's four stop reasons stay stops in every mode.
 - **One queue.** Keep open questions, doubts and discrepancies in one list: the project's tracker when `CLAUDE.md` names one, otherwise `## Open questions` in `journal.md`. Each entry has the question, why it matters, what it blocks, the options and your recommendation. Never record a question, or your own reading of an answer, as a decision; mark your reading as yours until the user confirms it.
 - **One decision in force.** When an answer replaces an earlier decision, record it once as the decision in force and mark every earlier one as superseded in the same pass, wherever it is written (queue, journal, rule sources, documents, labels), so that two colliding decisions never stand side by side. When the data cannot follow at once, say which part still shows the old decision and track that as a task, not as an open question.
-- **Remind with a summary.** When key questions have piled up, and from time to time while any are open (after a wave, a release or a long stretch of work, not in every message), end a report with a short state summary (done, in progress, next) and the numbered list of open questions, each with a one-line recommendation and what it blocks. Say that the user can settle them one by one. Then continue working.
-- **Settling round.** When the user asks to settle the questions, or agrees to go through them one by one, ask them one at a time, the most blocking first: explain the matter in plain words (what it is, why it matters, what each choice costs), then the question with 2 to 4 proposed answers, the recommended one first and marked. Use the harness's question tool when it has one (a few independent questions may share one round); otherwise a numbered list. A free-text answer is recorded verbatim, with your reading marked separately. When the proposed answers do not fit, switch to a discussion of that one question, settle it, then return to the list. When the list is empty or the user stops, close the round: write every answer to the queue and `journal.md`, say what each answer unblocks, dispatch the unblocked work and stop asking.
+- **Status report.** Report where the work stands:
+  - periodically: every 3 hours of an autonomous or long session, or the interval the user sets; schedule a recurring prompt once, with CronCreate or `/loop`, and say how to stop it;
+  - in short form after a wave checkpoint, a release or a closed stage;
+  - in full whenever the user asks.
+
+  When the `status-report:status-report` skill is installed, follow it; it also gathers git tags and issue checklists. Otherwise build the report from facts you have just checked, never from memory: `ledger.py next`, `status.py`, `journal.md`, running agents and long jobs, and the open-question queue.
+
+  The report has five sections, as tables with short cells:
+  1. ✅ done since the last report;
+  2. 🔄 in progress, with the current concrete step and a % (a ledger share, or an estimate marked `~`);
+  3. ⏭️ next, at most 5, naming any blocker;
+  4. milestones or initiatives with done/total and %;
+  5. ⚠️ waiting on the user: one decision per row, with your recommendation and when it is needed.
+
+  A red run is written as red and a skipped step as skipped. Do not repeat unchanged rows beyond saying "no change". End with one line saying whether you keep working.
+- **Questions without stopping.** Asking never pauses the work.
+  1. Before you ask, dispatch everything that does not depend on the answers, and start the long jobs in the background.
+  2. Right after a status report, ask the section 5 decisions that are needed now or when convenient. Use the harness's question tool (AskUserQuestion in Claude Code), at most 4 per call, the most blocking first:
+     - each question stands on its own: what it is, what you found, why it matters, and it ends with a question mark;
+     - offer 2 to 4 answers, with the recommended one first and marked "(Recommended)", each saying what happens if picked.
+  3. Leave out a row that needs the user to see something first. Show it, then ask.
+  4. While the dialog waits, running agents and jobs keep going, and their results are handled after the answers.
+  5. Without a question tool, end the report with a numbered list of the questions, each with a one-line recommendation and what it blocks.
+- **Settling round.** When the user asks to settle the questions, or agrees to go through them one by one, ask them one at a time, the most blocking first:
+  - Explain the matter in plain words: what it is, why it matters, and what each choice costs. Then ask the question with 2 to 4 proposed answers, the recommended one first and marked. Use the harness's question tool when it has one (a few independent questions may share one round); otherwise a numbered list.
+  - Record a free-text or "Other" answer verbatim, with your reading marked separately. Act on what it actually says; it may change the question or ask to see something first.
+  - When the proposed answers do not fit, switch to a discussion of that one question, settle it, then return to the list.
+  - When the list is empty or the user stops, close the round. Write every answer with its date to the queue and `journal.md`, and to the tracker issue when the project uses one. Say what each answer unblocks, dispatch the unblocked work and stop asking.
 
 ## Lanes
 

@@ -62,7 +62,7 @@ With the `superdesign` plugin installed, the lead can make the step 4 mockup on 
 
 ## Owner decisions
 
-Questions for the user do not stop independent work. With "act on your recommendation" the lead takes the recommended option and records it as a ruling; a key decision (substance of the work, costly to undo, the user's money, effects outside the repository) waits while other tasks go on. Open questions live in one queue and come back from time to time as a numbered list with a state summary. On request the lead settles them one by one: explanation, question, 2 to 4 proposed answers with the recommended one first, a discussion when none fits. A new decision marks the earlier ones as superseded.
+Questions for the user do not stop independent work. With "act on your recommendation" the lead takes the recommended option and records it as a ruling; a key decision (substance of the work, costly to undo, the user's money, effects outside the repository) waits while other tasks go on. Open questions live in one queue. Every 3 hours of an autonomous session, after each wave or release, and on request, the lead sends a five-section status report (done, in progress with %, next, milestones with %, waiting on the user), using `status-report` when it is installed. It then asks the open decisions through the question tool (AskUserQuestion), recommended option first, after dispatching everything that does not depend on them, so work keeps running while the dialog waits. On request the lead settles them one by one: explanation, question, 2 to 4 proposed answers with the recommended one first, a discussion when none fits. A new decision marks the earlier ones as superseded.
 
 ## Ledger schema
 

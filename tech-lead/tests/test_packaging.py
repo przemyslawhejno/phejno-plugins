@@ -15,7 +15,8 @@ DESC = (
     "Lead orchestrator: plans a spec into waves of tasks, assigns the cheapest "
     "capable model to each, delegates, reviews and verifies; adds hygiene passes, "
     "expert panels and UI/UX review; keeps project docs, status and backlog in "
-    "one hierarchy; optional superdesign mockup provider"
+    "one hierarchy; periodic status reports with questions for the owner asked as "
+    "choices without stopping work; optional superdesign mockup provider"
 )
 
 
@@ -35,7 +36,7 @@ class PackagingTests(unittest.TestCase):
         d = load(PLUGIN / ".claude-plugin" / "plugin.json")
         self.assertEqual(d["name"], "tech-lead")
         self.assertEqual(d["description"], DESC)
-        self.assertEqual(d["version"], "0.3.3")
+        self.assertEqual(d["version"], "0.4.0")
         self.assertEqual(d["author"]["name"], "Przemyslaw Hejno")
 
     def test_marketplace_entry_matches_plugin(self):

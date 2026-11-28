@@ -67,6 +67,10 @@ REQUIRED_IN_SKILL = [
     "key decision",
     "## Open questions",
     "recommended one first",
+    "Status report",
+    "Questions without stopping",
+    "status-report:status-report",
+    "AskUserQuestion",
 ]
 
 SECTIONS = [
